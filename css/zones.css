@@ -68,9 +68,12 @@
 /* ——— Pasillo ——— */
 .pasillo__lines {
   position: absolute;
-  inset: 0;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: max-content;
+  max-width: calc(100% - 2 * var(--gutter));
   display: grid;
-  place-content: center;
   text-align: center;
   font-size: var(--step-4);
   gap: 0.1em;
@@ -150,6 +153,30 @@
   .cartela__body { max-width: 12.5rem; }
 }
 
+/* ——— Scrim local (detrás de cada bloque de texto) ———
+   El alfa máximo (55 %) va en el degradado; la intensidad real es opacity. */
+.scrim {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  opacity: 0;
+}
+.scrim--radial {
+  /* caída casi gaussiana: sin borde visible del óvalo */
+  background: radial-gradient(closest-side,
+    rgb(8 11 20 / 0.55) 0%, rgb(8 11 20 / 0.535) 35%, rgb(8 11 20 / 0.45) 55%,
+    rgb(8 11 20 / 0.3) 70%, rgb(8 11 20 / 0.165) 82%, rgb(8 11 20 / 0.055) 92%, rgb(8 11 20 / 0) 100%);
+}
+.scrim--left, .scrim--right {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--fade, 48px), #000 calc(100% - var(--fade, 48px)), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 var(--fade, 48px), #000 calc(100% - var(--fade, 48px)), transparent 100%);
+}
+.scrim--left  { background: linear-gradient(to right, rgb(8 11 20 / 0.55) 0%, rgb(8 11 20 / 0.55) var(--stop, 60%), rgb(8 11 20 / 0) 100%); }
+.scrim--right { background: linear-gradient(to left,  rgb(8 11 20 / 0.55) 0%, rgb(8 11 20 / 0.55) calc(100% - var(--stop, 40%)), rgb(8 11 20 / 0) 100%); }
+
 /* ——— Pantalla en perspectiva (screenQuad) ——— */
 .quad {
   position: absolute;
@@ -200,5 +227,5 @@
   .is-still .layer { position: static; inset: auto; }
   .is-still .layer--cartelas { display: grid; gap: var(--space-5); }
   .is-still .cartela { position: static; transform: none; flex-direction: row; text-align: left; }
-  .is-still .fachada__copy, .is-still .pasillo__lines { position: static; }
+  .is-still .fachada__copy, .is-still .pasillo__lines { position: static; transform: none; }
 }

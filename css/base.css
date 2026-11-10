@@ -146,6 +146,9 @@ input, textarea { caret-color: var(--cyan); }
   line-height: 1;
 }
 
+.brand--svg { letter-spacing: 0; margin-right: 0; padding-block: var(--space-2); }
+.brand__svg { display: block; height: var(--logo-h, 1.375rem); width: auto; fill: currentColor; }
+
 .header-actions {
   display: flex;
   align-items: center;

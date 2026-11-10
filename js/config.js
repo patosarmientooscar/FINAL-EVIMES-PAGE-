@@ -1,9 +1,17 @@
 // Datos de contacto, redes y URLs. Rellenar con los datos reales.
 window.EVIMES_CONFIG = {
-  telefono: '',          // formato visible, p. ej. "+34 600 000 000"
-  telefonoHref: '',      // p. ej. "tel:+34600000000"
-  whatsapp: '',          // p. ej. "https://wa.me/34600000000"
-  email: '',
+  // Logo: con svg vacío se usa el logotipo provisional en HTML.
+  // Cuando llegue el vector: svg: 'assets/logo/evimes.svg' (y nada más).
+  logo: {
+    svg: '',
+    text: 'EVIMES'
+  },
+
+  // Teléfono y email tomados del aviso legal de la web antigua.
+  telefono: '+34 636 73 61 67',
+  telefonoHref: 'tel:+34636736167',
+  whatsapp: '',          // pendiente de confirmar, p. ej. "https://wa.me/34636736167"
+  email: 'evimes@evimesweb.com',
   redes: {
     instagram: '',
     linkedin: '',

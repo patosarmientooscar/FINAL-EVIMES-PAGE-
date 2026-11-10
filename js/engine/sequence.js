@@ -74,6 +74,7 @@
     var r = records[id];
     if (!r || !r.cfg.ready) return;
     r.gen++; // invalida cargas en curso de esta zona
+    r.luma = null;
     for (var i = 0; i < r.images.length; i++) {
       if (r.images[i]) { r.images[i].src = ''; r.images[i] = null; }
     }
@@ -218,6 +219,48 @@
     drawn.id = want.id; drawn.frame = frame; drawn.key = key;
   }
 
+  /* ---------- luminancia del fotograma (para los scrims) ----------
+     Rejilla pequeña (48×27 o 27×48) por fotograma, calculada desde la
+     imagen de origen —nunca leyendo el canvas grande— y cacheada. */
+  var SRGB_LIN = new Float32Array(256);
+  for (var li = 0; li < 256; li++) {
+    var c = li / 255;
+    SRGB_LIN[li] = c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  }
+  var lumaCanvas = null, lumaCtx = null;
+
+  function lumaGrid(r, frame) {
+    if (!r.luma || r.luma.variant !== variant) r.luma = { variant: variant, frames: {} };
+    var hit = r.luma.frames[frame];
+    if (hit) return hit;
+    if (!lumaCanvas) {
+      lumaCanvas = document.createElement('canvas');
+      lumaCtx = lumaCanvas.getContext('2d', { willReadFrequently: true });
+    }
+    var portrait = variant === 'mobile';
+    var gw = portrait ? 27 : 48, gh = portrait ? 48 : 27;
+    lumaCanvas.width = gw; lumaCanvas.height = gh;
+    lumaCtx.setTransform(1, 0, 0, 1, 0, 0);
+    if (r.cfg.ready) {
+      var img = r.images[frame];
+      if (!img) return null;
+      lumaCtx.drawImage(img, 0, 0, gw, gh);
+    } else {
+      var v = EV.manifest.variants[variant];
+      lumaCtx.fillStyle = '#080b14';
+      lumaCtx.fillRect(0, 0, gw, gh);
+      lumaCtx.setTransform(gw / v.w, 0, 0, gh / v.h, 0, 0);
+      EV.placeholder.draw(lumaCtx, r.cfg, frame, r.cfg.frames, v.w, v.h, r.index);
+      lumaCtx.setTransform(1, 0, 0, 1, 0, 0);
+    }
+    var d = lumaCtx.getImageData(0, 0, gw, gh).data;
+    var arr = new Float32Array(gw * gh);
+    for (var p = 0, q = 0; q < arr.length; p += 4, q++) {
+      arr[q] = 0.2126 * SRGB_LIN[d[p]] + 0.7152 * SRGB_LIN[d[p + 1]] + 0.0722 * SRGB_LIN[d[p + 2]];
+    }
+    return (r.luma.frames[frame] = { gw: gw, gh: gh, arr: arr });
+  }
+
   /* ---------- API pública ---------- */
   EV.sequence = {
     init: function (el) {
@@ -290,6 +333,25 @@
     wanted: function () { return want; },
     variant: function () { return variant; },
     coverTransform: function () { return cover; },
+
+    /* Luminancia relativa media (0–1, lineal) del fotograma DIBUJADO bajo un
+       rectángulo de pantalla en px CSS. null si aún no hay nada dibujado. */
+    luminanceUnder: function (rect) {
+      var r = records[drawn.id];
+      if (!r || drawn.frame < 0) return null;
+      var g = lumaGrid(r, drawn.frame);
+      if (!g) return null;
+      var W = cover.iw * cover.s, H = cover.ih * cover.s;
+      var x0 = Math.floor(clamp((rect.left - cover.dx) / W, 0, 1) * g.gw);
+      var x1 = Math.ceil(clamp((rect.left + rect.width - cover.dx) / W, 0, 1) * g.gw);
+      var y0 = Math.floor(clamp((rect.top - cover.dy) / H, 0, 1) * g.gh);
+      var y1 = Math.ceil(clamp((rect.top + rect.height - cover.dy) / H, 0, 1) * g.gh);
+      var sum = 0, n = 0;
+      for (var y = y0; y < Math.max(y1, y0 + 1) && y < g.gh; y++) {
+        for (var x = x0; x < Math.max(x1, x0 + 1) && x < g.gw; x++) { sum += g.arr[y * g.gw + x]; n++; }
+      }
+      return n ? sum / n : null;
+    },
 
     /* Coordenadas normalizadas de la imagen (0–1) → px CSS del viewport. */
     imageToScreen: function (nx, ny) {

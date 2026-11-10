@@ -29,6 +29,7 @@
     EV.zones.all().forEach(function (z) {
       var s = EV.zoneScripts[z.cfg.id];
       if (s && s.init) s.init(z);
+      EV.overlay.applyScrims(z); // después: los scripts crean sus cartelas
     });
 
     EV.fallback.init();

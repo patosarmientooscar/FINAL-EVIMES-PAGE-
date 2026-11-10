@@ -5,6 +5,12 @@
    - ext     : 'avif' | 'webp'.
    - ready   : false = aún no hay fotogramas reales → placeholder en canvas.
    - poster  : fotograma usado en modo "imágenes fijas".
+   - scrim   : degradados locales detrás de los bloques de texto.
+               { target: selector dentro de la zona,
+                 shape: 'radial' | 'left' | 'right',
+                 intensity: mínimo 0–0.55 (el motor lo sube si el fotograma
+                            es claro, para mantener AA),
+                 range: [a,b] progreso en el que existe (opcional) }
    Ruta de cada fotograma: assets/zones/<slug>/<desktop|mobile>/0001.<ext>
    ========================================================================== */
 window.EV = window.EV || {};
@@ -14,13 +20,19 @@ EV.manifest = {
     mobile:  { w: 1080, h: 1920 }
   },
   zones: [
-    { id: 'fachada',        slug: '01-fachada',        label: 'Fachada',        note: 'Calle',            screens: 3, frames: 120, ext: 'avif', ready: false, poster: 0 },
-    { id: 'pasillo',        slug: '02-pasillo',        label: 'Pasillo',        note: 'Planta noble',     screens: 2, frames: 90,  ext: 'avif', ready: false, poster: 45 },
-    { id: 'diseno-web',     slug: '03-diseno-web',     label: 'Diseño Web',     note: 'Sala de cristal I',  screens: 4, frames: 150, ext: 'avif', ready: false, poster: 75 },
-    { id: 'product-design', slug: '04-product-design', label: 'Product Design', note: 'Sala de cristal II', screens: 4, frames: 150, ext: 'avif', ready: false, poster: 75 },
-    { id: 'software-ai',    slug: '05-software-ai',    label: 'Software & AI',  note: 'Sala de cristal III', screens: 4, frames: 150, ext: 'avif', ready: false, poster: 75 },
+    { id: 'fachada',        slug: '01-fachada',        label: 'Fachada',        note: 'Calle',            screens: 3, frames: 120, ext: 'avif', ready: false, poster: 0,
+      scrim: [{ target: '.fachada__copy', shape: 'left', intensity: 0.3 }] },
+    { id: 'pasillo',        slug: '02-pasillo',        label: 'Pasillo',        note: 'Planta noble',     screens: 2, frames: 90,  ext: 'avif', ready: false, poster: 45,
+      scrim: [{ target: '.pasillo__lines', shape: 'radial', intensity: 0.25, range: [0.1, 0.95] }] },
+    { id: 'diseno-web',     slug: '03-diseno-web',     label: 'Diseño Web',     note: 'Sala de cristal I',  screens: 4, frames: 150, ext: 'avif', ready: false, poster: 75,
+      scrim: [{ target: '.cartela', shape: 'radial', intensity: 0.2 }] },
+    { id: 'product-design', slug: '04-product-design', label: 'Product Design', note: 'Sala de cristal II', screens: 4, frames: 150, ext: 'avif', ready: false, poster: 75,
+      scrim: [{ target: '.cartela', shape: 'radial', intensity: 0.2 }] },
+    { id: 'software-ai',    slug: '05-software-ai',    label: 'Software & AI',  note: 'Sala de cristal III', screens: 4, frames: 150, ext: 'avif', ready: false, poster: 75,
+      scrim: [{ target: '.cartela', shape: 'radial', intensity: 0.2 }] },
     { id: 'arcade',         slug: '06-arcade',         label: 'Arcade',         note: 'Sala de juego',    screens: 3, frames: 120, ext: 'avif', ready: false, poster: 60 },
-    { id: 'balcon',         slug: '07-balcon',         label: 'Balcón',         note: 'Madrid',           screens: 3, frames: 120, ext: 'avif', ready: false, poster: 119 }
+    { id: 'balcon',         slug: '07-balcon',         label: 'Balcón',         note: 'Madrid',           screens: 3, frames: 120, ext: 'avif', ready: false, poster: 119,
+      scrim: [{ target: '.balcon__cta', shape: 'left', intensity: 0.3, range: [0.48, 1.01] }] }
   ]
 };
 
