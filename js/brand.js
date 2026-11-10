@@ -1,37 +1,50 @@
 /* ==========================================================================
-   brand.js — logo de la cabecera desde js/config.js.
-   - logo.svg vacío  → logotipo provisional en HTML (logo.text).
-   - logo.svg = ruta → se incrusta el SVG en línea (así hereda currentColor).
-   Cambiar el logo = cambiar una línea en config.js.
+   brand.js — logos vectoriales desde js/config.js (EVIMES_CONFIG.logo).
+   Cada elemento con data-logo="<clave>" recibe el SVG de logo[<clave>],
+   incrustado en línea para que herede currentColor. Cambiar un logo =
+   cambiar una ruta en config.js.
    ========================================================================== */
 (function () {
+  var EV = (window.EV = window.EV || {});
   var cfg = (window.EVIMES_CONFIG && window.EVIMES_CONFIG.logo) || {};
-  var brands = document.querySelectorAll('.brand');
-  if (!brands.length) return;
+  var cache = {};
 
-  if (!cfg.svg) {
-    if (cfg.text) brands.forEach(function (a) { a.textContent = cfg.text; });
-    return;
+  function load(url) {
+    if (!cache[url]) {
+      cache[url] = fetch(url)
+        .then(function (r) { return r.ok ? r.text() : Promise.reject(r.status); })
+        .then(function (txt) {
+          var svg = new DOMParser().parseFromString(txt, 'image/svg+xml').documentElement;
+          if (!svg || svg.nodeName.toLowerCase() !== 'svg') throw new Error('no es SVG: ' + url);
+          // Higiene: nada ejecutable ni metadatos pesados dentro del DOM.
+          svg.querySelectorAll('script, foreignObject, metadata').forEach(function (n) { n.remove(); });
+          svg.removeAttribute('width');
+          svg.removeAttribute('height');
+          svg.removeAttribute('role');
+          svg.removeAttribute('aria-label');
+          svg.setAttribute('aria-hidden', 'true');
+          svg.setAttribute('focusable', 'false');
+          return svg;
+        });
+    }
+    return cache[url];
   }
 
-  fetch(cfg.svg)
-    .then(function (r) { return r.ok ? r.text() : Promise.reject(r.status); })
-    .then(function (txt) {
-      var doc = new DOMParser().parseFromString(txt, 'image/svg+xml');
-      var svg = doc.documentElement;
-      if (!svg || svg.nodeName.toLowerCase() !== 'svg') return;
-      // Higiene: nada ejecutable dentro del logo.
-      svg.querySelectorAll('script, foreignObject').forEach(function (n) { n.remove(); });
-      svg.setAttribute('aria-hidden', 'true');
-      svg.setAttribute('focusable', 'false');
-      svg.removeAttribute('width');
-      svg.removeAttribute('height');
-      svg.classList.add('brand__svg');
-      brands.forEach(function (a) {
-        a.textContent = '';
-        a.appendChild(document.importNode(svg, true));
-        a.classList.add('brand--svg');
-      });
-    })
-    .catch(function () { /* se queda el provisional en HTML */ });
+  function mount(el) {
+    var url = cfg[el.dataset.logo];
+    if (!url) return Promise.resolve(null);
+    return load(url).then(function (svg) {
+      var node = document.importNode(svg, true);
+      node.classList.add('logo-svg');
+      el.textContent = '';
+      el.appendChild(node);
+      el.classList.add('has-logo');
+      return node;
+    }).catch(function (e) { console.warn('[logo]', e); return null; });
+  }
+
+  EV.logo = { mount: mount, load: load };
+
+  var ready = Promise.all(Array.prototype.map.call(document.querySelectorAll('[data-logo]'), mount));
+  EV.logo.ready = ready;
 })();

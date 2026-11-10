@@ -135,19 +135,18 @@ input, textarea { caret-color: var(--cyan); }
 }
 .site-header > * { pointer-events: auto; }
 
+/* Marca: monograma EH vectorial (js/brand.js lo incrusta desde config).
+   Se reserva su caja para que no haya salto al cargar. */
 .brand {
-  font-family: var(--font-display);
-  font-size: var(--step--1);
-  letter-spacing: 0.24em;
-  margin-right: -0.24em; /* compensa el tracking final */
-  text-decoration: none;
+  --logo-h: clamp(1.25rem, 1.12rem + 0.35vw, 1.5rem);
+  display: inline-flex;
+  align-items: center;
+  height: 2.75rem;                         /* objetivo táctil */
+  width: calc(var(--logo-h) * 2.008);      /* proporción 1566 × 780 */
   color: var(--stone);
-  padding-block: var(--space-2);
-  line-height: 1;
+  text-decoration: none;
 }
-
-.brand--svg { letter-spacing: 0; margin-right: 0; padding-block: var(--space-2); }
-.brand__svg { display: block; height: var(--logo-h, 1.375rem); width: auto; fill: currentColor; }
+.brand .logo-svg { display: block; height: var(--logo-h); width: auto; }
 
 .header-actions {
   display: flex;

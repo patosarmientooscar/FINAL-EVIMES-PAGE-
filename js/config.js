@@ -1,10 +1,12 @@
 // Datos de contacto, redes y URLs. Rellenar con los datos reales.
 window.EVIMES_CONFIG = {
-  // Logo: con svg vacío se usa el logotipo provisional en HTML.
-  // Cuando llegue el vector: svg: 'assets/logo/evimes.svg' (y nada más).
+  // Logos vectoriales (fill="currentColor"). Cada clave alimenta los
+  // elementos con data-logo="<clave>"; el SVG se incrusta en línea.
   logo: {
-    svg: '',
-    text: 'EVIMES'
+    header:  'assets/logo/evimes-eh.svg',       // cabecera
+    favicon: 'assets/logo/evimes-eh.svg',       // origen de favicon.svg y apple-touch-icon.png
+    fachada: 'assets/logo/evimes-wordmark.svg', // letras corpóreas de la fachada
+    lockup:  'assets/logo/evimes-lockup.svg'    // EH + EVIMES (piezas sueltas)
   },
 
   // Teléfono y email tomados del aviso legal de la web antigua.

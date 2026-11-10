@@ -29,4 +29,4 @@ Experiencia cinematográfica controlada por scroll: la cámara entra por la vent
 - Zonas y duraciones en `js/zones/manifest.js` (`ready: false` = placeholder en canvas).
 - Fotogramas: `assets/zones/<slug>/<desktop|mobile>/0001.<ext>`.
 - Pruebas: `?modo=fijo` / `?modo=cine` fuerza el modo; `?listo=pasillo:webp` marca una zona como lista sin tocar el manifiesto.
-- Logo provisional en HTML ("EVIMES" en Libre Baskerville) hasta tener el SVG vectorial.
+- Logos vectoriales en `assets/logo/` (no retocar). Se eligen en `config.logo` y se montan con `data-logo="<clave>"` (js/brand.js). Los `evimes-navy-*` / `evimes-grey-*` / `evimes-logo-animado` son PNG metidos en SVG: no usarlos.
