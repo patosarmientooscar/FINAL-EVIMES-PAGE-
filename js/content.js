@@ -5,6 +5,7 @@ window.EVIMES_CONTENT = {
   fachada: {
     h1: 'Estudio de diseño web, producto y software en Madrid.',
     entradilla: 'Somos Evimes. Creamos webs, productos digitales y software con IA para negocios que quieren que se les vea, y que les elijan.',
+    entra: 'Entra',
   },
 
   pasillo: ['Si no eres visible,', 'no existes.'],

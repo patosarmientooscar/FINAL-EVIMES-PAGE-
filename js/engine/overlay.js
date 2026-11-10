@@ -175,6 +175,15 @@
       if (Array.isArray(k)) return k;
       return k[EV.sequence.variant()] || k.desktop;
     };
+    /* opts.corners: esquinas FIJAS en espacio de imagen (función o
+       { desktop, mobile }). Para un keyframe con cámara: la cámara mueve la
+       imagen y la capa la sigue sola. Con fotogramas reales se pasa a
+       opts.keyframes (tracking por fotograma) sin tocar nada más. */
+    var cornersFor = function () {
+      var c = typeof opts.corners === 'function' ? opts.corners() : opts.corners;
+      if (!c) return null;
+      return Array.isArray(c) ? c : (c[EV.sequence.variant()] || c.desktop);
+    };
 
     var api = {
       zone: opts.zone,
@@ -182,8 +191,9 @@
         if (!active) { this.hide(); return; }
         var d = EV.sequence.drawn();
         if (d.id !== opts.zone || d.frame < 0) { this.hide(); return; }
-        var frame = opts.smooth ? EV.sequence.wanted().f : d.frame;
-        var q = cornersAt(keysFor(), frame);
+        var q;
+        if (opts.corners) q = cornersFor();
+        else q = cornersAt(keysFor(), opts.smooth ? EV.sequence.wanted().f : d.frame);
         if (!q) { this.hide(); return; }
         var pts = q.map(function (c) { return EV.sequence.imageToScreen(c[0], c[1]); });
         var m = quadMatrix(size.w, size.h, pts);
@@ -382,6 +392,7 @@
     scrim: scrim,
     applyScrims: applyScrims,
     contrastAlpha: alphaFor,
+    contrast: contrastWith, // (alfa navy, L fondo, L texto, alfa texto) → ratio WCAG
 
     /* Llamado una vez por tick, DESPUÉS de dibujar el canvas. */
     update: function () {

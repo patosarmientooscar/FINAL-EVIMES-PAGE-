@@ -28,22 +28,31 @@
   var userMoved = false;
   var stillMode = false;
 
-  var want = { id: null, f: 0 };     // lo que se debería mostrar
+  var want = { id: null, f: 0, p: 0 }; // lo que se debería mostrar (p = progreso 0–1 de la zona)
   var drawn = { id: null, frame: -1, key: '' };
   var dirty = true;
   var cover = { s: 1, dx: 0, dy: 0, iw: 1920, ih: 1080 }; // transform imagen → pantalla (px CSS)
+  // Cámara 2D del modo keyframe: X' = cx + (X − ox)·z  (X en px CSS tras el cover).
+  // Identidad: z = 1, (ox, oy) = centro. Con fotogramas reales no se usa.
+  var cam = { z: 1, ox: 0, oy: 0, cx: 0, cy: 0, on: false };
   var waiters = [];
 
   /* ---------- utilidades ---------- */
   function pad(n) { return String(n).padStart(4, '0'); }
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
 
+  // La MISMA regla que los <source media> y los preload del HTML:
+  // pantalla estrecha o en vertical → encuadre vertical (mobile).
+  var MOBILE_MQ = '(max-width: 767px), (orientation: portrait)';
   function pickVariant() {
-    var w = window.innerWidth, h = window.innerHeight;
-    var portrait = h > w * 1.1;
-    // Pantallas estrechas o en vertical → mobile (encuadre 9:16).
-    // Una tablet apaisada con DPR alto sigue siendo desktop.
-    return (w < 768 || portrait) ? 'mobile' : 'desktop';
+    return window.matchMedia(MOBILE_MQ).matches ? 'mobile' : 'desktop';
+  }
+
+  // Modo keyframe: la zona aún no tiene fotogramas pero sí una imagen fija.
+  function isKeyframe(r) { return !r.cfg.ready && !!r.cfg.keyframe; }
+  function keyframeUrl(r) {
+    var k = r.cfg.keyframe;
+    return k[variant] + '.' + (EV.sequence.imageExt || 'avif');
   }
 
   function url(rec, i) {
@@ -72,6 +81,7 @@
   /* ---------- carga ---------- */
   function evict(id) {
     var r = records[id];
+    if (r && isKeyframe(r) && r.kf) { r.kf = null; r.luma = null; return; }
     if (!r || !r.cfg.ready) return;
     r.gen++; // invalida cargas en curso de esta zona
     r.luma = null;
@@ -81,8 +91,55 @@
     r.state.fill(0);
   }
 
+  /* Keyframe: una sola imagen por variante. Si el HTML trae su <img> de póster
+     (precargado como LCP), se reutiliza: no hay segunda descarga. */
+  /* Versión HD del keyframe (cfg.keyframe.hd[variant]): solo cuando el usuario
+     ya se mueve, para no competir con el LCP. Sustituye a la imagen base. */
+  function loadKeyframeHd(r) {
+    var hd = r.cfg.keyframe.hd && r.cfg.keyframe.hd[variant];
+    var kf = r.kf;
+    if (!hd || !kf || !kf.ok || kf.hd) return;
+    kf.hd = 'cargando';
+    var img = new Image();
+    img.decoding = 'async';
+    img.src = hd + '.' + (EV.sequence.imageExt || 'avif');
+    (img.decode ? img.decode() : Promise.resolve()).then(function () {
+      // ImageBitmap: decodificado y listo para la GPU; evita el tirón del primer drawImage.
+      return window.createImageBitmap ? createImageBitmap(img) : img;
+    }).then(function (bmp) {
+      if (r.kf !== kf) return;
+      if (bmp !== img) { bmp.naturalWidth = bmp.width; bmp.naturalHeight = bmp.height; }
+      kf.img = bmp; kf.hd = 'lista';
+      if (r.cfg.id === want.id) dirty = true;
+    }, function () { if (r.kf === kf) kf.hd = 'error'; });
+  }
+
+  function loadKeyframe(r) {
+    if (r.kf && r.kf.variant === variant) { if (userMoved) loadKeyframeHd(r); return; }
+    var kf = r.kf = { variant: variant, img: null, ok: false };
+    var poster = document.querySelector('[data-poster="' + r.cfg.id + '"] img');
+    var img;
+    if (poster && (poster.currentSrc || poster.src).indexOf('/' + variant + '/') !== -1) {
+      img = poster; // el navegador ya eligió la variante por <source media>
+    } else {
+      img = new Image();
+      img.decoding = 'async';
+      img.src = keyframeUrl(r);
+    }
+    var ready = img.complete && img.naturalWidth ? Promise.resolve()
+      : new Promise(function (res, rej) { img.addEventListener('load', res, { once: true }); img.addEventListener('error', rej, { once: true }); });
+    ready.then(function () { return img.decode ? img.decode().catch(function () {}) : null; }).then(function () {
+      if (r.kf !== kf) return;
+      kf.img = img; kf.ok = true;
+      if (r.cfg.id === want.id) dirty = true;
+      resolveWaiters();
+      if (userMoved) loadKeyframeHd(r);
+    }, function () { if (r.kf === kf) kf.err = true; });
+  }
+
   function enqueueZone(id, framesOverride) {
     var r = records[id];
+    if (r && isKeyframe(r)) { loadKeyframe(r); return; }
     if (!r || !r.cfg.ready) return;
     var n = r.cfg.frames;
     var list = framesOverride || (function () {
@@ -152,6 +209,7 @@
   }
 
   function nearestLoaded(r, i) {
+    if (isKeyframe(r)) return r.kf && r.kf.ok ? 0 : -1;
     if (!r.cfg.ready) return i;
     var n = r.cfg.frames;
     for (var d = 0; d < n; d++) {
@@ -165,7 +223,8 @@
   function resolveWaiters() {
     waiters = waiters.filter(function (w) {
       var r = records[w.id];
-      var ok = !r.cfg.ready || r.state[r.cfg.poster || 0] === 2 || nearestLoaded(r, 0) !== -1;
+      var ok = isKeyframe(r) ? nearestLoaded(r, 0) !== -1
+        : (!r.cfg.ready || r.state[r.cfg.poster || 0] === 2 || nearestLoaded(r, 0) !== -1);
       if (ok) { clearTimeout(w.timer); w.resolve(); }
       return !ok;
     });
@@ -179,13 +238,47 @@
     cover.dy = (cssH - ih * s) / 2;
   }
 
+  /* El <picture> del HTML pinta el primer fotograma (LCP, sin JS). Cuando el
+     canvas ya dibuja lo mismo, el póster se retira para no duplicar capas. */
+  function hidePoster(r) {
+    r.posterHidden = true;
+    var el = document.querySelector('[data-poster="' + r.cfg.id + '"]');
+    if (el) requestAnimationFrame(function () { el.style.opacity = '0'; el.style.visibility = 'hidden'; });
+  }
+
+  /* Cámara del modo keyframe: la pide el script de la zona (camera(p, vista)),
+     que devuelve { z, ox, oy }. Sin script o con fotogramas reales: identidad. */
+  function updateCamera(r) {
+    cam.cx = cssW / 2; cam.cy = cssH / 2;
+    cam.z = 1; cam.ox = cam.cx; cam.oy = cam.cy; cam.on = false;
+    if (!isKeyframe(r)) return;
+    var script = EV.zoneScripts && EV.zoneScripts[r.cfg.id];
+    if (!script || !script.camera) return;
+    var c = script.camera(want.p, { w: cssW, h: cssH, cover: cover, variant: variant, toScreen: baseToScreen });
+    if (!c) return;
+    cam.z = Math.max(1, c.z);
+    // Nunca enseñar fuera de la imagen: el encuadre visible queda dentro del cover.
+    var hx = cam.cx / cam.z, hy = cam.cy / cam.z;
+    var W = cover.iw * cover.s, H = cover.ih * cover.s;
+    cam.ox = clamp(c.ox, cover.dx + hx, cover.dx + W - hx);
+    cam.oy = clamp(c.oy, cover.dy + hy, cover.dy + H - hy);
+    cam.on = true;
+  }
+  // Imagen normalizada → pantalla SIN cámara (para que la zona calcule su encuadre).
+  function baseToScreen(nx, ny) { return [cover.dx + nx * cover.iw * cover.s, cover.dy + ny * cover.ih * cover.s]; }
+
   function draw() {
     var r = records[want.id];
     if (!r || !cssW) return;
     var n = r.cfg.frames;
     var target = clamp(Math.round(want.f), 0, n - 1);
     var frame = nearestLoaded(r, target);
-    var key = want.id + ':' + frame + ':' + cssW + 'x' + cssH + ':' + variant;
+    if (frame !== -1 && isKeyframe(r)) {
+      computeCover(r.kf.img.naturalWidth, r.kf.img.naturalHeight);
+      updateCamera(r);
+    }
+    var key = want.id + ':' + frame + ':' + cssW + 'x' + cssH + ':' + variant +
+      (cam.on ? ':' + cam.z.toFixed(4) + ',' + cam.ox.toFixed(1) + ',' + cam.oy.toFixed(1) : '');
     if (!dirty && key === drawn.key) return;
     dirty = false;
 
@@ -198,13 +291,25 @@
       return;
     }
 
-    if (r.cfg.ready) {
+    if (isKeyframe(r)) {
+      // Recorta del origen solo lo visible tras cover + cámara: nítido y barato.
+      var kimg = r.kf.img, s = cover.s * cam.z;
+      var sx = (cam.ox - cam.cx / cam.z - cover.dx) / cover.s;
+      var sy = (cam.oy - cam.cy / cam.z - cover.dy) / cover.s;
+      var sw = cssW / s, sh = cssH / s;
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(kimg, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+      if (!r.posterHidden) hidePoster(r);
+    } else if (r.cfg.ready) {
+      cam.on = false; cam.z = 1; cam.ox = cam.cx = cssW / 2; cam.oy = cam.cy = cssH / 2;
       var img = r.images[frame];
       computeCover(img.naturalWidth, img.naturalHeight);
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
       ctx.drawImage(img, cover.dx * dpr, cover.dy * dpr, cover.iw * cover.s * dpr, cover.ih * cover.s * dpr);
     } else {
+      cam.on = false; cam.z = 1; cam.ox = cam.cx = cssW / 2; cam.oy = cam.cy = cssH / 2;
       var v = EV.manifest.variants[variant];
       computeCover(v.w, v.h);
       ctx.fillStyle = '#080b14';
@@ -241,7 +346,10 @@
     var gw = portrait ? 27 : 48, gh = portrait ? 48 : 27;
     lumaCanvas.width = gw; lumaCanvas.height = gh;
     lumaCtx.setTransform(1, 0, 0, 1, 0, 0);
-    if (r.cfg.ready) {
+    if (isKeyframe(r)) {
+      if (!r.kf || !r.kf.ok) return null;
+      lumaCtx.drawImage(r.kf.img, 0, 0, gw, gh);
+    } else if (r.cfg.ready) {
       var img = r.images[frame];
       if (!img) return null;
       lumaCtx.drawImage(img, 0, 0, gw, gh);
@@ -268,6 +376,9 @@
       ctx = canvas.getContext('2d', { alpha: false });
       stillMode = EV.mode === 'still';
       variant = pickVariant();
+      // Formato que el navegador ya eligió para el póster (AVIF si lo soporta).
+      var pimg = document.querySelector('[data-poster] img');
+      this.imageExt = pimg && /\.webp(\?|$)/.test(pimg.currentSrc || '') ? 'webp' : 'avif';
       EV.manifest.zones.forEach(function (cfg, index) {
         records[cfg.id] = { cfg: cfg, index: index, gen: 0, images: new Array(cfg.frames), state: new Uint8Array(cfg.frames) };
         order.push(cfg.id);
@@ -304,7 +415,7 @@
       var r = records[id];
       if (!r) return;
       var f = progress * (r.cfg.frames - 1);
-      if (want.id !== id || want.f !== f) { want.id = id; want.f = f; }
+      if (want.id !== id || want.f !== f || want.p !== progress) { want.id = id; want.f = f; want.p = progress; }
     },
 
     /* Modo fijo: muestra el póster de la zona. */
@@ -312,7 +423,7 @@
       var r = records[id];
       if (!r) return;
       this.setActive(id);
-      want.id = id; want.f = r.cfg.poster || 0;
+      want.id = id; want.f = r.cfg.poster || 0; want.p = 0;
       dirty = true;
     },
 
@@ -341,11 +452,13 @@
       if (!r || drawn.frame < 0) return null;
       var g = lumaGrid(r, drawn.frame);
       if (!g) return null;
-      var W = cover.iw * cover.s, H = cover.ih * cover.s;
-      var x0 = Math.floor(clamp((rect.left - cover.dx) / W, 0, 1) * g.gw);
-      var x1 = Math.ceil(clamp((rect.left + rect.width - cover.dx) / W, 0, 1) * g.gw);
-      var y0 = Math.floor(clamp((rect.top - cover.dy) / H, 0, 1) * g.gh);
-      var y1 = Math.ceil(clamp((rect.top + rect.height - cover.dy) / H, 0, 1) * g.gh);
+      // La cámara es escala + traslación: el rectángulo sigue siendo un rectángulo.
+      var a = EV.sequence.screenToImage(rect.left, rect.top);
+      var b = EV.sequence.screenToImage(rect.left + rect.width, rect.top + rect.height);
+      var x0 = Math.floor(clamp(a[0], 0, 1) * g.gw);
+      var x1 = Math.ceil(clamp(b[0], 0, 1) * g.gw);
+      var y0 = Math.floor(clamp(a[1], 0, 1) * g.gh);
+      var y1 = Math.ceil(clamp(b[1], 0, 1) * g.gh);
       var sum = 0, n = 0;
       for (var y = y0; y < Math.max(y1, y0 + 1) && y < g.gh; y++) {
         for (var x = x0; x < Math.max(x1, x0 + 1) && x < g.gw; x++) { sum += g.arr[y * g.gw + x]; n++; }
@@ -355,8 +468,16 @@
 
     /* Coordenadas normalizadas de la imagen (0–1) → px CSS del viewport. */
     imageToScreen: function (nx, ny) {
-      return [cover.dx + nx * cover.iw * cover.s, cover.dy + ny * cover.ih * cover.s];
+      var X = cover.dx + nx * cover.iw * cover.s, Y = cover.dy + ny * cover.ih * cover.s;
+      if (!cam.on) return [X, Y];
+      return [cam.cx + (X - cam.ox) * cam.z, cam.cy + (Y - cam.oy) * cam.z];
     },
+    /* Inversa: px CSS del viewport → coordenadas normalizadas de la imagen. */
+    screenToImage: function (X, Y) {
+      if (cam.on) { X = cam.ox + (X - cam.cx) / cam.z; Y = cam.oy + (Y - cam.cy) / cam.z; }
+      return [(X - cover.dx) / (cover.iw * cover.s), (Y - cover.dy) / (cover.ih * cover.s)];
+    },
+    camera: function () { return cam; },
 
     /* Diagnóstico para QA. */
     debug: function () {

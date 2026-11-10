@@ -21,6 +21,10 @@ EV.manifest = {
   },
   zones: [
     { id: 'fachada',        slug: '01-fachada',        label: 'Fachada',        note: 'Calle',            screens: 3, frames: 120, ext: 'avif', ready: false, poster: 0,
+      // Sin vídeo aún: keyframe con empuje de cámara (lo calcula 01-fachada.js).
+      // Cuando lleguen los fotogramas: ready: true y la cámara se apaga sola.
+      keyframe: { desktop: 'assets/zones/01-fachada/desktop/keyframe', mobile: 'assets/zones/01-fachada/mobile/keyframe',
+                  hd: { desktop: 'assets/zones/01-fachada/desktop/keyframe-4096' } }, // HD para el empuje (solo AVIF)
       scrim: [{ target: '.fachada__copy', shape: 'left', intensity: 0.3 }] },
     { id: 'pasillo',        slug: '02-pasillo',        label: 'Pasillo',        note: 'Planta noble',     screens: 2, frames: 90,  ext: 'avif', ready: false, poster: 45,
       scrim: [{ target: '.pasillo__lines', shape: 'radial', intensity: 0.25, range: [0.1, 0.95] }] },

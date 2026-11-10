@@ -44,26 +44,181 @@
   position: absolute;
   left: 0;
   bottom: clamp(1rem, 4vh, 3rem);
-  max-width: min(100%, 46rem);
-  display: grid;
-  gap: var(--space-5);
-}
-.fachada__h1 {
-  font-size: var(--step-4);
-  max-width: 16ch;
-}
-.fachada__lead {
-  font-size: var(--step-1);
-  line-height: var(--leading-snug);
-  color: var(--ink-muted);
-  max-width: 34ch;
+  max-width: min(100%, 60rem);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 .fachada__firma {
   font-family: var(--font-display);
   font-style: italic;
   font-size: var(--step-0);
+  line-height: 1.3;
   color: var(--oak);
+  margin-bottom: var(--space-4);
 }
+.fachada__h1 {
+  font-size: var(--step-4);
+  max-width: 19ch; /* tres líneas de 1280 a 1920 */
+}
+.fachada__lead {
+  margin-top: var(--space-5);
+  font-size: var(--step-1);
+  line-height: var(--leading-snug);
+  color: var(--ink);
+  max-width: 36ch;
+}
+
+/* "Entra": una línea fina que respira, nada de flechas que botan */
+.entra {
+  margin-top: var(--space-6);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 2.75rem;
+  color: var(--stone);
+  font: 500 var(--step--1) / 1 var(--font-text);
+  letter-spacing: 0.02em;
+  text-decoration: none;
+}
+.entra__linea {
+  width: 1px;
+  height: 2.25rem;
+  background: var(--stone);
+  transform-origin: 50% 0;
+  animation: entra-respira 2.8s var(--ease-in-out) infinite;
+}
+.entra:hover .entra__linea, .entra:focus-visible .entra__linea { animation-duration: 1.4s; }
+@keyframes entra-respira {
+  0%   { transform: scaleY(0.45); opacity: 0.5; }
+  55%  { transform: scaleY(1);    opacity: 1; }
+  100% { transform: scaleY(0.45); opacity: 0.5; }
+}
+
+/* Móvil vertical: el bloque vive en el tercio inferior oscuro y deja ver
+   la ventana encendida y las letras, que son el foco. */
+@media (max-width: 47.99rem) and (orientation: portrait) {
+  .fachada__copy { bottom: var(--space-3); }
+  .fachada__firma { font-size: var(--step--1); margin-bottom: var(--space-2); }
+  .fachada__h1 { font-size: clamp(1.75rem, 1.1rem + 3.2vw, 2.25rem); line-height: 1.06; max-width: 14ch; }
+  .fachada__lead { margin-top: var(--space-3); font-size: var(--step-0); line-height: 1.42; }
+  .entra { margin-top: var(--space-2); }
+}
+
+/* Horizontal bajo (móvil girado): todo cabe bajo la cabecera. */
+@media (max-height: 34rem) and (orientation: landscape) {
+  .fachada__copy { bottom: var(--space-3); max-width: min(100%, 34rem); }
+  .fachada__firma { font-size: var(--step--1); margin-bottom: var(--space-1); }
+  .fachada__h1 { font-size: clamp(1.5rem, 1rem + 2.4vw, 2rem); line-height: 1.05; max-width: 26ch; }
+  .fachada__lead { margin-top: var(--space-2); font-size: 0.9375rem; line-height: 1.4; max-width: 46ch; }
+  .entra { margin-top: 0; }
+}
+
+/* Póster del primer fotograma (LCP). Mismo encuadre que el canvas: cover centrado. */
+.poster {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100lvh;
+  z-index: var(--z-canvas);
+  pointer-events: none;
+}
+.poster img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; display: block; }
+
+/* Letras corpóreas retroiluminadas. Tamaño intrínseco = viewBox del wordmark
+   (1442 × 261); matrix3d las lleva a sus 4 esquinas sobre la fachada. */
+.letras {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 1442px;
+  height: 261px;
+  z-index: var(--z-canvas);
+  transform-origin: 0 0;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform;
+}
+.letras svg { display: block; width: 100%; height: 100%; overflow: visible; }
+
+/* Capa trasera: la luz que las letras echan sobre la piedra. */
+.letras--halo { mix-blend-mode: screen; }
+.letras__luz { position: relative; width: 100%; height: 100%; opacity: 0; }
+/* La luz ya viene pintada en un canvas (01-fachada.js): sin filtros en vivo. */
+.letras__luz canvas { position: absolute; display: block; }
+/* Capa delantera: la letra, casi navy, con un canto claro finísimo. */
+.letras--cara svg {
+  fill: #0b1019;
+  stroke: rgb(196 236 246 / 0.6);
+  stroke-width: 3.5;
+  stroke-linejoin: round;
+  paint-order: stroke fill;
+}
+
+/* Reflejo cian al cruzar el cristal (85–100 %). */
+.reflejo {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-canvas);
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0;
+  overflow: hidden;
+}
+.reflejo__banda {
+  position: absolute;
+  top: -10%;
+  left: 0;
+  width: 75vw;
+  height: 120%;
+  transform: translate3d(110vw, 0, 0) skewX(-12deg);
+  background: linear-gradient(90deg, rgb(0 229 255 / 0) 0%, rgb(0 229 255 / 0.16) 38%, rgb(0 229 255 / 0.3) 50%, rgb(0 229 255 / 0.16) 62%, rgb(0 229 255 / 0) 100%);
+}
+.reflejo__letras {
+  position: absolute;
+  top: 40%;
+  left: 12%;
+  width: 52vw;
+  opacity: 0.45;
+  transform: scale(-1, 1.18);   /* invertido, como en un cristal */
+}
+.reflejo__letras canvas { width: 100%; height: auto; display: block; }
+
+/* ?ajustar=letras */
+.ajuste__marco { position: fixed; inset: 0; width: 100%; height: 100%; z-index: var(--z-dialog); pointer-events: none; }
+.ajuste__marco polygon { fill: rgb(0 229 255 / 0.06); stroke: var(--cyan); stroke-width: 1; }
+.ajuste__punto {
+  position: fixed;
+  top: -14px;
+  left: -14px;
+  width: 28px;
+  height: 28px;
+  z-index: var(--z-dialog);
+  border: 1px solid var(--cyan);
+  border-radius: 50%;
+  background: rgb(8 11 20 / 0.5);
+  cursor: grab;
+  touch-action: none;
+}
+.ajuste__punto:active { cursor: grabbing; }
+.ajuste__panel {
+  position: fixed;
+  right: var(--gutter);
+  bottom: var(--gutter);
+  z-index: var(--z-dialog);
+  max-width: min(32rem, calc(100% - 2 * var(--gutter)));
+  padding: var(--space-4);
+  background: var(--navy-raised);
+  color: var(--ink);
+  font-size: var(--step--1);
+}
+.ajuste__titulo { font-weight: 600; margin-bottom: var(--space-2); }
+.ajuste__json { white-space: pre-wrap; word-break: break-all; font: 12px/1.5 ui-monospace, monospace; color: var(--ink-muted); margin: 0 0 var(--space-2); user-select: all; }
+.ajuste__estado { color: var(--ink-faint); margin-bottom: var(--space-3); }
+.ajuste__acciones { display: flex; gap: var(--space-3); }
+.ajuste__acciones button { appearance: none; background: none; border: 1px solid var(--line-strong); color: var(--stone); font: inherit; padding: var(--space-2) var(--space-3); cursor: pointer; }
 
 /* ——— Pasillo ——— */
 .pasillo__lines {
@@ -178,21 +333,21 @@
 .scrim--right { background: linear-gradient(to left,  rgb(8 11 20 / 0.55) 0%, rgb(8 11 20 / 0.55) calc(100% - var(--stop, 40%)), rgb(8 11 20 / 0) 100%); }
 
 /* ——— Pantalla en perspectiva (screenQuad) ——— */
+/* Solo lo que necesita matrix3d. La posición (absolute en un escenario,
+   fixed en el body) la decide cada capa. */
 .quad {
-  position: absolute;
-  top: 0;
-  left: 0;
   transform-origin: 0 0;
   backface-visibility: hidden;
   will-change: transform;
   opacity: 0;
-  border: 0;
-  background: var(--navy);
-  overflow: hidden;
 }
 
 /* Pantalla de prueba del motor (se sustituye por capturas/iframes reales) */
 .quad-test {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
   width: 1280px;
   height: 800px;
   background: var(--stone);

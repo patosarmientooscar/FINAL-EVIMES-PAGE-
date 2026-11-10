@@ -3,17 +3,75 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Evimes — Estudio de diseño web, producto y software en Madrid</title>
+  <title>Evimes | Estudio de diseño web, producto y software en Madrid</title>
+  <meta name="description" content="Evimes, estudio de diseño web, producto y software con IA en Madrid. Webs, productos digitales y software para negocios que quieren que les elijan.">
+
+  <!-- Primer fotograma (LCP): misma regla de variante que el motor y que <picture> -->
+  <link rel="preload" as="image" type="image/avif" fetchpriority="high"
+        href="assets/zones/01-fachada/desktop/keyframe.avif"
+        imagesrcset="assets/zones/01-fachada/desktop/keyframe.avif 2560w" imagesizes="100vw"
+        media="(min-width: 768px) and (orientation: landscape)">
+  <link rel="preload" as="image" type="image/avif" fetchpriority="high"
+        href="assets/zones/01-fachada/mobile/keyframe.avif"
+        imagesrcset="assets/zones/01-fachada/mobile/keyframe.avif 1080w" imagesizes="100vw"
+        media="(max-width: 767px), (orientation: portrait)">
+  <link rel="preload" href="assets/logo/evimes-eh.svg" as="fetch" crossorigin="anonymous">
+  <link rel="preload" href="assets/logo/evimes-wordmark.svg" as="fetch" crossorigin="anonymous">
+
+  <link rel="canonical" href="https://www.evimesweb.com/">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <link rel="preload" href="assets/logo/evimes-eh.svg" as="fetch" crossorigin="anonymous">
-  <meta name="description" content="Somos Evimes. Creamos webs, productos digitales y software con IA para negocios que quieren que se les vea, y que les elijan.">
   <meta name="theme-color" content="#080b14">
+  <meta name="robots" content="index, follow">
+  <meta name="geo.region" content="ES-MD">
+  <meta name="geo.placename" content="Madrid">
+
   <meta property="og:type" content="website">
   <meta property="og:locale" content="es_ES">
   <meta property="og:site_name" content="Evimes">
-  <meta property="og:title" content="Evimes — Tu esencia, digital.">
-  <meta property="og:description" content="Estudio de diseño web, producto y software en Madrid.">
+  <meta property="og:url" content="https://www.evimesweb.com/">
+  <meta property="og:title" content="Evimes | Estudio de diseño web, producto y software en Madrid">
+  <meta property="og:description" content="Webs, productos digitales y software con IA para negocios que quieren que se les vea, y que les elijan. Tu esencia, digital.">
+  <meta property="og:image" content="https://www.evimesweb.com/assets/og/evimes-og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Fachada de un edificio señorial de Madrid a la hora azul, con las letras EVIMES retroiluminadas junto a una ventana encendida.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Evimes | Estudio de diseño web, producto y software en Madrid">
+  <meta name="twitter:description" content="Webs, productos digitales y software con IA en Madrid. Tu esencia, digital.">
+  <meta name="twitter:image" content="https://www.evimesweb.com/assets/og/evimes-og.jpg">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "@id": "https://www.evimesweb.com/#estudio",
+    "name": "Evimes",
+    "slogan": "Tu esencia, digital.",
+    "description": "Estudio de diseño web, producto y software con IA en Madrid. Creamos webs, productos digitales y software para negocios que quieren que se les vea, y que les elijan.",
+    "url": "https://www.evimesweb.com/",
+    "logo": "https://www.evimesweb.com/apple-touch-icon.png",
+    "image": "https://www.evimesweb.com/assets/og/evimes-og.jpg",
+    "telephone": "+34636736167",
+    "email": "evimes@evimesweb.com",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Av. Cardenal Herrera Oria 171",
+      "addressLocality": "Madrid",
+      "addressRegion": "Comunidad de Madrid",
+      "postalCode": "28034",
+      "addressCountry": "ES"
+    },
+    "areaServed": [
+      { "@type": "City", "name": "Madrid" },
+      { "@type": "Country", "name": "España" }
+    ],
+    "serviceType": ["Diseño web", "Product design", "Software a medida", "Inteligencia artificial", "Automatización", "SEO", "Local SEO", "AEO", "GEO", "Google Ads", "Analytics"],
+    "knowsAbout": ["Diseño web", "UX/UI", "Landing pages", "Branding digital", "E-commerce", "User research", "Prototipado", "APIs e integraciones", "Automatización con IA"],
+    "priceRange": "€€",
+    "openingHours": "Mo-Fr 09:00-18:00"
+  }
+  </script>
 
   <!-- Decide modo cine / imágenes fijas antes de pintar -->
   <script src="js/engine/fallback.js"></script>
@@ -42,6 +100,14 @@
   <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
   <canvas class="scene" aria-hidden="true"></canvas>
+  <!-- Primer fotograma en HTML: es el LCP y se ve sin JS. El canvas lo releva. -->
+  <picture class="poster" data-poster="fachada">
+    <source media="(max-width: 767px), (orientation: portrait)" type="image/avif" srcset="assets/zones/01-fachada/mobile/keyframe.avif">
+    <source media="(max-width: 767px), (orientation: portrait)" type="image/webp" srcset="assets/zones/01-fachada/mobile/keyframe.webp">
+    <source type="image/avif" srcset="assets/zones/01-fachada/desktop/keyframe.avif">
+    <img src="assets/zones/01-fachada/desktop/keyframe.webp" width="2560" height="1434" fetchpriority="high" decoding="async"
+         alt="Fachada de un edificio señorial de Madrid a la hora azul, con una ventana encendida en la planta noble.">
+  </picture>
   <div class="curtain" aria-hidden="true"></div>
   <div class="grain" aria-hidden="true"></div>
 
@@ -206,9 +272,10 @@
       <div class="zone__stage">
         <div class="layer">
           <div class="fachada__copy">
+            <p class="fachada__firma" data-c="firma">Tu esencia, digital.</p>
             <h1 class="fachada__h1" id="h-fachada" data-c="fachada.h1">Estudio de diseño web, producto y software en Madrid.</h1>
             <p class="fachada__lead" data-c="fachada.entradilla">Somos Evimes. Creamos webs, productos digitales y software con IA para negocios que quieren que se les vea, y que les elijan.</p>
-            <p class="fachada__firma" data-c="firma">Tu esencia, digital.</p>
+            <a class="entra" href="#zona-pasillo"><span class="entra__linea" aria-hidden="true"></span><span data-c="fachada.entra">Entra</span></a>
           </div>
         </div>
       </div>

@@ -30,3 +30,6 @@ Experiencia cinematográfica controlada por scroll: la cámara entra por la vent
 - Fotogramas: `assets/zones/<slug>/<desktop|mobile>/0001.<ext>`.
 - Pruebas: `?modo=fijo` / `?modo=cine` fuerza el modo; `?listo=pasillo:webp` marca una zona como lista sin tocar el manifiesto.
 - Logos vectoriales en `assets/logo/` (no retocar). Se eligen en `config.logo` y se montan con `data-logo="<clave>"` (js/brand.js). Los `evimes-navy-*` / `evimes-grey-*` / `evimes-logo-animado` son PNG metidos en SVG: no usarlos.
+- Fachada sin vídeo: `keyframe` en el manifiesto + `camera(p)` en `js/zones/01-fachada.js` (empuje 2D). Con `ready: true` la cámara se apaga sola; las letras pasarán de `corners` a `keyframes` por fotograma (tracking).
+- `?ajustar=letras`: arrastrar las 4 esquinas de las letras de la fachada; copia al portapapeles el valor para `config.fachada.letras`.
+- Efectos de luz (halo, reflejo): pintados una vez en canvas. Nada de `filter` CSS en vivo sobre capas que se mueven (picos de 1,5 s medidos).
