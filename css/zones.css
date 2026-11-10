@@ -1,1 +1,204 @@
-/* Estilos por zona del recorrido. */
+/* ==========================================================================
+   Zonas: canvas de escena, pistas pinned, capas HTML (cartelas, pantallas)
+   ========================================================================== */
+
+/* Un único canvas fijo para toda la película */
+.scene {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100lvh;          /* no se redimensiona al ocultarse la barra en móvil */
+  z-index: var(--z-canvas);
+  display: block;
+  pointer-events: none;
+  background: var(--navy);
+}
+
+.zones { position: relative; z-index: var(--z-stage); }
+
+.zone { position: relative; }
+
+/* Modo cine: cada pista empieza justo donde acaba el pin de la anterior,
+   así el progreso de las zonas es continuo y no hay "deslizamiento" entre salas. */
+.is-cine .zone + .zone { margin-top: -100vh; }
+
+.zone__stage {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+.is-cine .zone__stage { visibility: hidden; }
+.is-cine .zone.is-active .zone__stage { visibility: visible; }
+
+/* Contenedor de capas con márgenes de página */
+.layer {
+  position: absolute;
+  inset: var(--header-h) var(--gutter) var(--gutter);
+}
+
+/* ——— Fachada ——— */
+.fachada__copy {
+  position: absolute;
+  left: 0;
+  bottom: clamp(1rem, 4vh, 3rem);
+  max-width: min(100%, 46rem);
+  display: grid;
+  gap: var(--space-5);
+}
+.fachada__h1 {
+  font-size: var(--step-4);
+  max-width: 16ch;
+}
+.fachada__lead {
+  font-size: var(--step-1);
+  line-height: var(--leading-snug);
+  color: var(--ink-muted);
+  max-width: 34ch;
+}
+.fachada__firma {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: var(--step-0);
+  color: var(--oak);
+}
+
+/* ——— Pasillo ——— */
+.pasillo__lines {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  font-size: var(--step-4);
+  gap: 0.1em;
+}
+.pasillo__lines span { display: block; }
+.pasillo__lines span:first-child { color: var(--ink-muted); }
+
+/* ——— Balcón ——— */
+.balcon__cta {
+  position: absolute;
+  left: 0;
+  bottom: clamp(1rem, 6vh, 4rem);
+  font-size: var(--step-4);
+  max-width: 14ch;
+}
+
+/* ——— Cartela estilo museo ———
+   Ancla (punto) → filete finísimo → texto pequeño. */
+.cartela {
+  --len: clamp(2.5rem, 5vw, 4.5rem);
+  position: absolute;
+  left: var(--x, 50%);
+  top: var(--y, 50%);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  pointer-events: none;
+  opacity: 0;
+}
+.cartela[data-side="left"] { flex-direction: row-reverse; transform: translateX(-100%); text-align: right; }
+.cartela__anchor {
+  flex: none;
+  width: 5px; height: 5px;
+  margin-top: calc(0.55em - 2px);
+  border: 1px solid var(--stone);
+  border-radius: 50%;
+  translate: -50% 0;
+}
+.cartela[data-side="left"] .cartela__anchor { translate: 50% 0; }
+.cartela__line {
+  flex: none;
+  width: var(--len);
+  height: 1px;
+  margin-top: 0.55em;
+  background: var(--line-strong);
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+.cartela[data-side="left"] .cartela__line { transform-origin: right center; }
+.cartela__body {
+  display: grid;
+  gap: 0.35em;
+  max-width: 17rem;
+  clip-path: inset(0 0 100% 0);
+}
+.cartela__obj {
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+}
+.cartela__text {
+  font-size: var(--step--1);
+  line-height: 1.45;
+  color: var(--ink-muted);
+}
+.cartela__tech {
+  font-size: var(--step--2);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 47.99rem) {
+  .cartela { left: var(--x-m, var(--x, 50%)); top: var(--y-m, var(--y, 50%)); --len: 2rem; }
+  .cartela__body { max-width: 12.5rem; }
+}
+
+/* ——— Pantalla en perspectiva (screenQuad) ——— */
+.quad {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  backface-visibility: hidden;
+  will-change: transform;
+  opacity: 0;
+  border: 0;
+  background: var(--navy);
+  overflow: hidden;
+}
+
+/* Pantalla de prueba del motor (se sustituye por capturas/iframes reales) */
+.quad-test {
+  width: 1280px;
+  height: 800px;
+  background: var(--stone);
+  color: var(--navy);
+  padding: 72px 88px;
+  display: grid;
+  align-content: space-between;
+}
+.quad-test__nav { display: flex; justify-content: space-between; font: 500 20px/1 var(--font-text); letter-spacing: 0.02em; }
+.quad-test__title { font: 400 96px/1.02 var(--font-display); letter-spacing: -0.03em; max-width: 11ch; }
+.quad-test__foot { display: flex; gap: 48px; font: 400 20px/1.4 var(--font-text); color: #4a4d55; }
+
+/* ==========================================================================
+   Modo "imágenes fijas" (movimiento reducido o conexión lenta)
+   ========================================================================== */
+.is-still .zone__stage {
+  visibility: visible;
+  height: auto;
+  min-height: 100vh;
+  min-height: 100svh;
+}
+.is-still .cartela {
+  opacity: 1;
+}
+.is-still .cartela__line { transform: none; }
+.is-still .cartela__body { clip-path: none; }
+.is-still .quad { display: none; }
+
+/* En móvil, en modo fijo las cartelas pasan a lista en flujo */
+@media (max-width: 47.99rem) {
+  .is-still .zone__stage { display: flex; flex-direction: column; justify-content: flex-end; padding: var(--header-h) var(--gutter) var(--space-7); gap: var(--space-5); }
+  .is-still .layer { position: static; inset: auto; }
+  .is-still .layer--cartelas { display: grid; gap: var(--space-5); }
+  .is-still .cartela { position: static; transform: none; flex-direction: row; text-align: left; }
+  .is-still .fachada__copy, .is-still .pasillo__lines { position: static; }
+}

@@ -22,3 +22,11 @@ Experiencia cinematográfica controlada por scroll: la cámara entra por la vent
 - `js/game/` — juego del arcade.
 - `assets/zones/NN-nombre/{desktop,mobile}/` — fotogramas/escenas por zona.
 - `assets/screens/` — capturas o iframes de webs de clientes.
+
+## Motor (fase 1)
+
+- Orden del tick único: Lenis → `zones.flush` → `sequence.render` → `overlay.update` (ver `js/main.js`).
+- Zonas y duraciones en `js/zones/manifest.js` (`ready: false` = placeholder en canvas).
+- Fotogramas: `assets/zones/<slug>/<desktop|mobile>/0001.<ext>`.
+- Pruebas: `?modo=fijo` / `?modo=cine` fuerza el modo; `?listo=pasillo:webp` marca una zona como lista sin tocar el manifiesto.
+- Logo provisional en HTML ("EVIMES" en Libre Baskerville) hasta tener el SVG vectorial.
