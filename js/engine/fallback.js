@@ -43,7 +43,8 @@
   EV.fallback = {
     init: function () {
       if (EV.mode !== 'still') return;
-      var canvas = document.querySelector('.scene');
+      // El canvas (salas) y la fachada (DOM) se funden juntos.
+      var canvas = [document.querySelector('.scene'), document.querySelector('.fachada-cam')].filter(Boolean);
       var fading = null;
       document.addEventListener('ev:zone', function (e) {
         var id = e.detail.id;
@@ -51,7 +52,7 @@
         var dur = EV.reducedMotion ? 0.35 : 0.6;
         fading = gsap.timeline()
           .to(canvas, { opacity: 0, duration: dur * 0.5, ease: 'power2.in' })
-          .add(function () { EV.sequence.showStill(id); })
+          .add(function () { EV.stage.showStill(id); })
           .to(canvas, { opacity: 1, duration: dur, ease: 'power2.out' });
       });
     }

@@ -3,6 +3,13 @@ _10 nov 2026 · Oscar_
 
 Rediseño de evimesweb.com como una película: la cámara entra por la ventana del estudio de Evimes y recorre sus salas de cristal, una por servicio, hasta el CTA en el balcón. Nada se genera ni se construye sin el visto bueno de Oscar.
 
+## Cambio de enfoque (11 nov 2026)
+- No hay vídeos generados ni secuencias de fotogramas de recorridos: se ven raros y delatan la IA.
+- Fachada = foto fija 4K con movimiento de cámara suave en código.
+- Cada sala = un panorama 360° hiperrealista (imagen fija) que gira con el scroll, como la sección estudio de disco.es (Three.js + ScrollTrigger).
+- Entre salas, transiciones limpias de cine (desenfoque de cristal + fundido). Nunca se atraviesa un cristal o una ventana cerrada: o se abre, o es un corte.
+- Todo super clean: ni deformaciones ni parpadeos raros. Si algo no queda perfecto, se quita.
+
 ## Concepto y recorrido
 Edificio señorial de Madrid con las letras EVIMES en la fachada. Dentro, una planta diáfana con salas de cristal sin marcos, una por servicio. El scroll mueve una cámara que nunca se detiene del todo.
 
@@ -125,10 +132,11 @@ Reglas: jerséis de punto elegantes · casi quietas · perfil/tres cuartos/espal
 ## Técnica y reglas de producción
 Stack: HTML + CSS + JS, Tailwind CDN, GSAP + ScrollTrigger, Lenis.
 
-1. Higgsfield: fotogramas clave por sala (validados antes de animar).
-2. Higgsfield: recorridos de cámara entre fotogramas.
-3. Recorridos → secuencias de imágenes controladas por scroll.
+1. Fachada: una foto fija 4K; la cámara (dolly, apertura de la ventana, cruce) es código.
+2. Salas: un panorama 360° equirectangular por sala (5792 / 4096 / 2048 px), validado antes de montarlo.
+3. Recorrido de cada sala = paradas (yaw, pitch, fov) definidas en js/config.js; nada de vídeo.
 4. Encima, HTML real: textos, rótulos, cartelas, pantallas con webs reales en perspectiva, juego.
+(Sustituye al plan anterior de fotogramas clave + recorridos generados con Higgsfield.)
 
 Plan de carga: fachada ~2 MB al entrar · sala 8–15 MB desktop / 3–5 MB móvil · juego 150–300 KB · cada sala se precarga mientras se ve la anterior · AVIF/WebP · modo imágenes fijas con conexión lenta o reducir movimiento.
 

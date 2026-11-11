@@ -56,10 +56,12 @@
     var body = document.createElement('div');
     body.className = 'cartela__body';
 
-    var obj = document.createElement('p');
-    obj.className = 'cartela__obj';
-    obj.textContent = opts.objeto;
-    body.appendChild(obj);
+    if (opts.objeto) {
+      var obj = document.createElement('p');
+      obj.className = 'cartela__obj';
+      obj.textContent = opts.objeto;
+      body.appendChild(obj);
+    }
     if (opts.texto) {
       var tx = document.createElement('p');
       tx.className = 'cartela__text';
@@ -83,9 +85,47 @@
     var span = Math.max(0.0001, to - from);
     var wEl = writer(el), wLine = writer(line), wBody = writer(body);
 
+    /* opts.anchor: función → [x, y] en pantalla (o null). La cartela sigue a
+       su objeto: el punto de ancla queda exactamente sobre él. El lado del
+       texto se decide al aparecer (nunca cambia a la vista). */
+    var anchored = typeof opts.anchor === 'function';
+    var dotY = 0, side = opts.side || 'auto', shown = false, toned = false;
+    if (anchored) {
+      el.classList.add('cartela--anclada');
+      el.style.setProperty('--x', '0px');
+      el.style.setProperty('--y', '0px');
+      el.style.setProperty('--x-m', '0px');
+      el.style.setProperty('--y-m', '0px');
+    }
+    function place(pt, textShown) {
+      if (!shown || !toned) {
+        // Lado del texto: el preferido, salvo que no quepa entre los márgenes.
+        // Se decide (con la tinta) hasta que el texto empieza a verse.
+        var W = window.innerWidth, m = 16, bw = el.offsetWidth;
+        var s = side === 'auto' ? (pt[0] > W * 0.58 ? 'left' : 'right') : side;
+        if (s === 'left' && pt[0] - bw < m && pt[0] + bw <= W - m) s = 'right';
+        else if (s === 'right' && pt[0] + bw > W - m && pt[0] - bw >= m) s = 'left';
+        if (s === 'left') el.dataset.side = 'left'; else delete el.dataset.side;
+        dotY = anchor.offsetTop + anchor.offsetHeight / 2;
+        shown = true;
+      }
+      var left = el.dataset.side === 'left';
+      wEl('transform', 'translate3d(' + pt[0].toFixed(1) + 'px,' + (pt[1] - dotY).toFixed(1) + 'px,0)' + (left ? ' translateX(-100%)' : ''));
+      if (!toned) {
+        // Tinta según lo que hay detrás: clara sobre oscuro, navy sobre papel
+        // o pared clara. Se mide hasta que el texto empieza a verse y ahí se
+        // fija: nunca cambia a la vista.
+        var Lb = EV.stage.luminanceUnder(body.getBoundingClientRect());
+        el.classList.toggle('cartela--clara', Lb != null && Lb > LIGHT_BG);
+        if (textShown) toned = true;
+      }
+    }
+
     items.push({
       zone: opts.zone,
+      progress: opts.progress,
       update: function (p) {
+        if (opts.rangeFn) { var rr = opts.rangeFn(); from = rr[0]; span = Math.max(0.0001, rr[1] - rr[0]); }
         var local = (p - from) / span;
         if (local <= 0 || local >= 1) { this.hide(); return; }
         // entrada: ancla → filete → texto; salida: fundido.
@@ -93,11 +133,16 @@
         var exit = clamp01((1 - local) / 0.2);
         var lineT = expoOut(clamp01(enter * 1.8));
         var bodyT = cubicOut(clamp01(enter * 1.8 - 0.55));
+        if (anchored) {
+          var pt = opts.anchor(p);
+          if (!pt) { this.hide(); return; }
+          place(pt, bodyT > 0.02);
+        }
         wEl('opacity', String(Math.min(clamp01(enter * 6), exit).toFixed(3)));
         wLine('transform', 'scaleX(' + lineT.toFixed(4) + ')');
         wBody('clipPath', 'inset(0 0 ' + ((1 - bodyT) * 100).toFixed(2) + '% 0)');
       },
-      hide: function () { wEl('opacity', '0'); }
+      hide: function () { wEl('opacity', '0'); shown = false; toned = false; }
     });
     return el;
   }
@@ -133,30 +178,14 @@
       c + ',' + f + ',0,1)';
   }
 
-  function lerp(a, b, t) { return a + (b - a) * t; }
-
-  /* Esquinas interpoladas para un fotograma (puede ser fraccional). */
-  function cornersAt(keys, frame) {
-    if (frame < keys[0].f || frame > keys[keys.length - 1].f) return null;
-    var k = 0;
-    while (k < keys.length - 2 && frame > keys[k + 1].f) k++;
-    var A = keys[k], B = keys[Math.min(k + 1, keys.length - 1)];
-    var t = B.f === A.f ? 0 : (frame - A.f) / (B.f - A.f);
-    var out = [];
-    for (var i = 0; i < 4; i++) out.push([lerp(A.c[i][0], B.c[i][0], t), lerp(A.c[i][1], B.c[i][1], t)]);
-    return out;
-  }
-
   /* ---------------------------------------------------------------------
      screenQuad(el, opts)
-     opts: {
-       zone,
-       keyframes: [{ f, c:[[x,y]×4] }]  ó  { desktop:[…], mobile:[…] }
-                  (coordenadas normalizadas 0–1 de la imagen original)
-       smooth: false  → usa el fotograma dibujado (bloqueo exacto a la imagen)
-               true   → usa el fotograma continuo (más suave si la imagen ya
-                        está interpolada o hay muchos fotogramas)
-     }
+     Coloca un elemento HTML (imagen, iframe, página) sobre 4 puntos de
+     pantalla con matrix3d. Los puntos los da el escenario en cada tick
+     (en las salas, la proyección exacta de 4 direcciones yaw/pitch con la
+     misma cámara que dibuja el panorama: la capa no baila al girar).
+     opts: { zone, points: function (p) → [[x,y]×4] | null,
+             opacity: function (p) → 0–1 (opcional) }
      --------------------------------------------------------------------- */
   function screenQuad(el, opts) {
     el.classList.add('quad');
@@ -170,38 +199,22 @@
     window.addEventListener('resize', measure);
 
     var wEl = writer(el);
-    var keysFor = function () {
-      var k = opts.keyframes;
-      if (Array.isArray(k)) return k;
-      return k[EV.sequence.variant()] || k.desktop;
-    };
-    /* opts.corners: esquinas FIJAS en espacio de imagen (función o
-       { desktop, mobile }). Para un keyframe con cámara: la cámara mueve la
-       imagen y la capa la sigue sola. Con fotogramas reales se pasa a
-       opts.keyframes (tracking por fotograma) sin tocar nada más. */
-    var cornersFor = function () {
-      var c = typeof opts.corners === 'function' ? opts.corners() : opts.corners;
-      if (!c) return null;
-      return Array.isArray(c) ? c : (c[EV.sequence.variant()] || c.desktop);
-    };
-
     var api = {
       zone: opts.zone,
+      progress: opts.progress,
       update: function (p, active) {
         if (!active) { this.hide(); return; }
-        var d = EV.sequence.drawn();
-        if (d.id !== opts.zone || d.frame < 0) { this.hide(); return; }
-        var q;
-        if (opts.corners) q = cornersFor();
-        else q = cornersAt(keysFor(), opts.smooth ? EV.sequence.wanted().f : d.frame);
-        if (!q) { this.hide(); return; }
-        var pts = q.map(function (c) { return EV.sequence.imageToScreen(c[0], c[1]); });
+        var pts = opts.points(p);
+        if (!pts) { this.hide(); return; }
         var m = quadMatrix(size.w, size.h, pts);
         if (!m) { this.hide(); return; }
+        var o = opts.opacity ? opts.opacity(p) : 1;
+        if (o <= 0.001) { this.hide(); return; }
         wEl('transform', m);
-        wEl('opacity', '1');
+        wEl('opacity', o >= 0.999 ? '1' : o.toFixed(3));
+        wEl('visibility', 'visible');
       },
-      hide: function () { wEl('opacity', '0'); },
+      hide: function () { wEl('opacity', '0'); wEl('visibility', 'hidden'); },
       measure: measure
     };
     items.push(api);
@@ -226,25 +239,30 @@
   function lin2s(L) { return L <= 0.0031308 ? L * 12.92 : 1.055 * Math.pow(L, 1 / 2.4) - 0.055; }
   function s2lin(s) { return s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4); }
   var S_NAVY = lin2s(L_NAVY);
+  var S_STONE = lin2s(L_TEXT);
+  /* Por encima de este brillo, una cartela anclada pasa a tinta navy con un
+     velo claro (como una cartela de museo sobre pared clara). */
+  var LIGHT_BG = 0.36;
 
   /* Contraste de un texto (luminancia del color Lt, alfa ta) sobre un fondo Lb
-     cubierto por navy con alfa a. Las mezclas ocurren en sRGB, como el navegador. */
-  function contrastWith(a, Lb, Lt, ta) {
-    var sb = (1 - a) * lin2s(Lb) + a * S_NAVY;
+     cubierto por un velo (navy, o piedra si `So` = S_STONE) con alfa a.
+     Las mezclas ocurren en sRGB, como el navegador. */
+  function contrastWith(a, Lb, Lt, ta, So) {
+    var sb = (1 - a) * lin2s(Lb) + a * (So == null ? S_NAVY : So);
     var st = ta * lin2s(Lt) + (1 - ta) * sb;
     var L1 = s2lin(st), L2 = s2lin(sb);
     return (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
   }
 
-  /* Alfa de navy mínimo para alcanzar `ratio` (bisección; >0.55 = imposible). */
-  function alphaFor(Lb, ratio, Lt, ta) {
+  /* Alfa mínimo del velo para alcanzar `ratio` (bisección; >0.55 = imposible). */
+  function alphaFor(Lb, ratio, Lt, ta, So) {
     Lt = Lt == null ? L_TEXT : Lt; ta = ta == null ? 1 : ta;
-    if (contrastWith(0, Lb, Lt, ta) >= ratio) return 0;
-    if (contrastWith(1, Lb, Lt, ta) < ratio) return Infinity;
+    if (contrastWith(0, Lb, Lt, ta, So) >= ratio) return 0;
+    if (contrastWith(1, Lb, Lt, ta, So) < ratio) return Infinity;
     var lo = 0, hi = 1;
     for (var i = 0; i < 18; i++) {
       var mid = (lo + hi) / 2;
-      if (contrastWith(mid, Lb, Lt, ta) >= ratio) hi = mid; else lo = mid;
+      if (contrastWith(mid, Lb, Lt, ta, So) >= ratio) hi = mid; else lo = mid;
     }
     return hi;
   }
@@ -299,7 +317,7 @@
     var profile = null;
     var cur = base;
     var wEl = writer(el);
-    var lastKey = '', need = base;
+    var lastKey = '', need = base, lastLight = false;
     var box = { w: -1, h: -1, x: 0, y: 0 };
 
     function layout(rect, prect) {
@@ -346,19 +364,23 @@
         var prect = parent.getBoundingClientRect();
         layout(rect, prect);
 
+        // Cartela clara (tinta navy): el velo pasa a ser de piedra.
+        var light = target.classList.contains('cartela--clara');
+        if (light !== lastLight) { lastLight = light; profile = null; lastKey = ''; el.classList.toggle('scrim--claro', light); }
         if (profile === null) profile = textProfile(target);
 
         // Brillo bajo el texto: solo se recalcula si cambia el fotograma o la caja.
-        var d = EV.sequence.drawn();
+        var d = EV.stage.drawn();
         var key = d.key + '|' + Math.round(rect.left) + ',' + Math.round(rect.top) + ',' + Math.round(rect.width) + ',' + Math.round(rect.height);
         if (key !== lastKey) {
           lastKey = key;
-          var Lb = EV.sequence.luminanceUnder(rect);
+          var Lb = EV.stage.luminanceUnder(rect);
           var req = 0;
+          var So = light ? S_STONE : S_NAVY;
           if (Lb == null) req = base;
-          else profile.forEach(function (t) { req = Math.max(req, alphaFor(Lb, t.ratio, t.L, t.a) / plateau); });
-          if (req > SCRIM_MAX && !warned[key]) {
-            warned[key] = true;
+          else profile.forEach(function (t) { req = Math.max(req, alphaFor(Lb, t.ratio, t.L, t.a, So) / plateau); });
+          if (req > SCRIM_MAX && !api.warned) {
+            api.warned = true;
             console.warn('[scrim] AA no alcanzable con el tope de 55 % en ' + opts.zone + ' (fotograma ' + d.frame + '): ajusta el encuadre o mueve el texto.', target);
           }
           need = Math.min(SCRIM_MAX, Math.max(base, req));
@@ -390,6 +412,8 @@
     screenQuad: screenQuad,
     quadMatrix: quadMatrix,
     scrim: scrim,
+    /* Capa propia de una zona: { zone, progress?, update(p, active), hide() } */
+    add: function (it) { items.push(it); return it; },
     applyScrims: applyScrims,
     contrastAlpha: alphaFor,
     contrast: contrastWith, // (alfa navy, L fondo, L texto, alfa texto) → ratio WCAG
@@ -399,7 +423,8 @@
       var active = EV.zones.active();
       for (var i = 0; i < items.length; i++) {
         var it = items[i];
-        it.update(EV.zones.progress(it.zone), it.zone === active);
+        // Las capas de las salas usan el progreso suavizado de su cámara.
+        it.update(it.progress ? it.progress() : EV.zones.progress(it.zone), it.zone === active);
       }
     }
   };

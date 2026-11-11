@@ -28,7 +28,7 @@
     var z = byId[id];
     z.section.classList.add('is-active');
     z.dirty = true;
-    if (!jumping) EV.sequence.setActive(id);
+    if (!jumping) EV.stage.setActive(id);
     document.dispatchEvent(new CustomEvent('ev:zone', { detail: { id: id, index: z.index, label: z.cfg.label } }));
   }
 
@@ -84,7 +84,7 @@
       });
 
       setActive(list[0].cfg.id);
-      if (!cine) EV.sequence.showStill(list[0].cfg.id);
+      if (!cine) EV.stage.showStill(list[0].cfg.id);
       // Tras cada refresh (resize, fuentes, restauración de scroll) recalcular la activa.
       if (cine) ScrollTrigger.addEventListener('refresh', resolveActive);
     },
@@ -95,9 +95,9 @@
     flush: function () {
       var a = byId[activeId];
       if (!a) return;
-      if (EV.mode === 'cine') EV.sequence.set(activeId, a.progress);
       for (var i = 0; i < list.length; i++) {
         var z = list[i];
+        if (EV.mode === 'cine') EV.stage.set(z.cfg.id, z.progress);
         if (!z.dirty) continue;
         z.dirty = false;
         var fns = listeners[z.cfg.id];
@@ -129,9 +129,9 @@
           ScrollTrigger.update();
           jumping = false;
           resolveActive();
-          EV.sequence.setActive(id);
+          EV.stage.setActive(id);
           if (done) done();
-          EV.sequence.whenReady(id, 900).then(function () {
+          EV.stage.whenReady(id, 900).then(function () {
             gsap.to(curtain, { opacity: 0, duration: 0.7, ease: 'power2.out', delay: 0.05 });
           });
         }

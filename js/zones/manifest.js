@@ -1,10 +1,9 @@
 /* ==========================================================================
    Manifiesto de zonas.
    - screens : duración del pin en "pantallas" (alto de viewport).
-   - frames  : número de fotogramas de la secuencia.
-   - ext     : 'avif' | 'webp'.
-   - ready   : false = aún no hay fotogramas reales → placeholder en canvas.
-   - poster  : fotograma usado en modo "imágenes fijas".
+   - frames, ext, ready, poster: del motor de secuencias (sequence-legacy.js,
+     desconectado). Ya no hay vídeos: la fachada es foto fija y las salas,
+     panoramas 360° (config.salas). Se conservan solo por si se reactiva.
    - scrim   : degradados locales detrás de los bloques de texto.
                { target: selector dentro de la zona,
                  shape: 'radial' | 'left' | 'right',
@@ -20,11 +19,8 @@ EV.manifest = {
     mobile:  { w: 1080, h: 1920 }
   },
   zones: [
+    // Foto fija + cámara en código (01-fachada.js). Sin vídeo.
     { id: 'fachada',        slug: '01-fachada',        label: 'Fachada',        note: 'Calle',            screens: 3, frames: 120, ext: 'avif', ready: false, poster: 0,
-      // Sin vídeo aún: keyframe con empuje de cámara (lo calcula 01-fachada.js).
-      // Cuando lleguen los fotogramas: ready: true y la cámara se apaga sola.
-      keyframe: { desktop: 'assets/zones/01-fachada/desktop/keyframe', mobile: 'assets/zones/01-fachada/mobile/keyframe',
-                  hd: { desktop: 'assets/zones/01-fachada/desktop/keyframe-4096' } }, // HD para el empuje (solo AVIF)
       scrim: [{ target: '.fachada__copy', shape: 'left', intensity: 0.3 }] },
     { id: 'pasillo',        slug: '02-pasillo',        label: 'Pasillo',        note: 'Planta noble',     screens: 2, frames: 90,  ext: 'avif', ready: false, poster: 45,
       scrim: [{ target: '.pasillo__lines', shape: 'radial', intensity: 0.25, range: [0.1, 0.95] }] },

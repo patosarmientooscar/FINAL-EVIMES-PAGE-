@@ -100,14 +100,17 @@
   <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
   <canvas class="scene" aria-hidden="true"></canvas>
-  <!-- Primer fotograma en HTML: es el LCP y se ve sin JS. El canvas lo releva. -->
-  <picture class="poster" data-poster="fachada">
-    <source media="(max-width: 767px), (orientation: portrait)" type="image/avif" srcset="assets/zones/01-fachada/mobile/keyframe.avif">
-    <source media="(max-width: 767px), (orientation: portrait)" type="image/webp" srcset="assets/zones/01-fachada/mobile/keyframe.webp">
-    <source type="image/avif" srcset="assets/zones/01-fachada/desktop/keyframe.avif">
-    <img src="assets/zones/01-fachada/desktop/keyframe.webp" width="2560" height="1434" fetchpriority="high" decoding="async"
-         alt="Fachada de un edificio señorial de Madrid a la hora azul, con una ventana encendida en la planta noble.">
-  </picture>
+  <!-- Fachada: foto fija (LCP, se ve sin JS). La cámara mueve este contenedor
+       entero; letras, hojas de la ventana e interior viven dentro. -->
+  <div class="fachada-cam">
+    <picture class="poster" data-poster="fachada">
+      <source media="(max-width: 767px), (orientation: portrait)" type="image/avif" srcset="assets/zones/01-fachada/mobile/keyframe.avif">
+      <source media="(max-width: 767px), (orientation: portrait)" type="image/webp" srcset="assets/zones/01-fachada/mobile/keyframe.webp">
+      <source type="image/avif" srcset="assets/zones/01-fachada/desktop/keyframe.avif">
+      <img src="assets/zones/01-fachada/desktop/keyframe.webp" width="2560" height="1434" fetchpriority="high" decoding="async"
+           alt="Fachada de un edificio señorial de Madrid a la hora azul, con una ventana encendida en la planta noble.">
+    </picture>
+  </div>
   <div class="curtain" aria-hidden="true"></div>
   <div class="grain" aria-hidden="true"></div>
 
@@ -293,13 +296,7 @@
     <section class="zone" id="zona-diseno-web" data-zone="diseno-web" aria-labelledby="h-diseno-web">
       <div class="zone__stage">
         <h2 class="sr-only" id="h-diseno-web" data-c="disenoWeb.rotulo">Diseño Web</h2>
-        <div class="layer layer--cartelas"></div>
-        <!-- Pantalla de prueba de screenQuad (se sustituye por capturas/iframes de clientes) -->
-        <div class="quad quad-test" aria-hidden="true">
-          <div class="quad-test__nav"><span>Pantalla de prueba</span><span>1280 × 800</span></div>
-          <p class="quad-test__title">Esta capa es HTML real, no imagen.</p>
-          <div class="quad-test__foot"><span>screenQuad · matrix3d</span><span>4 esquinas interpoladas por fotograma</span></div>
-        </div>
+        <!-- Panorama 360°: cartelas, rótulo y pantallas las coloca js/engine/pano.js -->
       </div>
     </section>
 
@@ -334,6 +331,12 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://unpkg.com/lenis@1.1.20/dist/lenis.min.js"></script>
+  <!-- Three.js (salas 360°). Módulo: se ejecuta antes de DOMContentLoaded,
+       así main.js ya lo encuentra en window.THREE. -->
+  <script type="module">
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js';
+    window.THREE = THREE;
+  </script>
 
   <!-- Datos y textos -->
   <script src="js/config.js"></script>
@@ -343,12 +346,15 @@
 
   <!-- Motor -->
   <script src="js/engine/lenis.js"></script>
-  <script src="js/engine/sequence.js"></script>
+  <script src="js/engine/stage.js"></script>
   <script src="js/engine/zones.js"></script>
   <script src="js/engine/overlay.js"></script>
+  <script src="js/engine/ajuste.js"></script>
+  <script src="js/engine/pano.js"></script>
 
   <!-- Zonas -->
   <script src="js/zones/room.js"></script>
+  <script src="js/zones/growth.js"></script>
   <script src="js/zones/01-fachada.js"></script>
   <script src="js/zones/02-pasillo.js"></script>
   <script src="js/zones/03-diseno-web.js"></script>

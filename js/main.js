@@ -1,8 +1,8 @@
 /* ==========================================================================
    main.js — arranque. Orden del tick único (gsap.ticker):
      1. Lenis.raf            (prioritario, en lenis.js) → ScrollTrigger.update
-     2. zones.flush          progreso → canvas y oyentes de capas
-     3. sequence.render      dibuja el fotograma (solo si cambió)
+     2. zones.flush          progreso → escenarios y oyentes de capas
+     3. stage.render         fachada (cámara DOM) y salas 360° (Three.js)
      4. overlay.update       cartelas y pantallas, sincronizadas con lo dibujado
    ========================================================================== */
 (function () {
@@ -23,7 +23,8 @@
 
     bindContent();
     EV.scroll.init();
-    EV.sequence.init(document.querySelector('.scene'));
+    EV.stage.init(document.querySelector('.scene'));
+    if (EV.pano) EV.pano.init(document.querySelector('.scene'));
     EV.zones.init();
 
     EV.zones.all().forEach(function (z) {
@@ -37,7 +38,7 @@
 
     gsap.ticker.add(function () {
       EV.zones.flush();
-      EV.sequence.render();
+      EV.stage.render();
       EV.overlay.update();
     });
 
@@ -45,7 +46,7 @@
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(function () {
         ScrollTrigger.refresh();
-        EV.sequence.invalidate();
+        EV.stage.invalidate();
       });
     }
     document.documentElement.classList.add('is-ready');
