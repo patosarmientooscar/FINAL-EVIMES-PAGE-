@@ -5,7 +5,7 @@
 
    lineas: las tres líneas del titular. Entre corchetes, la palabra que lleva
    el subrayado cian ("tu [sí]."). suave: true = línea en gris más suave.
-   asunto: asunto del correo de "Pide tu propuesta" al pulsar el CTA.
+   perfil: lo que el CTA marca en "Soy…" del formulario de contacto.
    ========================================================================== */
 window.EVIMES_CLIENTES = [
   {
@@ -15,7 +15,7 @@ window.EVIMES_CLIENTES = [
     texto: 'Somos el estudio técnico de agencias creativas e innovadoras. Webs 3D, WebGL e interacción a medida, con vuestra marca y a vuestro ritmo.',
     cta: 'Hablemos de un proyecto',
     href: '#contacto',
-    asunto: 'Proyecto para agencia',
+    perfil: 'Agencia creativa',
     puntos: [
       { titulo: 'Marca blanca', texto: 'Lo presentáis como vuestro. Nosotros, detrás.' },
       { titulo: '3D y WebGL a medida', texto: 'Lo que otros no se atreven a programar.' },
@@ -29,7 +29,7 @@ window.EVIMES_CLIENTES = [
     texto: 'Restaurantes, barberías y comercios de Madrid con una web que trabaja por ellos, también cuando está cerrado.',
     cta: 'Pide tu propuesta',
     href: '#contacto',
-    asunto: 'Propuesta web',
+    perfil: 'Negocio local',
     puntos: [
       { titulo: 'Web rápida', texto: 'Carga al instante, también en el móvil.' },
       { titulo: 'Google y Maps', texto: 'Que te encuentren cuando te buscan cerca.' },

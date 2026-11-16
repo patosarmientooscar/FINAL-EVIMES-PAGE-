@@ -39,8 +39,6 @@
     "url": "https://www.evimesweb.com/",
     "logo": "https://www.evimesweb.com/apple-touch-icon.png",
     "image": "https://www.evimesweb.com/assets/onda/onda-og.jpg",
-    "telephone": "+34636736167",
-    "email": "evimes@evimesweb.com",
     "address": {
       "@type": "PostalAddress",
       "streetAddress": "Av. Cardenal Herrera Oria 171",
@@ -88,6 +86,7 @@
   <link rel="stylesheet" href="css/gris.css">
   <link rel="stylesheet" href="css/oficina.css">
   <link rel="stylesheet" href="css/con-quien.css">
+  <link rel="stylesheet" href="css/contacto.css">
 </head>
 <body class="inicio">
   <a class="skip-link" href="#contenido">Saltar al contenido</a>
@@ -299,18 +298,80 @@
       <p class="planes__mas"><a class="enlace" href="planes.html" data-scramble><span class="sl" data-c="inicio.planes.verTodo">Ver qué incluye cada plan</span> →</a></p>
     </section>
 
-    <!-- ===== Contacto ===== -->
+    <!-- ===== Contacto: formulario (Web3Forms; la clave va en js/config.js → WEB3FORMS_KEY). JS: js/contacto/form.js · CSS: css/contacto.css ===== -->
     <section class="contacto" id="contacto" aria-labelledby="h-contacto">
-      <h2 class="display contacto__titulo" id="h-contacto" data-c="inicio.contacto.titulo">¿Hacemos que se te vea?</h2>
-      <div class="contacto__botones">
-        <a class="pastilla pastilla--grande" href="mailto:evimes@evimesweb.com?subject=Propuesta%20web" data-propuesta data-c="inicio.contacto.cta">Pide tu propuesta</a>
-        <a class="enlace" href="#" data-whatsapp target="_blank" rel="noopener" hidden data-c="inicio.contacto.whatsapp">o escríbenos por WhatsApp</a>
+      <div class="contacto__cab">
+        <h2 class="display contacto__titulo" id="h-contacto" data-c="inicio.contacto.titulo">¿Hacemos que se te vea?</h2>
+        <p class="contacto__intro">Cuéntanos qué necesitas. Te respondemos con una propuesta clara.</p>
+        <p class="contacto__directo" data-directo hidden>
+          <a data-whatsapp href="#" target="_blank" rel="noopener" hidden>WhatsApp</a>
+          <a data-email href="#" hidden></a>
+          <a data-telefono href="#" hidden></a>
+        </p>
       </div>
-      <p class="contacto__plan" data-plan-elegido aria-live="polite" hidden></p>
-      <p class="contacto__directo">
-        <a data-email href="mailto:evimes@evimesweb.com">evimes@evimesweb.com</a>
-        <a data-telefono href="tel:+34636736167">+34 636 73 61 67</a>
-      </p>
+
+      <div class="contacto__form" data-form-caja>
+        <form class="form" data-form novalidate aria-describedby="form-nota">
+          <!-- trampa para bots (Web3Forms): oculta para personas y lectores de pantalla -->
+          <input class="form__hp" type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+          <div class="campo">
+            <input class="campo__input" id="f-nombre" name="nombre" type="text" autocomplete="name" required placeholder=" " aria-describedby="f-nombre-err">
+            <label class="campo__label" for="f-nombre">Nombre <span aria-hidden="true">*</span></label>
+            <span class="campo__linea" aria-hidden="true"></span>
+            <p class="campo__error" id="f-nombre-err"></p>
+          </div>
+          <div class="campo">
+            <input class="campo__input" id="f-email" name="email" type="email" autocomplete="email" inputmode="email" required placeholder=" " aria-describedby="f-email-err">
+            <label class="campo__label" for="f-email">Email <span aria-hidden="true">*</span></label>
+            <span class="campo__linea" aria-hidden="true"></span>
+            <p class="campo__error" id="f-email-err"></p>
+          </div>
+          <div class="campo">
+            <input class="campo__input" id="f-telefono" name="telefono" type="tel" autocomplete="tel" inputmode="tel" placeholder=" " aria-describedby="f-telefono-err">
+            <label class="campo__label" for="f-telefono">Teléfono <span class="campo__opc">(opcional)</span></label>
+            <span class="campo__linea" aria-hidden="true"></span>
+            <p class="campo__error" id="f-telefono-err"></p>
+          </div>
+
+          <fieldset class="grupo">
+            <legend class="grupo__legend">Soy…</legend>
+            <div class="grupo__chips">
+              <label class="chip"><input type="radio" name="perfil" value="Agencia creativa"><span>Agencia creativa</span></label>
+              <label class="chip"><input type="radio" name="perfil" value="Negocio local"><span>Negocio local</span></label>
+              <label class="chip"><input type="radio" name="perfil" value="Otro"><span>Otro</span></label>
+            </div>
+          </fieldset>
+          <fieldset class="grupo">
+            <legend class="grupo__legend">Plan que te interesa</legend>
+            <div class="grupo__chips">
+              <label class="chip"><input type="radio" name="plan" value="fundamento"><span>Fundamento</span></label>
+              <label class="chip"><input type="radio" name="plan" value="inmersion"><span>Inmersión</span></label>
+              <label class="chip"><input type="radio" name="plan" value="impacto"><span>Impacto</span></label>
+              <label class="chip"><input type="radio" name="plan" value="aun-no"><span>Aún no lo sé</span></label>
+            </div>
+          </fieldset>
+
+          <div class="campo campo--area">
+            <textarea class="campo__input" id="f-mensaje" name="mensaje" rows="4" required placeholder=" " aria-describedby="f-mensaje-err"></textarea>
+            <label class="campo__label" for="f-mensaje">Mensaje <span aria-hidden="true">*</span></label>
+            <span class="campo__linea" aria-hidden="true"></span>
+            <p class="campo__error" id="f-mensaje-err"></p>
+          </div>
+
+          <div class="casilla">
+            <input id="f-privacidad" name="privacidad" type="checkbox" required aria-describedby="f-privacidad-err">
+            <label for="f-privacidad">He leído y acepto la <a href="privacidad.html">política de privacidad</a>. <span aria-hidden="true">*</span></label>
+            <p class="campo__error" id="f-privacidad-err"></p>
+          </div>
+
+          <div class="form__pie">
+            <button class="pastilla pastilla--grande form__enviar" type="submit" data-scramble><span class="sl">Enviar</span></button>
+            <p class="form__nota" id="form-nota">Los campos con * son obligatorios.</p>
+          </div>
+          <div class="form__estado" data-form-estado role="status" aria-live="polite"></div>
+        </form>
+      </div>
     </section>
   </main>
 
@@ -343,6 +404,7 @@
   <script defer src="js/fondo/onda.js"></script>
   <script defer src="js/home.js"></script>
   <script defer src="js/gris/clientes.js"></script>
+  <script defer src="js/contacto/form.js"></script>
   <!-- Bento: módulo ES; Three.js 0.160.0 (la misma URL que la onda) se importa al acercarse al bento. -->
   <script type="module" src="js/bento/index.js"></script>
   <!-- La oficina: módulo ES; Three.js 0.160.0 y el panorama se cargan a una pantalla de distancia. -->

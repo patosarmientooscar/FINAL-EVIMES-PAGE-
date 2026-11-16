@@ -21,3 +21,17 @@ Lo que decidí sin poder preguntar, y por qué. Lo que Oscar tiene que revisar e
 - "Ver más →" del bento: aria-label "Ver más sobre <oficio>" (cuatro enlaces iguales no dicen adónde van).
 - Páginas de texto y legales: el botón "Pide tu propuesta" tenía un relleno que barría el texto al pasar el ratón; se quita y queda el scramble, que es el efecto común. "Volver al inicio" también lo lleva. No se ha tocado ni una palabra del texto legal.
 - Aplicado a: menú (4 enlaces), "Pide tu propuesta" de cabecera y hero, "Ver proyectos", los 4 "Ver más", "Ver la web" de la oficina, los CTA de Con quién, los botones de los planes, "Ver qué incluye cada plan". No al interruptor de Con quién ni a los campos del formulario.
+
+## Bloque 3 · Formulario de contacto (`v-form`)
+- Web3Forms con POST JSON a https://api.web3forms.com/submit. Clave en `js/config.js` → `WEB3FORMS_KEY: ''`.
+- **Para activarlo (Oscar, 3 pasos):**
+  1. Entra en https://web3forms.com, escribe tu email (el que recibirá las propuestas) y pulsa "Create Access Key". Te llega la clave por correo.
+  2. Pégala en `js/config.js` → `WEB3FORMS_KEY: 'la-clave'` (la clave es pública por diseño: solo sirve para enviarte correos a ti).
+  3. Sube la web y haz un envío de prueba desde el formulario; debe llegarte "Nueva propuesta desde evimesweb.com".
+- Mientras la clave esté vacía, el formulario valida y al enviar dice "Formulario en configuración" (y ofrece WhatsApp / email si están en config.js).
+- "Soy…" y "Plan que te interesa" son chips (radio) en lugar de desplegables: con etiquetas que flotan, un `<select>` no encaja, y así el plan se ve preseleccionado de un vistazo. No son obligatorios (el prompt solo marca con * nombre, email, mensaje y privacidad).
+- Preselección: `?plan=…`, `index.html#contacto?plan=…` (desde planes.html; al cargar baja al formulario y deja el hash en `#contacto`), los botones de los planes de la home (`data-plan`) y los CTA de Con quién (`data-perfil` marca "Soy…": antes cambiaban el asunto del mailto, que ya no existe).
+- Datos privados fuera del código: el email y el teléfono que había en `js/config.js`, en el HTML de la home (enlaces y JSON-LD) y como "respaldo" en home.js y clientes.js se han quitado. `config.js` lleva `email`, `telefono`, `telefonoHref` y `whatsapp` vacíos; los enlaces directos solo se ven si están rellenos.
+- NO se han tocado los textos legales (aviso legal, privacidad, cookies, términos), que llevan el email y el teléfono del titular: es texto legal (regla del proyecto) y la LSSI obliga a publicarlos. Tampoco `oficina.html` (aparcada).
+- Animación de "Recibido": anillo (scale + opacity) y check que se dibuja con clip-path; nada fuera de transform/opacity/clip-path.
+- Errores en un coral claro (#ff9b8a, ≈ 9:1 sobre el navy).

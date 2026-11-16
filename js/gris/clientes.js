@@ -7,7 +7,7 @@
    (umbral .3); al cambiar, el panel que sale se va hacia arriba y el nuevo
    entra (600 ms).
    Cambios de estructura: los paneles se pintan desde js/data/clientes.js
-   (BORRADOR) y el CTA pone el asunto del correo de "Pide tu propuesta".
+   (BORRADOR) y el CTA marca "Soy…" en el formulario de contacto (data-perfil).
    ========================================================================== */
 (function () {
   var root = document.querySelector('[data-cq]');
@@ -29,7 +29,7 @@
         return '<span class="l"><span' + (o.suave ? ' class="soft"' : '') + '>' + marca(o.texto) + '</span></span>';
       }).join('\n') + '</h2>' +
       '<div class="side"><p>' + esc(d.texto) + '</p>' +
-        '<a class="cta" href="' + esc(d.href || '#contacto') + '" data-asunto="' + esc(d.asunto) + '" data-scramble><span class="sl">' + esc(d.cta) + '</span> <i aria-hidden="true">→</i></a></div>' +
+        '<a class="cta" href="' + esc(d.href || '#contacto') + '" data-perfil="' + esc(d.perfil) + '" data-scramble><span class="sl">' + esc(d.cta) + '</span> <i aria-hidden="true">→</i></a></div>' +
       '<div class="points">' + d.puntos.map(function (p, k) {
         return '<div class="pt"><b>' + String(k + 1).padStart(2, '0') + '</b><h3>' + esc(p.titulo) + '</h3><p>' + esc(p.texto) + '</p></div>';
       }).join('') + '</div>' +
@@ -55,12 +55,4 @@
   }
   btns.forEach(function (b) { b.addEventListener('click', function () { go(+b.dataset.i); }); });
   sw.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); var n = cur ? 0 : 1; go(n); btns[n].focus(); } });
-
-  // El asunto del correo de "Pide tu propuesta" según el caso elegido.
-  stage.addEventListener('click', function (e) {
-    var a = e.target.closest('[data-asunto]');
-    if (!a) return;
-    var p = document.querySelector('[data-propuesta]');
-    if (p) p.href = 'mailto:' + ((window.EVIMES_CONFIG && EVIMES_CONFIG.email) || 'evimes@evimesweb.com') + '?subject=' + encodeURIComponent(a.dataset.asunto);
-  });
 })();

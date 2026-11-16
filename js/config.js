@@ -86,11 +86,16 @@ window.EVIMES_CONFIG = {
     }
   },
 
-  // Contacto. Teléfono y email tomados del aviso legal de la web antigua.
-  telefono: '+34 636 73 61 67',
-  telefonoHref: 'tel:+34636736167',
-  whatsapp: '',          // número en internacional sin "+", p. ej. "34636736167". Vacío = sin botón flotante.
-  email: 'evimes@evimesweb.com',
+  // Contacto. LO RELLENA OSCAR (el repositorio no lleva datos privados).
+  // Vacío = el enlace no se muestra.
+  telefono: '',          // tal cual se lee, p. ej. '+34 600 00 00 00'
+  telefonoHref: '',      // p. ej. 'tel:+34600000000'
+  whatsapp: '',          // número en internacional sin '+', p. ej. '34600000000'
+  email: '',             // p. ej. 'hola@tudominio.com'
+
+  // Formulario de contacto (Web3Forms: web3forms.com → pon tu email → te mandan la clave).
+  // Vacía: el formulario valida pero al enviar dice 'Formulario en configuración'.
+  WEB3FORMS_KEY: '',
   redes: {
     instagram: '',
     linkedin: '',

@@ -183,27 +183,18 @@
     io.observe(ol);
   }
 
-  /* ---------- contacto ---------- */
-  var planElegido = null;
-  function mailto() {
-    var asunto = 'Propuesta web' + (planElegido ? ' · plan ' + planElegido.nombre : '');
-    return 'mailto:' + (cfg.email || 'evimes@evimesweb.com') + '?subject=' + encodeURIComponent(asunto);
-  }
-  function elegirPlan(id) {
-    planElegido = (window.EVIMES_PLANES || []).filter(function (p) { return p.id === id; })[0] || null;
-    var a = $('[data-propuesta]'); a.href = mailto();
-    var n = $('[data-plan-elegido]');
-    if (planElegido) { n.textContent = 'Plan elegido: ' + planElegido.nombre + '.'; n.hidden = false; }
-    var wa = $('[data-whatsapp]');
-    if (cfg.whatsapp) wa.href = 'https://wa.me/' + cfg.whatsapp + '?text=' + encodeURIComponent('Hola, quiero una propuesta web' + (planElegido ? ' (plan ' + planElegido.nombre + ')' : '') + '.');
-  }
+  /* ---------- contacto ----------
+     El formulario es js/contacto/form.js. Aquí solo: el plan elegido en una
+     card de plan se preselecciona en el formulario, y los enlaces directos
+     (WhatsApp, email, teléfono) salen de js/config.js; vacíos, no se muestran. */
+  function elegirPlan(id) { if (EV.form && EV.form.plan) EV.form.plan(id); }
   function contacto() {
-    $('[data-propuesta]').href = mailto();
-    var wa = $('[data-whatsapp]');
-    if (cfg.whatsapp) { wa.hidden = false; elegirPlan(null); }
-    else wa.remove();                      // sin número: sin enlace
-    $$('[data-email]').forEach(function (a) { if (cfg.email) { a.href = 'mailto:' + cfg.email; a.textContent = cfg.email; } });
-    $$('[data-telefono]').forEach(function (a) { if (cfg.telefono) { a.href = cfg.telefonoHref; a.textContent = cfg.telefono; } });
+    var hay = false, cont = $('[data-directo]');
+    var wa = $('[data-whatsapp]'), em = $('[data-email]'), tel = $('[data-telefono]');
+    if (wa && cfg.whatsapp) { wa.href = 'https://wa.me/' + cfg.whatsapp; wa.hidden = false; hay = true; }
+    if (em && cfg.email) { em.href = 'mailto:' + cfg.email; em.textContent = cfg.email; em.hidden = false; hay = true; }
+    if (tel && cfg.telefono) { tel.href = cfg.telefonoHref || ('tel:' + cfg.telefono.replace(/s/g, '')); tel.textContent = cfg.telefono; tel.hidden = false; hay = true; }
+    if (cont) cont.hidden = !hay;
   }
 
   /* ---------- estado por scroll (sin lecturas de layout por fotograma) ---------- */
