@@ -208,6 +208,8 @@
   background: radial-gradient(closest-side, rgb(8 11 20 / 0.86), rgb(8 11 20 / 0.6) 55%, rgb(8 11 20 / 0));
 }
 .portada__h1 { font-size: clamp(42px, 6.4vw, 100px); }
+/* "altura" en cian (el punto final, no). Va dentro del span que sube: entra con su línea. */
+.portada__h1 .accent { color: var(--cyan); }
 .linea { display: block; overflow: hidden; padding-bottom: 0.12em; margin-bottom: -0.12em; }
 .linea > span { display: inline-block; }
 .portada__sub {

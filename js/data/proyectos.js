@@ -32,19 +32,3 @@ window.EVIMES_PROYECTOS = {
     { id: 'p5', proximamente: true }
   ]
 };
-
-/* ==========================================================================
-   La oficina (home, panel gris → #oficina-slot): las 4 cards que salen del
-   monitor. Las lee js/oficina/config.js. EDITABLE.
-   · Solo proyectos reales. Sin cifras.
-   · soon:true = "Próximo proyecto · En el horno" (sin enlace). hue: 0 | 1, el
-     degradado de su cristal esmerilado.
-   · img: captura de la web (assets/proyectos/), 1280×800.
-   ========================================================================== */
-window.EVIMES_TRABAJO = [
-  { title: 'Disco Producción', sub: 'Productora audiovisual · Madrid', img: 'assets/proyectos/discoproduccion.jpg', url: 'https://discoproduccion.com' },
-  { title: 'Amad Peña Barbershop', sub: 'Barbería · Peñagrande, Madrid', img: 'assets/proyectos/amad-pena-barbershop.jpg', url: 'https://patosarmientooscar.github.io/Pelqueria-A-M/' },
-  // BORRADOR: se cambiarán por proyectos reales.
-  { title: 'Próximo proyecto', sub: 'En el horno', soon: true, hue: 0, borrador: true },
-  { title: 'Próximo proyecto', sub: 'En el horno', soon: true, hue: 1, borrador: true }
-];

@@ -87,6 +87,7 @@
   <link rel="stylesheet" href="css/bento.css">
   <link rel="stylesheet" href="css/gris.css">
   <link rel="stylesheet" href="css/oficina.css">
+  <link rel="stylesheet" href="css/con-quien.css">
 </head>
 <body class="inicio">
   <a class="skip-link" href="#contenido">Saltar al contenido</a>
@@ -128,7 +129,7 @@
       <div class="portada__texto">
         <h1 class="display portada__h1" id="h1">
           <span class="linea"><span data-c="inicio.hero.linea1">Tu negocio merece</span></span>
-          <span class="linea"><span data-c="inicio.hero.linea2">una web a su altura.</span></span>
+          <span class="linea"><span data-c="inicio.hero.linea2">una web a su <span class="accent">altura</span>.</span></span>
         </h1>
         <p class="portada__sub aparece" data-c="inicio.hero.sub">Diseño web a medida en Madrid. Webs rápidas, únicas y pensadas para convertir visitas en clientes. Desde 150&nbsp;€.</p>
         <div class="portada__botones aparece">
@@ -182,8 +183,8 @@
       </div>
     </section>
 
-    <!-- ===== Panel gris: qué hacemos (bento) → trabajo selecto → la oficina (#oficina-slot, track de 720vh) ===== -->
-    <section class="panel" id="oficina" aria-label="Qué hacemos y trabajo selecto">
+    <!-- ===== Panel gris: qué hacemos (bento) → trabajo selecto → la oficina (#oficina-slot) → con quién trabajamos ===== -->
+    <section class="panel" id="oficina" aria-label="Qué hacemos, trabajo selecto y con quién trabajamos">
 
       <!-- 1. Qué hacemos: bento de 4 cards 3D (prototipo aprobado: evimes-cards/bento.html).
            Textos: js/data/servicios.js (BORRADOR). Escenas: js/bento/. Estilos: css/bento.css. -->
@@ -215,12 +216,13 @@
         </div>
       </div>
 
-      <!-- 2. Trabajo selecto + la oficina (#oficina-slot). Prototipo aprobado: evimes-oficina/index.html.
-           Textos: js/data/oficina.js (BORRADOR) · proyectos: js/data/proyectos.js (EVIMES_TRABAJO)
+      <!-- 2. Trabajo selecto + la oficina (#oficina-slot, track de 820vh): la ventana se abre desde una card,
+           entra en el monitor, sale con la web de Disco y se vuelve a cerrar en card.
+           Textos: js/data/oficina.js (BORRADOR) · proyecto y rutas: js/oficina/config.js
            Escena: js/oficina/ · estilos: css/oficina.css -->
       <div class="intro" id="trabajo" role="group" aria-labelledby="ts">
         <p class="label" data-of="intro.label">Trabajo selecto</p>
-        <h2 class="display" id="ts" data-of="intro.titulo">Webs que ya están dando que hablar.</h2>
+        <h2 class="display" id="ts" data-of="intro.titulo">Webs que dan que hablar.</h2>
         <p data-of="intro.texto">Pasa. Siéntate en nuestra mesa y mira lo que sale de la pantalla.</p>
       </div>
 
@@ -228,26 +230,63 @@
         <div class="stage">
           <div class="window" id="win">
             <picture class="espera" aria-hidden="true">
-              <source media="(max-aspect-ratio: 9/10)" srcset="assets/oficina/oficina-lejos-espera-movil.webp">
-              <img src="assets/oficina/oficina-lejos-espera.webp" alt="" width="640" height="360" decoding="async">
+              <source media="(max-aspect-ratio: 9/10)" srcset="assets/oficina/oficina-espera-movil.webp">
+              <img src="assets/oficina/oficina-espera.webp" alt="" width="480" height="270" decoding="async">
             </picture>
             <canvas aria-hidden="true"></canvas>
+            <div class="flash" aria-hidden="true"></div>
             <div class="scrim"></div>
             <div class="cap" data-cap="1"><p class="k" data-of="cap1.k">El estudio</p><h3 class="display" data-of="cap1.titulo">Aquí se hacen.</h3><p data-of="cap1.texto">Una oficina pequeña en Madrid, gente que diseña y programa cada web a mano.</p></div>
-            <div class="cap" data-cap="2"><p class="k" data-of="cap2.k">Trabajo selecto</p><h3 class="display" data-of="cap2.titulo">Elige una y entra.</h3><p data-of="cap2.texto">Pasa el ratón por encima. Haz clic para verla en vivo.</p></div>
+            <div class="cap" data-cap="2"><p class="k" data-of="cap2.k">Trabajo selecto · 01</p><h3 class="display" data-of="cap2.titulo">Disco <span class="accent">Producción</span></h3><p data-of="cap2.texto">Productora audiovisual en Madrid. Su web ya está dando que hablar.</p>
+              <a class="btn" href="https://discoproduccion.com" target="_blank" rel="noopener" data-of="cap2.boton" aria-label="Ver la web de Disco Producción (abre en una pestaña nueva)">Ver la web <i aria-hidden="true">→</i></a></div>
             <div class="hud" aria-hidden="true" data-of="hud">Desliza</div>
-            <!-- Las 4 cards como enlaces reales (teclado y lectores de pantalla); se ven al recibir el foco. -->
-            <ul class="enlaces" data-oficina-enlaces aria-label="Proyectos"></ul>
           </div>
         </div>
       </div>
-    </section>
 
-    <!-- ===== 3. Con quién trabajamos (datos: js/data/clientes.js) ===== -->
-    <section class="clientes" id="con-quien" aria-labelledby="h-clientes">
-      <h2 class="display clientes__titulo" id="h-clientes">¿Con quién trabajamos?</h2>
-      <div class="interruptor" role="tablist" aria-label="Tipo de cliente" data-interruptor></div>
-      <div class="clientes__paneles" data-clientes></div>
+      <!-- 3. Con quién trabajamos (última sección del gris). Prototipo aprobado: evimes-cards/con-quien.html.
+           Textos: js/data/clientes.js (BORRADOR; js/gris/clientes.js repinta los paneles desde ahí).
+           Estilos: css/con-quien.css. Sin JS se ven los dos casos, uno debajo del otro. -->
+      <section class="cq" id="con-quien" aria-labelledby="cq-label" data-cq>
+        <div class="top">
+          <p class="label" id="cq-label">Con quién trabajamos</p>
+          <div class="switch" role="radiogroup" aria-label="Elige tu caso" data-v="0" data-cq-switch></div>
+        </div>
+        <div class="cq-stage" data-cq-stage>
+            <div class="cq-p" data-p="0">
+              <h2 class="display">
+                <span class="l"><span>Tenéis la idea.</span></span>
+                <span class="l"><span>Nosotros la creamos.</span></span>
+                <span class="l"><span class="soft">Solo nos falta tu <span class="mark">sí</span>.</span></span>
+              </h2>
+              <div class="side">
+                <p>Somos el estudio técnico de agencias creativas e innovadoras. Webs 3D, WebGL e interacción a medida, con vuestra marca y a vuestro ritmo.</p>
+                <a class="cta" href="#contacto">Hablemos de un proyecto <i aria-hidden="true">→</i></a>
+              </div>
+              <div class="points">
+                <div class="pt"><b>01</b><h3>Marca blanca</h3><p>Lo presentáis como vuestro. Nosotros, detrás.</p></div>
+                <div class="pt"><b>02</b><h3>3D y WebGL a medida</h3><p>Lo que otros no se atreven a programar.</p></div>
+                <div class="pt"><b>03</b><h3>Plazos claros</h3><p>Sabéis qué llega y cuándo, desde el primer día.</p></div>
+              </div>
+            </div>
+            <div class="cq-p" data-p="1">
+              <h2 class="display">
+                <span class="l"><span>Más visitas.</span></span>
+                <span class="l"><span>Más reservas.</span></span>
+                <span class="l"><span>Más <span class="mark">ventas</span>.</span></span>
+              </h2>
+              <div class="side">
+                <p>Restaurantes, barberías y comercios de Madrid con una web que trabaja por ellos, también cuando está cerrado.</p>
+                <a class="cta" href="#contacto">Pide tu propuesta <i aria-hidden="true">→</i></a>
+              </div>
+              <div class="points">
+                <div class="pt"><b>01</b><h3>Web rápida</h3><p>Carga al instante, también en el móvil.</p></div>
+                <div class="pt"><b>02</b><h3>Google y Maps</h3><p>Que te encuentren cuando te buscan cerca.</p></div>
+                <div class="pt"><b>03</b><h3>Reservas y WhatsApp</h3><p>Del "me interesa" al cliente, en un clic.</p></div>
+              </div>
+            </div>
+        </div>
+      </section>
     </section>
 
     <!-- ===== Planes ===== -->
@@ -296,7 +335,6 @@
   <script defer src="js/content.js"></script>
   <script defer src="js/data/planes.js"></script>
   <script defer src="js/data/servicios.js"></script>
-  <script defer src="js/data/proyectos.js"></script>
   <script defer src="js/data/oficina.js"></script>
   <script defer src="js/data/clientes.js"></script>
   <script defer src="js/brand.js"></script>

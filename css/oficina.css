@@ -1,16 +1,19 @@
 /* ==========================================================================
    oficina.css — "Trabajo selecto" + la oficina (#oficina-slot), panel gris.
-   Portado tal cual del prototipo aprobado (Downloads/evimes-oficina/index.html):
-   .intro, .track (720vh), .stage sticky, .window (se abre como una card del
-   bento: clip-path inset con esquinas de 30 px → pantalla completa), .scrim,
-   .cap, .hud. Solo cambia la estructura: el track sale a sangre del panel y
-   los márgenes son los de la página (--g). Escena: js/oficina/.
+   .intro, .track (820vh), .stage sticky, .window (se abre desde una card del
+   gris: clip-path inset con esquinas de 30 px → pantalla completa, y al
+   final se vuelve a cerrar en card), .flash, .scrim, .cap, .btn, .hud.
+   El track sale a sangre del panel; los márgenes del texto son los de la
+   página (--g). Los textos siguen al borde de la ventana (--ix, --ib): al
+   cerrarse en card, el texto y el botón de Disco se quedan dentro.
+   Escena: js/oficina/ · textos: js/data/oficina.js.
    (La oficina 360 aparcada usa css/oficina-aparcada.css.)
    ========================================================================== */
 .intro, .track {
   --b-ink: #0b1020;
   --b-navy: #070a13;
   --b-stone: #ece7dd;
+  --b-cyan: #00e5ff;
   font-family: var(--font-text);
   font-size: 16px;
   line-height: normal;
@@ -18,81 +21,67 @@
 .intro h2, .intro p, .track h3, .track p { margin: 0; text-wrap: wrap; }
 
 .intro { padding: clamp(80px,14vh,160px) 0 clamp(28px,5vh,56px); color: var(--b-ink); }
-.intro .label { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: rgba(11,16,32,.62); } /* prototipo .55 = 3,9:1; .62 = 4,9:1 (AA) */
+.intro .label { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: rgba(11,16,32,.62); } /* .55 = 3,9:1; .62 = 4,9:1 (AA) */
 .intro h2 { font-size: clamp(38px,5.6vw,84px); line-height: 1; margin-top: 18px; max-width: 16ch; }
 .intro p { margin-top: 22px; max-width: 46ch; font-size: clamp(15px,1.2vw,18px); line-height: 1.55; color: rgba(11,16,32,.66); }
 
 /* El track ocupa todo el ancho (sale del padding del panel). */
-.track { position: relative; height: 720vh; margin-inline: calc(-1 * var(--g)); }
+.track { position: relative; height: 820vh; margin-inline: calc(-1 * var(--g)); }
 .stage { position: sticky; top: 0; height: 100vh; overflow: hidden; }
-/* the office opens like one of the bento cards growing to fill the screen */
+/* the office opens like one of the bento cards growing to fill the screen, and closes back into one */
 .window { position: absolute; inset: 0; background: var(--b-navy); will-change: clip-path;
   clip-path: inset(var(--it,14vh) var(--ix,12vw) var(--ib,14vh) var(--ix,12vw) round var(--r,30px)); }
 .window canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-.window::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: var(--r,30px); box-shadow: inset 0 0 0 1px rgba(255,255,255,calc(.08*var(--edge,1))); }
-/* Mientras cargan Three.js y el panorama: la misma vista, desenfocada (fotograma de v360). */
+.window::after { content: ""; position: absolute; inset: var(--it,14vh) var(--ix,12vw) var(--ib,14vh) var(--ix,12vw); pointer-events: none; border-radius: var(--r,30px);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,calc(.08*var(--edge,1))); }
+/* Mientras cargan Three.js y el panorama: la misma vista, desenfocada (v360 del panorama 4K). */
 .espera { position: absolute; inset: 0; transition: opacity .8s cubic-bezier(.2,.7,.2,1); }
 .espera img { width: 100%; height: 100%; max-width: none; object-fit: cover; display: block; filter: blur(12px); transform: scale(1.06); }
 .window.is-lista .espera { opacity: 0; }
-.scrim { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(120% 70% at 18% 100%,rgba(7,10,19,.82),rgba(7,10,19,0) 60%); opacity: var(--scrim,0); }
-/* AA: la foto es clara bajo los captions (cuaderno, mesa). Un segundo velo navy, más corto, justo detrás del texto. */
-.scrim::before { content: ""; position: absolute; inset: 0; background: radial-gradient(80% 62% at 8% 100%,rgba(7,10,19,.72),rgba(7,10,19,0) 74%); }
-.cap { position: absolute; left: var(--g); bottom: clamp(36px,9vh,96px); max-width: min(560px,86vw); color: var(--b-stone); pointer-events: none; opacity: 0; transform: translateY(24px); text-shadow: 0 1px 20px rgba(7,10,19,.55); }
-.cap .k { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: rgba(236,231,221,.94); } /* prototipo .6: no pasaba AA sobre la foto */
+/* el flash al atravesar la pantalla (solo opacidad) */
+.flash { position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: radial-gradient(70% 70% at 50% 50%, #ffffff 0%, #e8fbff 38%, rgba(0,229,255,.85) 78%, rgba(43,77,255,.9) 100%); }
+/* El velo sigue el borde de la ventana: al cerrarse en card, sigue detrás del texto. */
+.scrim { position: absolute; inset: var(--it,14vh) var(--ix,12vw) var(--ib,14vh) var(--ix,12vw); pointer-events: none; background: radial-gradient(120% 70% at 18% 100%,rgba(7,10,19,.82),rgba(7,10,19,0) 60%); opacity: var(--scrim,0); }
+/* AA: un segundo velo navy, más corto, justo detrás del texto (la mesa y el cuaderno son claros). */
+.scrim::before { content: ""; position: absolute; inset: 0; background: radial-gradient(95% 88% at 6% 100%,rgba(7,10,19,.86),rgba(7,10,19,.62) 45%,rgba(7,10,19,0) 86%); }
+.cap { position: absolute; left: calc(var(--ix,12vw) + var(--g)); bottom: calc(var(--ib,14vh) + clamp(36px,9vh,96px));
+  max-width: min(560px, calc(100vw - 2 * var(--ix,12vw) - 2 * var(--g))); color: var(--b-stone); pointer-events: none; opacity: 0; transform: translateY(24px); text-shadow: 0 1px 20px rgba(7,10,19,.55); }
+.cap .k { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: rgba(236,231,221,.94); }
 .cap h3 { margin-top: 12px; font-size: clamp(34px,4.4vw,64px); line-height: 1; }
-.cap p { margin-top: 14px; font-size: clamp(14px,1.1vw,17px); line-height: 1.5; color: rgba(236,231,221,.86); } /* prototipo .72 */
-.hud { position: absolute; right: var(--g); bottom: clamp(36px,9vh,96px); color: rgba(236,231,221,.85); font-size: 12px; letter-spacing: .16em; text-transform: uppercase; opacity: 0; pointer-events: none;
-  text-shadow: 0 0 2px rgba(7,10,19,.9), 0 0 14px rgba(7,10,19,.9); } /* prototipo .55 sin halo: ~3:1 sobre la mesa */
+.cap .accent { color: var(--b-cyan); }
+.cap p { margin-top: 14px; font-size: clamp(14px,1.1vw,17px); line-height: 1.5; color: rgba(236,231,221,.86); }
+.cap .btn { display: inline-flex; align-items: center; gap: 10px; margin-top: 22px; padding: 14px 22px; border-radius: 999px; background: var(--b-stone); color: var(--b-navy);
+  font-size: 15px; font-weight: 500; text-decoration: none; text-shadow: none; transition: transform .4s cubic-bezier(.2,.75,.15,1), box-shadow .4s cubic-bezier(.2,.75,.15,1); }
+.cap .btn i { font-style: normal; display: inline-block; transition: transform .4s cubic-bezier(.2,.75,.15,1); }
+.cap .btn:hover { transform: translateY(-2px); box-shadow: 0 14px 30px -14px rgba(0,0,0,.65); }
+.cap .btn:hover i { transform: translateX(4px); }
+.cap .btn:focus-visible { outline: 2px solid var(--b-stone); outline-offset: 3px; }
+.cap.is-on .btn { pointer-events: auto; }
+/* Con teclado, el enlace a Disco se ve al recibir el foco aunque el texto aún no haya entrado. */
+.cap:focus-within { opacity: 1 !important; transform: none !important; }
+.hud { position: absolute; right: calc(var(--ix,12vw) + var(--g)); bottom: calc(var(--ib,14vh) + clamp(36px,9vh,96px)); color: rgba(236,231,221,.94); font-size: 12px; letter-spacing: .16em; text-transform: uppercase; opacity: 0; pointer-events: none;
+  text-shadow: 0 0 2px rgba(7,10,19,.9), 0 0 14px rgba(7,10,19,.9); }
 
-/* Las 4 cards como enlaces reales: ocultos a la vista, visibles al recibir el foco. */
-.enlaces { position: absolute; left: 50%; bottom: 24px; z-index: 2; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; width: max-content; max-width: calc(100% - 32px); margin: 0; padding: 0; list-style: none; transform: translateX(-50%);
-  clip-path: inset(50%); }
-.enlaces:focus-within { clip-path: none; }
-.enlaces li > * { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; font-size: 15px; color: var(--b-stone); text-decoration: none;
-  background: rgba(7,10,19,.82); border: 1px solid rgba(255,255,255,.18); }
-.enlaces a span { margin-left: 6px; color: rgba(236,231,221,.72); }
-.enlaces a:focus-visible { outline: 2px solid var(--b-stone); outline-offset: 3px; }
-
-@media (max-width:820px) { .cap { bottom: 28px } .hud { display: none } }
+@media (max-width:820px) { .cap { bottom: calc(var(--ib,14vh) + 28px); } .hud { display: none; }
+  /* En vertical el texto ocupa todo el ancho, encima de la pantalla encendida: velo de abajo arriba. */
+  .scrim::before { background: linear-gradient(to top,rgba(7,10,19,.9),rgba(7,10,19,.72) 32%,rgba(7,10,19,0) 58%); } }
 
 /* ---------- Versión fija (movimiento reducido, ahorro de datos, sin WebGL) ----------
-   Sin track largo: la foto de la oficina (sacada del propio render) con las cards
-   ya colocadas encima del monitor, en HTML y con enlaces. */
+   Sin track largo: la oficina en una card del gris (foto sacada del propio render)
+   con la web de Disco ya colocada encima del monitor, el texto y el enlace. */
 .track.is-fija { height: auto; margin-inline: 0; }
 .track.is-fija .stage { position: relative; height: auto; overflow: visible; }
 .track.is-fija .window { position: relative; inset: auto; clip-path: none; border-radius: 30px; overflow: hidden; }
-.track.is-fija .window::after { border-radius: 30px; }
-.track.is-fija :is(canvas, .espera, .hud, .cap[data-cap="1"], .enlaces) { display: none; }
-.track.is-fija .cap[data-cap="2"] { opacity: 1; transform: none; }
-.track.is-fija .scrim { opacity: 1; }
+.track.is-fija .window::after { inset: 0; border-radius: 30px; }
+.track.is-fija :is(canvas, .espera, .hud, .flash, .cap[data-cap="1"]) { display: none; }
+.track.is-fija .cap[data-cap="2"] { left: var(--g); bottom: clamp(28px,6vh,64px); max-width: min(560px, calc(100% - 2 * var(--g))); opacity: 1; transform: none; }
+.track.is-fija .cap .btn { pointer-events: auto; }
+.track.is-fija .scrim { inset: 0; opacity: 1; }
 .fija { position: relative; aspect-ratio: var(--ar); }
 .fija__foto { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; display: block; }
 .fija--movil { display: none; }
 @media (max-width: 700px) { .fija--escritorio { display: none; } .fija--movil { display: block; } }
-
-/* Card en HTML con las proporciones de drawCard (1024×1280). La caja (.fcard) es el
-   contenedor: dentro, todo se mide en cqw (su ancho). Alto = el de la card en el render. */
-.fcard { position: absolute; display: block; container-type: inline-size; color: var(--b-stone); text-decoration: none; }
-.fcard__in { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 4.3cqw; border-radius: 7cqw; overflow: hidden;
-  background: radial-gradient(90% 60% at 50% 10%, rgba(43,77,255,.35), rgba(43,77,255,0)), linear-gradient(180deg, #0c1326, #070a13);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.10), 0 0 0 1px rgba(228,233,240,.35), 0 30px 60px -30px rgba(0,0,0,.7); }
-.fcard__img { position: relative; display: block; flex: none; aspect-ratio: 16/10; border-radius: 3.9cqw; overflow: hidden; background: #10182f; box-shadow: inset 0 0 0 1px rgba(255,255,255,.14); }
-.fcard__img img { width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: top; display: block; }
-.fcard__horno { position: absolute; inset: 0; display: grid; place-items: center; font-size: max(10px, 2.9cqw); font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: rgba(236,231,221,.95);
-  background: linear-gradient(135deg, #1c2d6b, #2a3f8f 55%, #1b6f86); }
-.fcard--h1 .fcard__horno { background: linear-gradient(135deg, #123b56, #0f6f86 55%, #2b4dff); }
-.fcard__num { margin-top: 6cqw; font-size: max(10px, 2.54cqw); letter-spacing: .2em; color: rgba(236,231,221,.62); }
-.fcard__t { margin-top: 2.5cqw; font-size: max(14px, 8.2cqw); line-height: 1.02; }
-.fcard__s { margin-top: 1.6cqw; font-size: max(11px, 3.3cqw); line-height: 1.3; color: rgba(236,231,221,.72); }
-.fcard__btn, .fcard__pronto { margin-top: auto; align-self: flex-start; font-size: max(11px, 3.1cqw); }
-.fcard__btn { padding: .6em 1.2em; border-radius: 999px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.18); }
-.fcard__pronto { color: rgba(236,231,221,.72); }
-.fcard__pronto::before { content: ""; display: inline-block; width: .55em; height: .55em; margin-right: .6em; border-radius: 50%; background: rgba(0,229,255,.9); }
-@container (max-width: 210px) { .fcard__num { display: none; } .fcard__t { margin-top: 4cqw; } }
-@container (max-width: 170px) { .fcard__s { display: none; } }
-/* Tan pequeña que el botón no cabe: la card entera ya es el enlace (con su aria-label). */
-@container (max-width: 150px) { .fcard__btn { display: none; } }
-a.fcard:hover .fcard__btn { background: rgba(255,255,255,.14); }
-a.fcard:focus-visible { outline: 2px solid var(--b-stone); outline-offset: 3px; border-radius: 7cqw; }
-/* En la versión fija no hay hover: solo "Elige una y entra." */
-.track.is-fija .cap[data-cap="2"] p:last-child { display: none; }
+/* La web de Disco (primera captura de la tira) con el filo de cromo y la ráfaga de detrás. */
+.fweb { position: absolute; display: block; border-radius: 3.4% / 5.5%; background-repeat: no-repeat; background-position: 0 0; background-color: #0b1226;
+  box-shadow: 0 0 0 1px rgba(228,233,240,.55), inset 0 0 0 1px rgba(255,255,255,.12), 0 0 60px 6px rgba(43,77,255,.35), 0 0 120px 10px rgba(0,229,255,.18), 0 30px 60px -30px rgba(0,0,0,.7); }
