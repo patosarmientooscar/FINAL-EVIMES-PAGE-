@@ -291,6 +291,18 @@
 
     resize: resize,
 
+    /* Un "pulso" en las cuerdas (p. ej. al cambiar el interruptor de clientes):
+       un golpe gaussiano en todos los tubos que luego viaja y se apaga solo. */
+    pulso: function (f) {
+      if (!fieldTex || EV.reducedMotion) return;
+      f = f || 0.05;
+      var W = SIM.W, c = W * 0.62;
+      for (var b = 0; b < N; b++) {
+        for (var k = 0; k < W; k++) fieldV[b * W + k] += f * Math.exp(-Math.pow((k - c) / 6, 2)) * (1 - b * 0.06);
+      }
+      quieto = false;
+    },
+
     /* Puntero en px de la ventana (ratón o dedo). dentro=false: sin empuje. */
     pointer: function (x, y, dentro) { ptr.x = x; ptr.y = y; ptr.dentro = dentro; },
 

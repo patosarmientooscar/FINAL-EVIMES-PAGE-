@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es" class="is-still">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Servicios | Evimes</title>
+  <meta name="description" content="Desarrollo web, animaciones 3D, posicionamiento, software con IA y mantenimiento. Lo que hace Evimes, oficio a oficio.">
+  <!-- BORRADOR: la página no se indexa hasta que los textos estén confirmados. -->
+  <meta name="robots" content="noindex, follow">
+  <link rel="canonical" href="https://www.evimesweb.com/servicios.html">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="theme-color" content="#080b14">
+
+  <link rel="preload" href="assets/fonts/fraunces-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/schibsted-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/fonts.css">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/fondo.css">
+  <link rel="stylesheet" href="css/home.css">
+  <link rel="stylesheet" href="css/servicios.css">
+</head>
+<body class="inicio fondo-fijo servicios-pag">
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+  <!-- Fondo: el mismo póster de la home, fijo (sin Three.js en esta página). -->
+  <div class="fondo" aria-hidden="true">
+    <picture class="fondo__fija">
+      <source media="(max-width: 719px)" type="image/webp" srcset="assets/onda/onda-movil.webp">
+      <img src="assets/onda/onda-escritorio.webp" alt="" width="1920" height="1080" decoding="async">
+    </picture>
+  </div>
+  <div class="grano" aria-hidden="true"></div>
+
+  <header class="cabecera">
+    <a class="cabecera__marca" href="index.html" aria-label="Evimes, inicio" data-logo="wordmark"></a>
+    <nav class="cabecera__nav" id="cabecera-nav" aria-label="Principal">
+      <ul>
+        <li><a href="index.html#herramientas">Herramientas</a></li>
+        <li><a href="index.html#oficina">Proyectos</a></li>
+        <li><a href="index.html#planes">Planes</a></li>
+        <li><a href="index.html#contacto">Contacto</a></li>
+      </ul>
+    </nav>
+    <a class="pastilla cabecera__cta" href="index.html#contacto">Pide tu propuesta</a>
+    <button class="cabecera__abrir" type="button" aria-expanded="false" aria-controls="cabecera-nav">
+      <span class="sr-only">Menú</span>
+      <span class="cabecera__lineas" aria-hidden="true"><span></span><span></span></span>
+    </button>
+  </header>
+
+  <main id="contenido">
+    <section class="serv-cab" aria-labelledby="h1">
+      <h1 class="display serv-cab__titulo" id="h1"><span class="sr-only">Qué hacemos: </span>Una línea, cinco oficios.</h1>
+      <ol class="serv-indice" aria-label="Oficios">
+        <li><a href="#web"><span>01</span> Desarrollo web</a></li>
+        <li><a href="#3d"><span>02</span> Animaciones 3D</a></li>
+        <li><a href="#seo"><span>03</span> Posicionamiento</a></li>
+        <li><a href="#ia"><span>04</span> Software IA</a></li>
+        <li><a href="#mantenimiento"><span>05</span> Mantenimiento</a></li>
+      </ol>
+    </section>
+
+    <!-- BORRADOR: titulares y frases de js/data/servicios.js; los textos largos están pendientes. -->
+    <section class="serv" id="web" aria-labelledby="h-web">
+      <p class="display serv__num" aria-hidden="true">01</p>
+      <div class="serv__texto">
+        <h2 class="display serv__nombre" id="h-web">Desarrollo web</h2>
+        <p class="serv__frase">Webs a medida, rápidas y hechas a mano. Sin plantillas.</p>
+        <p class="serv__borrador"><span>Borrador</span> Texto pendiente: qué incluye, cómo se trabaja y qué hace falta para empezar.</p>
+      </div>
+    </section>
+
+    <section class="serv" id="3d" aria-labelledby="h-3d">
+      <p class="display serv__num" aria-hidden="true">02</p>
+      <div class="serv__texto">
+        <h2 class="display serv__nombre" id="h-3d">Animaciones 3D</h2>
+        <p class="serv__frase">Experiencias 3D y WebGL que la gente recuerda.</p>
+        <p class="serv__borrador"><span>Borrador</span> Texto pendiente: qué incluye, cómo se trabaja y qué hace falta para empezar.</p>
+      </div>
+    </section>
+
+    <section class="serv" id="seo" aria-labelledby="h-seo">
+      <p class="display serv__num" aria-hidden="true">03</p>
+      <div class="serv__texto">
+        <h2 class="display serv__nombre" id="h-seo">Posicionamiento</h2>
+        <p class="serv__frase">Que te encuentren en Google, en Maps y en las respuestas de la IA.</p>
+        <p class="serv__borrador"><span>Borrador</span> Texto pendiente: qué incluye, cómo se trabaja y qué hace falta para empezar.</p>
+      </div>
+    </section>
+
+    <section class="serv" id="ia" aria-labelledby="h-ia">
+      <p class="display serv__num" aria-hidden="true">04</p>
+      <div class="serv__texto">
+        <h2 class="display serv__nombre" id="h-ia">Software IA</h2>
+        <p class="serv__frase">Agentes, bots y herramientas con IA que trabajan por ti.</p>
+        <p class="serv__borrador"><span>Borrador</span> Texto pendiente: qué incluye, cómo se trabaja y qué hace falta para empezar.</p>
+      </div>
+    </section>
+
+    <section class="serv" id="mantenimiento" aria-labelledby="h-mantenimiento">
+      <p class="display serv__num" aria-hidden="true">05</p>
+      <div class="serv__texto">
+        <h2 class="display serv__nombre" id="h-mantenimiento">Mantenimiento</h2>
+        <p class="serv__frase">Tu web siempre al día, segura y online.</p>
+        <p class="serv__borrador"><span>Borrador</span> Texto pendiente: qué incluye, cómo se trabaja y qué hace falta para empezar.</p>
+      </div>
+    </section>
+
+    <section class="serv-fin" aria-label="Contacto">
+      <p class="display serv-fin__titulo">¿Cuál es el tuyo?</p>
+      <div class="serv-fin__botones">
+        <a class="pastilla pastilla--grande" href="index.html#contacto">Pide tu propuesta</a>
+        <a class="enlace" href="index.html#planes">Ver planes</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <p>© 2026 Evimes · Madrid</p>
+    <nav aria-label="Textos legales">
+      <ul class="pie__legales">
+        <li><a href="aviso-legal.html">Aviso legal</a></li>
+        <li><a href="terminos.html">Términos</a></li>
+        <li><a href="privacidad.html">Privacidad</a></li>
+        <li><a href="cookies.html">Cookies</a></li>
+      </ul>
+    </nav>
+  </footer>
+
+  <script defer src="js/config.js"></script>
+  <script defer src="js/brand.js"></script>
+  <script>
+    // Menú móvil (el mismo comportamiento que la home, sin el resto de home.js).
+    (function () {
+      var cab = document.querySelector('.cabecera'), btn = document.querySelector('.cabecera__abrir');
+      function abrir(on) { cab.classList.toggle('is-abierta', on); btn.setAttribute('aria-expanded', String(on)); }
+      btn.addEventListener('click', function () { abrir(btn.getAttribute('aria-expanded') !== 'true'); });
+      cab.addEventListener('click', function (e) { if (e.target.closest('.cabecera__nav a')) abrir(false); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') abrir(false); });
+    })();
+  </script>
+</body>
+</html>

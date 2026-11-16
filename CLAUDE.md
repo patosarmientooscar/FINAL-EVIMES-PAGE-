@@ -44,6 +44,14 @@ La oficina 360° (vista desde la silla del jefe) queda APARCADA tal cual en `ofi
 - Versión fija (movimiento reducido, ahorro de datos, 2G/3G, `?modo=fijo`): póster fijo, sin Three.js, frase encendida, cinta quieta.
 - Ojo: no hay reset global de box-sizing; la home lo pone en `.inicio *`. Y `overflow-x: clip` en main: el degradado del hero es más ancho que el texto y Chrome móvil encogía la página.
 
+## Panel gris (fase gris)
+
+- `js/gris/oficios.js`: carrusel de scroll horizontal nativo con snap (arrastre con inercia, flechas, Shift+rueda, teclado; la rueda vertical pasa a Lenis). Un canvas del tamaño de la ventana dibuja la línea EH con el scrollLeft exacto; lo que se interpola (lerp 0,1) es el estado de forma `pS`. Mezcla espacial entre slides con smoothstep(0,28–0,72): sin cortes. Solo dibuja con la sección en pantalla.
+- `js/gris/trabajo.js`: datos en `EVIMES_TRABAJO` (proyectos.js; sin url o media no se ven; `?borradores=1` los enseña). Flash de cámara (WAAPI 80 ms), cursor "Ver", vuelo de las cards al visor `#oficina-slot` (scrub con medidas cacheadas).
+- `js/gris/clientes.js`: tablist accesible; al cambiar, `EV.onda.pulso()` en los tubos. Textos en `js/data/clientes.js`.
+- `EV.home` (home.js) expone `lenis`, `ir`, `cine`… para los módulos del panel. `servicios.html`: los 5 oficios (anclas #web #3d #seo #ia #mantenimiento), póster fijo, sin Three.js.
+- Grabación de una web real (assets/proyectos/discoproduccion/): screencast CDP + ffmpeg, visitando SOLO esa URL.
+
 ## Motor (oficina aparcada)
 
 - Tick único: Lenis → `zones.flush` → `stage.render` (cámara + panorama + capas) → `overlay.update` (scrims).

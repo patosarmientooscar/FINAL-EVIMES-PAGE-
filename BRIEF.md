@@ -42,12 +42,16 @@ La oficina queda aparcada (`oficina.html`, sin tocar). La home se construye desd
 3. Hero: "Tu negocio merece una web a su altura." + línea + "Pide tu propuesta" / "Ver proyectos" + "Desliza".
 4. Herramientas (cinta infinita de logos monocromos, se para con el ratón).
 5. Frase "Si no eres visible, no existes." (palabra a palabra con el scroll).
-6. Panel gris: "Proyectos" · "Siéntate. Esto es lo que hacemos." · hueco `#oficina-slot` (aquí entrará la oficina).
+6. Panel gris (fase gris, v-gris-1): "Una línea, cinco oficios." (carrusel de 5 servicios con la línea EH en canvas) · "Pocos proyectos. Todos con nombre propio." (Disco destacado + fila) · visor `#oficina-slot` (las cards vuelan a él; será el monitor de la oficina).
+6b. "¿Con quién trabajamos?" (interruptor Agencias creativas | Negocios locales) sobre navy.
 7. Planes (tres cards de cristal; listas "incluye" en BORRADOR) + enlace a planes.html.
 8. Contacto: "¿Hacemos que se te vea?" + "Pide tu propuesta" (correo) + WhatsApp si hay número.
 9. Pie: © 2026 Evimes · Madrid + legales.
 
 ## Pendientes
+- [ ] Disco (web 3D): url + vídeo en bucle + póster en assets/proyectos/disco/ (ahora placeholder "Vídeo de la web en camino").
+- [ ] Barbería y "En el horno": nombre, url y media (js/data/proyectos.js → EVIMES_TRABAJO; ocultos hasta rellenarlos, se ven con ?borradores=1).
+- [ ] Confirmar textos BORRADOR: js/data/servicios.js, js/data/clientes.js y los textos largos de servicios.html (noindex hasta entonces).
 - [ ] Confirmar las listas "incluye" de cada plan (js/data/planes.js, BORRADOR, salen del prototipo).
 - [ ] Decidir si las palabras apagadas de la frase (opacidad 0,16 antes de encenderse) se aceptan: no pasan AA en ese estado.
 - [ ] Integrar la oficina en `#oficina-slot`.

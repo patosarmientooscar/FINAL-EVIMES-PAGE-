@@ -343,6 +343,8 @@
 
     var h = location.hash.slice(1);
     if (h && document.getElementById(h)) setTimeout(function () { ir(h); }, 80);
+    // API mínima para los módulos del panel gris (js/gris/*): mismo scroll, mismo bucle.
+    EV.home = { scrollY: scrollY, get lenis() { return lenis; }, cine: cine, ir: ir, elegirPlan: elegirPlan };
     root.classList.add('is-ready');
   }
 

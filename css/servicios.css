@@ -1,0 +1,89 @@
+/* ==========================================================================
+   servicios.html — los cinco oficios, uno por sección (#web #3d #seo #ia
+   #mantenimiento). Misma cabecera, pie y fondo que la home (póster fijo,
+   atenuado para leer encima). Textos largos: BORRADOR.
+   ========================================================================== */
+.servicios-pag { background: var(--navy, #080b14); }
+.servicios-pag .fondo__fija { opacity: 0.32; }
+.servicios-pag main { padding: 0 var(--g); }
+
+/* Cabecera de la página */
+.serv-cab { padding: clamp(150px, 24vh, 240px) 0 clamp(64px, 10vh, 120px); }
+.serv-cab__titulo {
+  margin: 0;
+  max-width: 14ch;
+  font-size: clamp(48px, 8.4vw, 128px);
+  color: var(--stone);
+}
+.serv-indice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 28px;
+  margin: clamp(36px, 6vh, 64px) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.serv-indice a {
+  display: inline-flex;
+  gap: 8px;
+  min-height: 44px;
+  align-items: center;
+  font-size: 16px;
+  color: var(--stone);
+  text-decoration: none;
+  transition: color 0.25s var(--ease-boton);
+}
+.serv-indice a span { font-size: 13px; letter-spacing: 0.08em; color: var(--texto-2); }
+.serv-indice a:hover { color: #fff; }
+
+/* Cada oficio: número fino enorme a la izquierda, texto a la derecha */
+.serv {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 24px clamp(24px, 5vw, 96px);
+  align-items: start;
+  padding: clamp(56px, 10vh, 112px) 0;
+  border-top: 1px solid rgb(236 230 219 / 0.12);
+  scroll-margin-top: 96px;
+}
+.inicio .serv__num {
+  margin: 0;
+  font-size: clamp(96px, 14vw, 220px);
+  font-weight: 250;
+  line-height: 0.82;
+  color: var(--stone);
+}
+.serv__nombre { margin: 0; font-size: clamp(34px, 4.4vw, 64px); color: var(--stone); }
+.serv__frase { margin: 18px 0 0; max-width: 34ch; font-size: clamp(19px, 1.6vw, 23px); line-height: 1.45; color: var(--stone); }
+.serv__borrador {
+  margin: 28px 0 0;
+  max-width: 52ch;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--texto-2);
+}
+.serv__borrador span {
+  display: inline-block;
+  margin-right: 10px;
+  padding: 2px 9px;
+  border: 1px solid rgb(0 229 255 / 0.5);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #7febff;
+  vertical-align: 2px;
+}
+
+/* Cierre */
+.serv-fin { padding: clamp(72px, 12vh, 140px) 0 clamp(96px, 14vh, 160px); border-top: 1px solid rgb(236 230 219 / 0.12); }
+.serv-fin__titulo { margin: 0; font-size: clamp(40px, 6vw, 88px); color: var(--stone); }
+.serv-fin__botones { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 26px; margin-top: 36px; }
+
+.servicios-pag :focus-visible { outline: 2px solid #7febff; outline-offset: 3px; border-radius: 6px; }
+
+@media (max-width: 47.99rem) {
+  .serv { grid-template-columns: 1fr; }
+  .inicio .serv__num { font-size: clamp(80px, 26vw, 120px); }
+}

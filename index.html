@@ -84,6 +84,7 @@
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/fondo.css">
   <link rel="stylesheet" href="css/home.css">
+  <link rel="stylesheet" href="css/gris.css">
 </head>
 <body class="inicio">
   <a class="skip-link" href="#contenido">Saltar al contenido</a>
@@ -179,13 +180,105 @@
       </div>
     </section>
 
-    <!-- ===== Panel gris: proyectos (aquí entrará la oficina) ===== -->
-    <section class="panel" id="oficina" aria-labelledby="h-panel">
-      <p class="etiqueta etiqueta--oscura" data-c="inicio.panel.etiqueta">Proyectos</p>
-      <h2 class="display panel__titulo" id="h-panel" data-c="inicio.panel.titulo">Siéntate. Esto es lo que hacemos.</h2>
-      <div class="panel__hueco" id="oficina-slot" data-oficina-slot>
-        <p class="panel__nota">Aquí entra la oficina.</p>
+    <!-- ===== Panel gris: qué hacemos → trabajo selecto → la oficina (#oficina-slot) ===== -->
+    <section class="panel" id="oficina" aria-label="Qué hacemos y trabajo selecto">
+
+      <!-- 1. Qué hacemos: una línea, cinco oficios (carrusel con scroll horizontal nativo) -->
+      <div class="oficios" id="que-hacemos" role="group" aria-labelledby="h-oficios">
+        <div class="oficios__cab">
+          <p class="etiqueta etiqueta--oscura">Qué hacemos</p>
+          <h2 class="display oficios__titulo" id="h-oficios">Una línea, cinco oficios.</h2>
+        </div>
+        <div class="oficios__carrusel" data-oficios>
+          <canvas class="oficios__linea" aria-hidden="true"></canvas>
+          <div class="oficios__pista" tabindex="0" role="region" aria-roledescription="carrusel" aria-label="Servicios. Usa las flechas izquierda y derecha para cambiar.">
+          <article class="oficio" id="oficio-web" data-servicio="web" aria-roledescription="diapositiva" aria-label="1 de 5: Desarrollo web">
+            <p class="oficio__num display" aria-hidden="true">01</p>
+            <div class="oficio__texto">
+              <h3 class="display oficio__nombre">Desarrollo web</h3>
+              <p class="oficio__frase">Webs a medida, rápidas y hechas a mano. Sin plantillas.</p>
+              <a class="enlace enlace--oscuro oficio__mas" href="servicios.html#web">Ver más →</a>
+            </div>
+          </article>
+          <article class="oficio" id="oficio-3d" data-servicio="3d" aria-roledescription="diapositiva" aria-label="2 de 5: Animaciones 3D">
+            <p class="oficio__num display" aria-hidden="true">02</p>
+            <div class="oficio__texto">
+              <h3 class="display oficio__nombre">Animaciones 3D</h3>
+              <p class="oficio__frase">Experiencias 3D y WebGL que la gente recuerda.</p>
+              <a class="enlace enlace--oscuro oficio__mas" href="servicios.html#3d">Ver más →</a>
+            </div>
+          </article>
+          <article class="oficio" id="oficio-seo" data-servicio="seo" aria-roledescription="diapositiva" aria-label="3 de 5: Posicionamiento">
+            <p class="oficio__num display" aria-hidden="true">03</p>
+            <div class="oficio__texto">
+              <h3 class="display oficio__nombre">Posicionamiento</h3>
+              <p class="oficio__frase">Que te encuentren en Google, en Maps y en las respuestas de la IA.</p>
+              <a class="enlace enlace--oscuro oficio__mas" href="servicios.html#seo">Ver más →</a>
+            </div>
+          </article>
+          <article class="oficio" id="oficio-ia" data-servicio="ia" aria-roledescription="diapositiva" aria-label="4 de 5: Software IA">
+            <p class="oficio__num display" aria-hidden="true">04</p>
+            <div class="oficio__texto">
+              <h3 class="display oficio__nombre">Software IA</h3>
+              <p class="oficio__frase">Agentes, bots y herramientas con IA que trabajan por ti.</p>
+              <a class="enlace enlace--oscuro oficio__mas" href="servicios.html#ia">Ver más →</a>
+            </div>
+          </article>
+          <article class="oficio" id="oficio-mantenimiento" data-servicio="mantenimiento" aria-roledescription="diapositiva" aria-label="5 de 5: Mantenimiento">
+            <p class="oficio__num display" aria-hidden="true">05</p>
+            <div class="oficio__texto">
+              <h3 class="display oficio__nombre">Mantenimiento</h3>
+              <p class="oficio__frase">Tu web siempre al día, segura y online.</p>
+              <a class="enlace enlace--oscuro oficio__mas" href="servicios.html#mantenimiento">Ver más →</a>
+            </div>
+          </article>
+          </div>
+        </div>
+        <div class="oficios__control">
+          <button class="cristal-boton" type="button" data-ofi-prev aria-label="Servicio anterior"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M19 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div class="oficios__barra">
+            <span class="oficios__progreso" aria-hidden="true"><span class="oficios__relleno"></span></span>
+            <ol class="oficios__numeros">
+            <li><button type="button" data-ofi-ir="0" aria-label="01 Desarrollo web">01</button></li>
+            <li><button type="button" data-ofi-ir="1" aria-label="02 Animaciones 3D">02</button></li>
+            <li><button type="button" data-ofi-ir="2" aria-label="03 Posicionamiento">03</button></li>
+            <li><button type="button" data-ofi-ir="3" aria-label="04 Software IA">04</button></li>
+            <li><button type="button" data-ofi-ir="4" aria-label="05 Mantenimiento">05</button></li>
+            </ol>
+          </div>
+          <button class="cristal-boton" type="button" data-ofi-next aria-label="Servicio siguiente"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
       </div>
+
+      <!-- 2. Trabajo selecto (datos: js/data/proyectos.js → EVIMES_TRABAJO) -->
+      <div class="trabajo" id="trabajo" role="group" aria-labelledby="h-trabajo">
+        <div class="trabajo__cab">
+          <p class="etiqueta etiqueta--oscura">Trabajo selecto</p>
+          <h2 class="display trabajo__titulo" id="h-trabajo">Pocos proyectos. Todos con nombre propio.</h2>
+        </div>
+        <div class="trabajo__destacado" data-trabajo-destacado></div>
+        <ul class="trabajo__fila" data-trabajo-fila></ul>
+      </div>
+
+      <!-- Hueco de la oficina (APARCADA). Mientras tanto, un visor: cuando se monte
+           la oficina, este visor será su monitor. -->
+      <div class="visor" id="oficina-slot" data-oficina-slot role="region" aria-roledescription="visor" aria-label="Proyectos en grande">
+        <div class="visor__marco">
+          <div class="visor__pantalla" data-visor aria-live="polite"></div>
+        </div>
+        <div class="visor__control">
+          <button class="cristal-boton" type="button" data-visor-prev aria-label="Proyecto anterior"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M19 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <p class="visor__rotulo" data-visor-rotulo></p>
+          <button class="cristal-boton" type="button" data-visor-next aria-label="Proyecto siguiente"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 3. Con quién trabajamos (datos: js/data/clientes.js) ===== -->
+    <section class="clientes" id="con-quien" aria-labelledby="h-clientes">
+      <h2 class="display clientes__titulo" id="h-clientes">¿Con quién trabajamos?</h2>
+      <div class="interruptor" role="tablist" aria-label="Tipo de cliente" data-interruptor></div>
+      <div class="clientes__paneles" data-clientes></div>
     </section>
 
     <!-- ===== Planes ===== -->
@@ -233,10 +326,16 @@
   <script defer src="js/config.js"></script>
   <script defer src="js/content.js"></script>
   <script defer src="js/data/planes.js"></script>
+  <script defer src="js/data/servicios.js"></script>
+  <script defer src="js/data/proyectos.js"></script>
+  <script defer src="js/data/clientes.js"></script>
   <script defer src="js/brand.js"></script>
   <script defer src="js/engine/util.js"></script>
   <script defer src="js/fondo/rayos.js"></script>
   <script defer src="js/fondo/onda.js"></script>
   <script defer src="js/home.js"></script>
+  <script defer src="js/gris/oficios.js"></script>
+  <script defer src="js/gris/trabajo.js"></script>
+  <script defer src="js/gris/clientes.js"></script>
 </body>
 </html>
