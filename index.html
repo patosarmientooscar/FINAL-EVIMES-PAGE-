@@ -86,6 +86,7 @@
   <link rel="stylesheet" href="css/home.css">
   <link rel="stylesheet" href="css/bento.css">
   <link rel="stylesheet" href="css/gris.css">
+  <link rel="stylesheet" href="css/oficina.css">
 </head>
 <body class="inicio">
   <a class="skip-link" href="#contenido">Saltar al contenido</a>
@@ -181,7 +182,7 @@
       </div>
     </section>
 
-    <!-- ===== Panel gris: qué hacemos (bento) → trabajo selecto → la oficina (#oficina-slot) ===== -->
+    <!-- ===== Panel gris: qué hacemos (bento) → trabajo selecto → la oficina (#oficina-slot, track de 720vh) ===== -->
     <section class="panel" id="oficina" aria-label="Qué hacemos y trabajo selecto">
 
       <!-- 1. Qué hacemos: bento de 4 cards 3D (prototipo aprobado: evimes-cards/bento.html).
@@ -214,26 +215,30 @@
         </div>
       </div>
 
-      <!-- 2. Trabajo selecto (datos: js/data/proyectos.js → EVIMES_TRABAJO) -->
-      <div class="trabajo" id="trabajo" role="group" aria-labelledby="h-trabajo">
-        <div class="trabajo__cab">
-          <p class="etiqueta etiqueta--oscura">Trabajo selecto</p>
-          <h2 class="display trabajo__titulo" id="h-trabajo">Pocos proyectos. Todos con nombre propio.</h2>
-        </div>
-        <div class="trabajo__destacado" data-trabajo-destacado></div>
-        <ul class="trabajo__fila" data-trabajo-fila></ul>
+      <!-- 2. Trabajo selecto + la oficina (#oficina-slot). Prototipo aprobado: evimes-oficina/index.html.
+           Textos: js/data/oficina.js (BORRADOR) · proyectos: js/data/proyectos.js (EVIMES_TRABAJO)
+           Escena: js/oficina/ · estilos: css/oficina.css -->
+      <div class="intro" id="trabajo" role="group" aria-labelledby="ts">
+        <p class="label" data-of="intro.label">Trabajo selecto</p>
+        <h2 class="display" id="ts" data-of="intro.titulo">Webs que ya están dando que hablar.</h2>
+        <p data-of="intro.texto">Pasa. Siéntate en nuestra mesa y mira lo que sale de la pantalla.</p>
       </div>
 
-      <!-- Hueco de la oficina (APARCADA). Mientras tanto, un visor: cuando se monte
-           la oficina, este visor será su monitor. -->
-      <div class="visor" id="oficina-slot" data-oficina-slot role="region" aria-roledescription="visor" aria-label="Proyectos en grande">
-        <div class="visor__marco">
-          <div class="visor__pantalla" data-visor aria-live="polite"></div>
-        </div>
-        <div class="visor__control">
-          <button class="cristal-boton" type="button" data-visor-prev aria-label="Proyecto anterior"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M19 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          <p class="visor__rotulo" data-visor-rotulo></p>
-          <button class="cristal-boton" type="button" data-visor-next aria-label="Proyecto siguiente"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="track" id="oficina-slot" data-oficina>
+        <div class="stage">
+          <div class="window" id="win">
+            <picture class="espera" aria-hidden="true">
+              <source media="(max-aspect-ratio: 9/10)" srcset="assets/oficina/oficina-lejos-espera-movil.webp">
+              <img src="assets/oficina/oficina-lejos-espera.webp" alt="" width="640" height="360" decoding="async">
+            </picture>
+            <canvas aria-hidden="true"></canvas>
+            <div class="scrim"></div>
+            <div class="cap" data-cap="1"><p class="k" data-of="cap1.k">El estudio</p><h3 class="display" data-of="cap1.titulo">Aquí se hacen.</h3><p data-of="cap1.texto">Una oficina pequeña en Madrid, gente que diseña y programa cada web a mano.</p></div>
+            <div class="cap" data-cap="2"><p class="k" data-of="cap2.k">Trabajo selecto</p><h3 class="display" data-of="cap2.titulo">Elige una y entra.</h3><p data-of="cap2.texto">Pasa el ratón por encima. Haz clic para verla en vivo.</p></div>
+            <div class="hud" aria-hidden="true" data-of="hud">Desliza</div>
+            <!-- Las 4 cards como enlaces reales (teclado y lectores de pantalla); se ven al recibir el foco. -->
+            <ul class="enlaces" data-oficina-enlaces aria-label="Proyectos"></ul>
+          </div>
         </div>
       </div>
     </section>
@@ -292,15 +297,17 @@
   <script defer src="js/data/planes.js"></script>
   <script defer src="js/data/servicios.js"></script>
   <script defer src="js/data/proyectos.js"></script>
+  <script defer src="js/data/oficina.js"></script>
   <script defer src="js/data/clientes.js"></script>
   <script defer src="js/brand.js"></script>
   <script defer src="js/engine/util.js"></script>
   <script defer src="js/fondo/rayos.js"></script>
   <script defer src="js/fondo/onda.js"></script>
   <script defer src="js/home.js"></script>
-  <script defer src="js/gris/trabajo.js"></script>
   <script defer src="js/gris/clientes.js"></script>
   <!-- Bento: módulo ES; Three.js 0.160.0 (la misma URL que la onda) se importa al acercarse al bento. -->
   <script type="module" src="js/bento/index.js"></script>
+  <!-- La oficina: módulo ES; Three.js 0.160.0 y el panorama se cargan a una pantalla de distancia. -->
+  <script type="module" src="js/oficina/index.js"></script>
 </body>
 </html>

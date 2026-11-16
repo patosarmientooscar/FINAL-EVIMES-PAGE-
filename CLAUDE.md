@@ -1,7 +1,7 @@
 # Evimes — home "La onda" + la oficina (aparcada)
 
-Home (index.html, fase onda): fondo global de rayos + "la onda de cromo" (7 bandas Three.js con la forma de la línea del monograma EH), hero, herramientas, frase, panel gris de proyectos (con el hueco `#oficina-slot`), planes y contacto. Prototipo de referencia aprobado en estilo: `_archivo/prototipo-onda/`.
-La oficina 360° (vista desde la silla del jefe) queda APARCADA tal cual en `oficina.html` (noindex): no se toca ni se borra; entrará en `#oficina-slot`. Ver BRIEF.md.
+Home (index.html, fase onda): fondo global de rayos + "la onda de cromo" (7 bandas Three.js con la forma de la línea del monograma EH), hero, herramientas, frase, panel gris (bento "Qué hacemos" + Trabajo selecto con la oficina en `#oficina-slot`), planes y contacto. Prototipo de referencia aprobado en estilo: `_archivo/prototipo-onda/`.
+La oficina de la home (fase oficina-2, v-oficina-2) es un port tal cual del prototipo aprobado `Downloads/evimes-oficina/index.html`: `#oficina-slot` (track de 720vh). La oficina 360° antigua sigue APARCADA en `oficina.html` (noindex), con su motor (`js/engine/`, `js/zones/`, `secciones.js`, `header.js`, `main.js`) y su CSS (`css/oficina-aparcada.css`): no se borra. Ver BRIEF.md.
 
 ## Reglas del proyecto
 
@@ -29,7 +29,7 @@ La oficina 360° (vista desde la silla del jefe) queda APARCADA tal cual en `ofi
 - `js/data/proyectos.js`, `js/data/planes.js`, `js/data/mediciones.js` — datos editables.
 - `js/engine/` — motor: `util`, `lenis`, `stage`, `zones`, `overlay` (scrim, matrix3d), `pano` (Three.js).
 - `js/zones/oficina.js` — la escena (cámara, cards, cifras, detalles vivos). `js/secciones.js` — secciones planas. `js/header.js` — menú y anclas.
-- `css/fonts.css` (fuentes alojadas en `assets/fonts/`), `tokens.css`, `base.css`, `engine.css`, `oficina.css`, `doc.css` + `paginas.css` (páginas planas y legales).
+- `css/fonts.css` (fuentes alojadas en `assets/fonts/`), `tokens.css`, `base.css`, `engine.css`, `oficina-aparcada.css` (la oficina aparcada), `oficina.css` (la oficina de la home), `doc.css` + `paginas.css` (páginas planas y legales).
 - `tools/render-hero.sh` — renders planos del panorama (ffmpeg v360). `tools/serve.js` — servidor local.
 - `_archivo/idea-estudio/` — la idea anterior completa. No se carga.
 
@@ -47,7 +47,7 @@ La oficina 360° (vista desde la silla del jefe) queda APARCADA tal cual en `ofi
 ## Panel gris (fase gris)
 
 - "Qué hacemos" = bento de 4 cards 3D (fase bento, v-bento-1), portado TAL CUAL del prototipo aprobado `Downloads/evimes-cards/bento.html`: `css/bento.css` + `js/bento/` (shared · web · star · pin · ia · index). Cada card es un renderer WebGL propio que solo pinta si está visible; un único bucle para las cuatro dentro de gsap.ticker. Three.js 0.160.0 con la misma URL que la onda, importado al acercarse al bento. El EH grabado del destello se lee de `assets/logo/evimes-eh.svg`. Versión fija o sin WebGL: pósters `assets/bento/<card>-escritorio|movil.png` (se rehacen con `?bento=captura` → `window.__bentoPosters()`). Textos BORRADOR en `js/data/servicios.js`. Los tubos no renderizan sobre el gris (opacidad 0).
-- `js/gris/trabajo.js`: datos en `EVIMES_TRABAJO` (proyectos.js; sin url o media no se ven; `?borradores=1` los enseña). Flash de cámara (WAAPI 80 ms), cursor "Ver", vuelo de las cards al visor `#oficina-slot` (scrub con medidas cacheadas).
+- Trabajo selecto + la oficina (`css/oficina.css`, `js/oficina/`: config · scene · cards · timeline · index): panorama equirectangular (ruta en UNA constante, `PANO` en config.js; WebP q88 + JPG) con uDim/uSat, entorno PMREM de la propia foto, EVIMES grabado en la pared y el EH de la pantalla desde `assets/logo/`, vapor de la taza, 4 cards (drawCard 1024×1280) que salen de la pantalla y se colocan en arco encima del monitor (2×2 en móvil). Fases del prototipo: ventana 0–0.16 · acercamiento 0.28–0.44 · encendido 0.34–0.66 · miniaturas 0.42–0.47 · vuelo 0.47–0.705 · salida 0.9–1. Progreso leído de Lenis con posiciones cacheadas y el mismo suavizado. Three.js y el panorama a 1 pantalla de distancia (mientras, `oficina-lejos-espera*.webp`, la misma vista desenfocada). Bucle dentro de gsap.ticker, parado fuera de pantalla. Cabecera oscura encima (`EV.cabeceraOscura`, la lee home.js). Las 4 cards también son enlaces del DOM (visibles al foco). Versión fija: `assets/oficina/oficina-fija*.webp` + cards en HTML (posiciones en `FIJA`, se rehacen con `?oficina=captura`). Datos: `js/data/proyectos.js` (EVIMES_TRABAJO) y textos BORRADOR en `js/data/oficina.js`.
 - `js/gris/clientes.js`: tablist accesible; al cambiar, `EV.onda.pulso()` en los tubos. Textos en `js/data/clientes.js`.
 - `EV.home` (home.js) expone `lenis`, `ir`, `cine`… para los módulos del panel. `servicios.html`: los 4 oficios (anclas #web #3d #seo #ia), póster fijo, sin Three.js.
 - Grabación de una web real (assets/proyectos/discoproduccion/): screencast CDP + ffmpeg, visitando SOLO esa URL.

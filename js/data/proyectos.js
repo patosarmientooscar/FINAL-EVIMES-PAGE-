@@ -34,45 +34,17 @@ window.EVIMES_PROYECTOS = {
 };
 
 /* ==========================================================================
-   Trabajo selecto (home nueva, panel gris). EDITABLE.
-   Un proyecto sin url o sin media NO se muestra (salvo `destacado` con
-   `placeholder: true`, que enseña un hueco limpio hasta que llegue el vídeo).
-   media: { video: [webm, mp4], poster } · estado: 'online' | 'horno' (coming soon).
-   Los proyectos marcados borrador: true solo se ven con ?borradores=1 (para
-   revisar el diseño) hasta que Oscar los rellene.
+   La oficina (home, panel gris → #oficina-slot): las 4 cards que salen del
+   monitor. Las lee js/oficina/config.js. EDITABLE.
+   · Solo proyectos reales. Sin cifras.
+   · soon:true = "Próximo proyecto · En el horno" (sin enlace). hue: 0 | 1, el
+     degradado de su cristal esmerilado.
+   · img: captura de la web (assets/proyectos/), 1280×800.
    ========================================================================== */
 window.EVIMES_TRABAJO = [
-  {
-    id: 'disco',
-    nombre: 'Disco',
-    tipo: 'Web 3D · WebGL',
-    nota: 'Cámaras, flashes y una pista que se mueve contigo.',      // BORRADOR
-    url: '',                                                         // PENDIENTE: URL de la web 3D
-    media: { video: ['assets/proyectos/disco/disco.webm', 'assets/proyectos/disco/disco.mp4'], poster: 'assets/proyectos/disco/disco-poster.webp' },
-    destacado: true,
-    placeholder: true                                                 // PENDIENTE: vídeo + póster en assets/proyectos/disco/
-  },
-  {
-    id: 'discoproduccion',
-    nombre: 'Disco Producción',
-    tipo: 'Web en HTML',
-    nota: 'Productora audiovisual en Madrid.',
-    url: 'https://discoproduccion.com/',
-    media: {
-      video: ['assets/proyectos/discoproduccion/discoproduccion-scroll.webm', 'assets/proyectos/discoproduccion/discoproduccion-scroll.mp4'],
-      poster: 'assets/proyectos/discoproduccion/discoproduccion-poster.webp'
-    },
-    estado: 'online'
-  },
-  {
-    id: 'barberia',
-    nombre: 'Barbería',                                               // BORRADOR: nombre real
-    tipo: 'Web para barbería',
-    url: '',                                                         // BORRADOR
-    media: null,                                                     // BORRADOR
-    acabado: 'laton',
-    borrador: true
-  },
-  { id: 'horno-1', nombre: '', fecha: '', estado: 'horno', borrador: true },   // BORRADOR: nombre + fecha aproximada
-  { id: 'horno-2', nombre: '', fecha: '', estado: 'horno', borrador: true }    // BORRADOR
+  { title: 'Disco Producción', sub: 'Productora audiovisual · Madrid', img: 'assets/proyectos/discoproduccion.jpg', url: 'https://discoproduccion.com' },
+  { title: 'Amad Peña Barbershop', sub: 'Barbería · Peñagrande, Madrid', img: 'assets/proyectos/amad-pena-barbershop.jpg', url: 'https://patosarmientooscar.github.io/Pelqueria-A-M/' },
+  // BORRADOR: se cambiarán por proyectos reales.
+  { title: 'Próximo proyecto', sub: 'En el horno', soon: true, hue: 0, borrador: true },
+  { title: 'Próximo proyecto', sub: 'En el horno', soon: true, hue: 1, borrador: true }
 ];

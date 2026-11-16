@@ -225,7 +225,8 @@
 
     // Cabecera clara cuando el panel gris pasa por su línea central.
     var pt = lay.panelTop - y, pb = lay.panelBottom - y, mid = (lay.cabTop + lay.cabBottom) / 2;
-    var clara = pt < mid && pb > mid;
+    // Sobre la oficina (js/oficina/), cristal oscuro: la oficina pone EV.cabeceraOscura.
+    var clara = pt < mid && pb > mid && !EV.cabeceraOscura;
     if (clara !== cabClara) { cabClara = clara; el.cab.classList.toggle('is-clara', clara); }
 
     var scrolled = y > 40;
