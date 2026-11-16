@@ -13,11 +13,13 @@
      (assets/bento/, ver ?bento=captura).
    ========================================================================== */
 const EV = window.EV || {};
-const root = document.querySelector('[data-bento]');
-if (root) init();
+// Uno o varios contenedores [data-bento] (la home tiene uno; servicios.html, uno por oficio):
+// todas sus cards comparten el mismo bucle.
+const roots = Array.from(document.querySelectorAll('[data-bento]'));
+if (roots.length) init();
 
 function init() {
-  const els = Array.from(root.querySelectorAll('.card'));
+  const els = roots.flatMap(r => Array.from(r.querySelectorAll('.card')));
   textos(els);
 
   const io = new IntersectionObserver(es => es.forEach(e => {
@@ -33,7 +35,7 @@ function init() {
     cerca.disconnect();
     arrancar(els, captura).catch(err => { console.warn('[bento]', err); posters(els); });
   }, { rootMargin: '800px 0px' });
-  cerca.observe(root);
+  roots.forEach(r => cerca.observe(r));
 }
 
 function textos(els) {
@@ -56,7 +58,7 @@ function hayWebGL() {
 }
 
 function posters(els) {
-  root.classList.add('is-fija');
+  roots.forEach(r => r.classList.add('is-fija'));
   els.forEach(el => {
     if (el.querySelector('.poster')) return;
     const k = el.dataset.kind;

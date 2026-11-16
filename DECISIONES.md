@@ -47,3 +47,16 @@ Lo que decidí sin poder preguntar, y por qué. Lo que Oscar tiene que revisar e
 - Cabecera: oscura con la ventana abierta más del 60 % (con el 50 % se quedaba oscura sobre la card cerrada por un redondeo).
 - Versión fija: render sin la card (P = 0.76) + la web de Disco en HTML + los 4 indicadores quietos (a los lados en escritorio, en fila debajo en móvil; tamaño en cqw para que escalen con la imagen). En móvil el texto de Disco va debajo de la foto, porque encima tapaba la fila de indicadores.
 - El botón "Ver la web →" pasa al de cristal del prototipo (antes era una pastilla clara).
+
+## Bloque 5 · Página de servicios (`v-servicios`)
+- innovativecode.es/servicios se ha leído solo para la estructura (número, título, frase, párrafos, "qué incluye", CTA; pasos; CTA final). Ninguna frase suya: todos los textos son los del prompt, en `js/data/servicios-pagina.js` (BORRADOR).
+- Fondo global compartido: nuevo `js/fondo/fondo.js` para servicios y planes, con los MISMOS módulos que la home (`js/fondo/rayos.js`, `js/fondo/onda.js`, `css/fondo.css`, el póster de `assets/onda/`). La home sigue con su propio `home.js`, que además lleva el hero, la frase, el panel gris, los planes y el contacto: reescribirlo para compartirlo era tocar lo que funciona. Opacidad de las bandas: `data-fondo-op="0.5"` en el body → 0,3 al bajar → 0 bajo las secciones grises (`data-cubre`).
+- Las cards 3D son las del bento de la home: `js/bento/index.js` acepta ahora varios `[data-bento]` en la misma página (un solo bucle para todas; cada card solo pinta si está en pantalla). En la home no cambia nada.
+- Cada sección: número fino (Fraunces 220), H2 = nombre del servicio, la frase destacada debajo (cian sobre navy; tinta suave sobre el gris, donde el cian no tiene contraste), párrafos, "Qué incluye" a dos columnas con filetes, CTA con scramble. No hay etiqueta encima del H2 (el detector de impeccable las prohíbe; el número ya hace ese papel).
+- El H2 y la frase suben línea a línea con máscara: se parten en líneas reales según el ancho (`js/paginas/paginas.js`) y se vuelven a partir al cambiar el ancho.
+- Las secciones grises (01, 03 y "Cómo trabajamos") tienen esquinas de 30 px arriba y abajo y suben 72 px al entrar.
+- "Cómo trabajamos": la línea cian se dibuja con el scroll (scaleX; en móvil, vertical con scaleY), dentro de gsap.ticker.
+- El HTML se ha generado una vez desde el archivo de datos (SEO y sin JS); `js/paginas/paginas.js` repinta desde los datos, así que para cambiar un texto basta con editar `js/data/servicios-pagina.js`.
+- `servicios.html` deja de ser noindex (antes lo era porque los textos eran un borrador vacío). Los textos siguen en BORRADOR: Oscar debe confirmarlos antes de publicar.
+- Se borra `css/servicios.css` (solo lo usaba la versión anterior de la página).
+- `.enlace` (home.css) lleva `gap: .4em`: era inline-flex y se comía el espacio antes de la flecha.

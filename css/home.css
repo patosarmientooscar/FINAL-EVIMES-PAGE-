@@ -57,6 +57,7 @@
 .enlace {
   display: inline-flex;
   align-items: center;
+  gap: .4em;                 /* inline-flex se come el espacio antes de la flecha (texto en .sl + "→") */
   min-height: 44px;
   font-size: 15px;
   color: var(--stone);
