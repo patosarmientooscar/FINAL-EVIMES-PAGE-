@@ -1,42 +1,87 @@
-// Todos los textos de la web, por zona.
+// Todos los textos de la web. EDITABLES: cambia aquí y el HTML se actualiza
+// (los elementos llevan data-c="ruta"). El HTML lleva el mismo texto para SEO.
 window.EVIMES_CONTENT = {
-  firma: 'Tu esencia, digital.',
-
-  fachada: {
-    h1: 'Estudio de diseño web, producto y software en Madrid.',
-    entradilla: 'Somos Evimes. Creamos webs, productos digitales y software con IA para negocios que quieren que se les vea, y que les elijan.',
-    entra: 'Entra',
+  menu: {
+    proyectos: 'Proyectos',
+    planes: 'Planes',
+    servicios: 'Servicios',
+    contacto: 'Contacto',
+    cta: 'Pide tu propuesta'
   },
 
-  pasillo: ['Si no eres visible,', 'no existes.'],
-
-  crecimiento: {
-    texto: 'Que te encuentren. En Google, en Maps y en las respuestas de la IA.',
-    cartelas: ['SEO', 'Local SEO', 'AEO y GEO', 'Google Ads', 'Analytics'],
+  hero: {
+    h1: 'Diseño web en Madrid que convierte visitas en clientes.',
+    linea: 'Webs rápidas, a medida y pensadas para vender. Desde 150 €.',
+    cta: 'Pide tu propuesta',
+    secundario: 'Ver proyectos'
   },
 
-  disenoWeb: {
-    rotulo: 'Diseño Web',
-    texto: 'Interfaces que enamoran y convierten. Tu web es tu mejor vendedor: trabaja 24/7, y la diseñamos para que cierre.',
-    cartelas: ['UX/UI', 'Landing pages', 'Branding digital', 'Responsive', 'E-commerce'],
-    tecnica: 'Figma, HTML, GSAP',
+  oficina: {
+    pista: 'Haz scroll',
+    // Bloque de texto en la parada MESA (proyectos)
+    mesa: {
+      etiqueta: 'Proyectos',
+      titulo: 'Webs hechas para vender.',
+      linea1: 'Cada proyecto sale de aquí medido: velocidad real, diseño propio, nada de plantillas.',
+      linea2: 'Pasa el ratón para recorrer cada web; haz clic para ver el detalle.',
+      boton: 'Ver todos los proyectos'
+    },
+    // Bloque de texto en la parada TECHO (cifras)
+    techo: {
+      etiqueta: 'Cifras',
+      titulo: 'Medido en proyectos reales.',
+      linea1: 'Velocidad, móvil y respuesta: lo que nota quien entra en tu web.',
+      linea2: 'Elige el plan que encaja con tu negocio.',
+      boton: 'Ver planes'
+    }
   },
 
-  productDesign: {
-    rotulo: 'Product Design',
-    texto: 'Productos digitales con propósito. Antes de diseñar una pantalla, entendemos a quién la va a usar.',
-    cartelas: ['User research', 'Flujos', 'Prototyping', 'Testing'],
-    tecnica: 'Figma, Notion',
+  proyectos: {
+    titulo: 'Proyectos',
+    proximamente: 'Próximamente',
+    detalle: { necesidad: 'Qué necesitaba', pagespeed: 'Test PageSpeed', ver: 'Ver web', cerrar: 'Cerrar' },
+    pills: { pagespeed: 'PageSpeed', carga: 'carga' }
   },
 
-  softwareAI: {
-    rotulo: 'Software & AI',
-    texto: 'Tecnología inteligente aplicada a tu negocio. Software a medida que automatiza lo repetitivo y te devuelve tiempo.',
-    cartelas: ['Software a medida', 'APIs e integraciones', 'Automatización'],
-    tecnica: 'Claude, React, Supabase, Vercel',
+  planes: {
+    titulo: 'Planes',
+    intro: 'Tres formas de empezar. Sin sorpresas: lo que incluye cada plan está escrito.',
+    recomendado: 'Recomendado',
+    verTodo: 'Ver qué incluye cada plan'
   },
 
-  cta: {
-    titulo: '¿Listo para empezar?', // provisional
+  tambien: {
+    titulo: 'También hacemos',
+    filas: [
+      { titulo: 'Software e IA', linea: 'Herramientas a medida que automatizan lo repetitivo.', href: 'software-ia.html' },
+      { titulo: 'Automatización de servicios', linea: 'Reservas, citas y avisos que funcionan solos.', href: 'automatizacion.html' },
+      { titulo: 'Plantillas de portfolio para fotógrafos', linea: 'Un portfolio rápido y elegante, listo en días.', href: 'plantillas-fotografos.html' }
+    ]
   },
+
+  faq: {
+    titulo: 'Preguntas frecuentes',
+    // PENDIENTE DE TEXTO: borrador para validar con Oscar.
+    items: [
+      { p: '¿Cuánto tarda una web?', r: 'Pendiente de texto. (Borrador: depende del plan; una web de una página suele estar lista en pocas semanas.)', pendiente: true },
+      { p: '¿Qué necesito para empezar?', r: 'Pendiente de texto. (Borrador: tu logo si lo tienes, fotos y una conversación de media hora.)', pendiente: true },
+      { p: '¿La web es mía?', r: 'Pendiente de texto. (Borrador: sí, el dominio y el código son tuyos.)', pendiente: true },
+      { p: '¿Hacéis mantenimiento?', r: 'Pendiente de texto. (Borrador: sí, se acuerda según el plan.)', pendiente: true }
+    ]
+  },
+
+  contacto: {
+    titulo: 'Cuéntanos tu negocio.',
+    linea: 'Te respondemos con una propuesta clara: qué haríamos, cuánto y cuándo.',
+    campos: { negocio: 'Tipo de negocio', nombre: 'Tu nombre', whatsapp: 'Tu WhatsApp', plan: 'Plan' },
+    placeholders: { negocio: 'Restaurante, clínica, tienda…', nombre: 'Nombre', whatsapp: '+34 600 000 000' },
+    sinPlan: 'Aún no lo sé',
+    enviar: 'Pide tu propuesta',
+    nota: 'Sin compromiso. Respondemos por WhatsApp o correo.'
+  },
+
+  pie: {
+    firma: 'Tu esencia, digital.',
+    lugar: 'Madrid'
+  }
 };

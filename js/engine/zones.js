@@ -26,13 +26,14 @@
     if (prev) prev.section.classList.remove('is-active');
     activeId = id;
     var z = byId[id];
-    z.section.classList.add('is-active');
-    z.dirty = true;
+    if (z) { z.section.classList.add('is-active'); z.dirty = true; }
     if (!jumping) EV.stage.setActive(id);
-    document.dispatchEvent(new CustomEvent('ev:zone', { detail: { id: id, index: z.index, label: z.cfg.label } }));
+    document.dispatchEvent(new CustomEvent('ev:zone', { detail: { id: id, index: z ? z.index : -1, label: z ? z.cfg.label : '' } }));
   }
 
-  // Zona activa = la última cuyo pin contiene el scroll actual.
+  // Zona activa = la última cuyo pin contiene el scroll actual. Pasada la
+  // última zona (más de una pantalla por debajo de su pin) no hay ninguna:
+  // el escenario se libera.
   function resolveActive() {
     var y = window.scrollY || document.documentElement.scrollTop;
     if (EV.scroll.lenis) y = EV.scroll.lenis.scroll;
@@ -40,7 +41,8 @@
     for (var i = 0; i < list.length; i++) {
       if (y >= list[i].st.start - 1) pick = list[i];
     }
-    setActive(pick.cfg.id);
+    if (pick === list[list.length - 1] && y > pick.st.end + window.innerHeight) pick = null;
+    setActive(pick ? pick.cfg.id : null);
   }
 
   EV.zones = {
@@ -67,6 +69,8 @@
               if (self.progress !== z.progress) { z.progress = self.progress; z.dirty = true; }
             },
             onToggle: resolveActive,
+            onLeave: resolveActive,
+            onEnterBack: resolveActive,
             onRefresh: function (self) { z.progress = self.progress; z.dirty = true; }
           });
         } else {
@@ -93,8 +97,7 @@
 
     /* Llamado una vez por tick: empuja progreso al canvas y a las capas. */
     flush: function () {
-      var a = byId[activeId];
-      if (!a) return;
+      if (EV.mode === 'cine' && list.length && !jumping) resolveActive();   // libera el escenario pasada la oficina
       for (var i = 0; i < list.length; i++) {
         var z = list[i];
         if (EV.mode === 'cine') EV.stage.set(z.cfg.id, z.progress);

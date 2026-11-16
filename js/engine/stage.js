@@ -61,7 +61,6 @@
       if (prev && prev.activate) prev.activate(false);
       var h = handlers[id];
       if (h && h.activate) h.activate(true);
-      if (!h) placeholderNote(id);
     },
     active: function () { return activeId; },
 

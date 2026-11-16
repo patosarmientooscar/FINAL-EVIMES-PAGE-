@@ -22,6 +22,11 @@
       if (c.saveData) return { mode: 'still', reason: 'ahorro-datos' };
       if (/(^|-)(2g|3g)$/.test(c.effectiveType || '')) return { mode: 'still', reason: 'conexion-lenta' };
     }
+    // Sin WebGL no hay panorama: versión fija.
+    try {
+      var cv = document.createElement('canvas');
+      if (!(cv.getContext('webgl2') || cv.getContext('webgl'))) return { mode: 'still', reason: 'sin-webgl' };
+    } catch (e) { return { mode: 'still', reason: 'sin-webgl' }; }
     return { mode: 'cine', reason: 'por-defecto' };
   }
 
@@ -43,18 +48,7 @@
   EV.fallback = {
     init: function () {
       if (EV.mode !== 'still') return;
-      // El canvas (salas) y la fachada (DOM) se funden juntos.
-      var canvas = [document.querySelector('.scene'), document.querySelector('.fachada-cam')].filter(Boolean);
-      var fading = null;
-      document.addEventListener('ev:zone', function (e) {
-        var id = e.detail.id;
-        if (fading) fading.kill();
-        var dur = EV.reducedMotion ? 0.35 : 0.6;
-        fading = gsap.timeline()
-          .to(canvas, { opacity: 0, duration: dur * 0.5, ease: 'power2.in' })
-          .add(function () { EV.stage.showStill(id); })
-          .to(canvas, { opacity: 1, duration: dur, ease: 'power2.out' });
-      });
+      document.addEventListener('ev:zone', function (e) { if (e.detail.id) EV.stage.showStill(e.detail.id); });
     }
   };
 })();

@@ -3,20 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Evimes | Estudio de diseño web, producto y software en Madrid</title>
-  <meta name="description" content="Evimes, estudio de diseño web, producto y software con IA en Madrid. Webs, productos digitales y software para negocios que quieren que les elijan.">
+  <title>Evimes | Diseño web en Madrid desde 150 €</title>
+  <meta name="description" content="Diseño web en Madrid que convierte visitas en clientes: webs rápidas, a medida y pensadas para vender, desde 150 €. Pide tu propuesta a Evimes.">
 
-  <!-- Primer fotograma (LCP): misma regla de variante que el motor y que <picture> -->
+  <!-- LCP: fondo del hero (render plano de la oficina, desenfocado y teñido de navy). -->
   <link rel="preload" as="image" type="image/avif" fetchpriority="high"
-        href="assets/zones/01-fachada/desktop/keyframe.avif"
-        imagesrcset="assets/zones/01-fachada/desktop/keyframe.avif 2560w" imagesizes="100vw"
-        media="(min-width: 768px) and (orientation: landscape)">
+        href="assets/oficina/hero-desktop-blur.avif" media="(min-width: 768px) and (orientation: landscape)">
   <link rel="preload" as="image" type="image/avif" fetchpriority="high"
-        href="assets/zones/01-fachada/mobile/keyframe.avif"
-        imagesrcset="assets/zones/01-fachada/mobile/keyframe.avif 1080w" imagesizes="100vw"
-        media="(max-width: 767px), (orientation: portrait)">
-  <link rel="preload" href="assets/logo/evimes-eh.svg" as="fetch" crossorigin="anonymous">
-  <link rel="preload" href="assets/logo/evimes-wordmark.svg" as="fetch" crossorigin="anonymous">
+        href="assets/oficina/hero-mobile-blur.avif" media="(max-width: 767px), (orientation: portrait)">
 
   <link rel="canonical" href="https://www.evimesweb.com/">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -30,16 +24,16 @@
   <meta property="og:locale" content="es_ES">
   <meta property="og:site_name" content="Evimes">
   <meta property="og:url" content="https://www.evimesweb.com/">
-  <meta property="og:title" content="Evimes | Estudio de diseño web, producto y software en Madrid">
-  <meta property="og:description" content="Webs, productos digitales y software con IA para negocios que quieren que se les vea, y que les elijan. Tu esencia, digital.">
-  <meta property="og:image" content="https://www.evimesweb.com/assets/og/evimes-og.jpg">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Fachada de un edificio señorial de Madrid a la hora azul, con las letras EVIMES retroiluminadas junto a una ventana encendida.">
+  <meta property="og:title" content="Evimes | Diseño web en Madrid desde 150 €">
+  <meta property="og:description" content="Webs rápidas, a medida y pensadas para vender. Diseño web en Madrid desde 150 €.">
+  <meta property="og:image" content="https://www.evimesweb.com/assets/oficina/hero-desktop.jpg">
+  <meta property="og:image:width" content="2560">
+  <meta property="og:image:height" content="1440">
+  <meta property="og:image:alt" content="La oficina de Evimes en Madrid: mesa de nogal con un monitor y, al fondo, la pared navy con el nombre EVIMES.">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Evimes | Estudio de diseño web, producto y software en Madrid">
-  <meta name="twitter:description" content="Webs, productos digitales y software con IA en Madrid. Tu esencia, digital.">
-  <meta name="twitter:image" content="https://www.evimesweb.com/assets/og/evimes-og.jpg">
+  <meta name="twitter:title" content="Evimes | Diseño web en Madrid desde 150 €">
+  <meta name="twitter:description" content="Webs rápidas, a medida y pensadas para vender. Desde 150 €.">
+  <meta name="twitter:image" content="https://www.evimesweb.com/assets/oficina/hero-desktop.jpg">
 
   <script type="application/ld+json">
   {
@@ -47,11 +41,10 @@
     "@type": "ProfessionalService",
     "@id": "https://www.evimesweb.com/#estudio",
     "name": "Evimes",
-    "slogan": "Tu esencia, digital.",
-    "description": "Estudio de diseño web, producto y software con IA en Madrid. Creamos webs, productos digitales y software para negocios que quieren que se les vea, y que les elijan.",
+    "description": "Diseño web en Madrid: webs rápidas, a medida y pensadas para vender, desde 150 €.",
     "url": "https://www.evimesweb.com/",
     "logo": "https://www.evimesweb.com/apple-touch-icon.png",
-    "image": "https://www.evimesweb.com/assets/og/evimes-og.jpg",
+    "image": "https://www.evimesweb.com/assets/oficina/hero-desktop.jpg",
     "telephone": "+34636736167",
     "email": "evimes@evimesweb.com",
     "address": {
@@ -62,308 +55,233 @@
       "postalCode": "28034",
       "addressCountry": "ES"
     },
-    "areaServed": [
-      { "@type": "City", "name": "Madrid" },
-      { "@type": "Country", "name": "España" }
-    ],
-    "serviceType": ["Diseño web", "Product design", "Software a medida", "Inteligencia artificial", "Automatización", "SEO", "Local SEO", "AEO", "GEO", "Google Ads", "Analytics"],
-    "knowsAbout": ["Diseño web", "UX/UI", "Landing pages", "Branding digital", "E-commerce", "User research", "Prototipado", "APIs e integraciones", "Automatización con IA"],
+    "areaServed": [{ "@type": "City", "name": "Madrid" }, { "@type": "Country", "name": "España" }],
+    "serviceType": ["Diseño web", "Tiendas online", "SEO", "Software e IA", "Automatización de servicios"],
     "priceRange": "€€",
-    "openingHours": "Mo-Fr 09:00-18:00"
+    "makesOffer": [
+      { "@type": "Offer", "name": "Fundamento", "price": "150", "priceCurrency": "EUR", "description": "Web de una página con formulario y botón de WhatsApp, adaptada a móvil. Desde 150 €." },
+      { "@type": "Offer", "name": "Inmersión", "price": "500", "priceCurrency": "EUR", "description": "Diseño web a medida con animaciones y SEO básico." }
+    ]
   }
   </script>
 
-  <!-- Decide modo cine / imágenes fijas antes de pintar -->
+  <!-- Decide modo cine / versión fija antes de pintar -->
   <script src="js/engine/fallback.js"></script>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Schibsted+Grotesk:wght@400;500;600&display=swap">
-
-  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: { navy: '#080b14', cyan: '#00e5ff', stone: '#e9e3d8', oak: '#b8875a', camel: '#b48a5e', graphite: '#2b2e35' },
-          fontFamily: { display: ['"Libre Baskerville"', 'Georgia', 'serif'], text: ['"Schibsted Grotesk"', 'system-ui', 'sans-serif'] }
-        }
-      }
-    };
-  </script>
+  <link rel="preload" href="assets/fonts/libre-baskerville-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/schibsted-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/fonts.css">
 
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/zones.css">
+  <link rel="stylesheet" href="css/engine.css">
+  <link rel="stylesheet" href="css/oficina.css">
 </head>
-<body>
+<body class="home">
   <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
-  <canvas class="scene" aria-hidden="true"></canvas>
-  <!-- Fachada: foto fija (LCP, se ve sin JS). La cámara mueve este contenedor
-       entero; letras, hojas de la ventana e interior viven dentro. -->
-  <div class="fachada-cam">
-    <picture class="poster" data-poster="fachada">
-      <source media="(max-width: 767px), (orientation: portrait)" type="image/avif" srcset="assets/zones/01-fachada/mobile/keyframe.avif">
-      <source media="(max-width: 767px), (orientation: portrait)" type="image/webp" srcset="assets/zones/01-fachada/mobile/keyframe.webp">
-      <source type="image/avif" srcset="assets/zones/01-fachada/desktop/keyframe.avif">
-      <img src="assets/zones/01-fachada/desktop/keyframe.webp" width="2560" height="1434" fetchpriority="high" decoding="async"
-           alt="Fachada de un edificio señorial de Madrid a la hora azul, con una ventana encendida en la planta noble.">
+  <!-- Fondo del hero: render plano de la oficina (yaw 0°, pitch +5°). El
+       desenfocado es el LCP; el nítido se carga al primer scroll y se cruza
+       con el panorama en el mismo encuadre. -->
+  <div class="fondo" aria-hidden="true">
+    <picture class="fondo__nitido">
+      <source media="(max-width: 767px), (orientation: portrait)" type="image/avif" data-srcset="assets/oficina/hero-mobile.avif">
+      <source media="(max-width: 767px), (orientation: portrait)" type="image/webp" data-srcset="assets/oficina/hero-mobile.webp">
+      <source type="image/avif" data-srcset="assets/oficina/hero-desktop.avif">
+      <img data-src="assets/oficina/hero-desktop.webp" alt="" width="2560" height="1440" decoding="async">
+    </picture>
+    <picture class="fondo__blur">
+      <source media="(max-width: 767px), (orientation: portrait)" type="image/avif" srcset="assets/oficina/hero-mobile-blur.avif">
+      <source media="(max-width: 767px), (orientation: portrait)" type="image/webp" srcset="assets/oficina/hero-mobile-blur.webp">
+      <source type="image/avif" srcset="assets/oficina/hero-desktop-blur.avif">
+      <img src="assets/oficina/hero-desktop-blur.webp" alt="" width="2560" height="1440" fetchpriority="high" decoding="async">
     </picture>
   </div>
-  <div class="curtain" aria-hidden="true"></div>
+  <canvas class="scene" aria-hidden="true"></canvas>
   <div class="grain" aria-hidden="true"></div>
 
-  <!-- ================= Cabecera fija ================= -->
-  <header class="site-header">
-    <a class="brand" href="./" aria-label="Evimes, inicio" data-logo="header"></a>
-
-    <nav class="header-actions" aria-label="Principal">
-      <button class="ui-btn btn-plan" type="button" aria-haspopup="dialog" aria-controls="plano" aria-expanded="false">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true">
-          <rect x="1.5" y="1.5" width="15" height="15"/>
-          <path d="M7.5 1.5v15M7.5 9h9"/>
-          <rect class="plan-icon__room" x="10" y="11.5" width="4" height="3"/>
-        </svg>
-        <span class="btn-plan__label">Plano</span>
-        <span class="btn-plan__room" data-room aria-live="off">Fachada</span>
-      </button>
-
-      <button class="ui-btn btn-sound" type="button" aria-pressed="false" aria-label="Activar sonido" title="Sonido">
-        <svg width="17" height="14" viewBox="0 0 17 14" aria-hidden="true">
-          <rect class="bar" x="1.5"  y="0" width="1.2" height="14" fill="currentColor"/>
-          <rect class="bar" x="5.9"  y="0" width="1.2" height="14" fill="currentColor"/>
-          <rect class="bar" x="10.3" y="0" width="1.2" height="14" fill="currentColor"/>
-          <rect class="bar" x="14.7" y="0" width="1.2" height="14" fill="currentColor"/>
-        </svg>
-      </button>
-
-      <a class="ui-btn btn-cta" href="contacto.html">
-        <span>Empieza tu proyecto</span>
-        <span class="btn-cta__fill" aria-hidden="true">Empieza tu proyecto</span>
-      </a>
+  <!-- ================= Menú ================= -->
+  <header class="menu">
+    <a class="menu__marca" href="#inicio" aria-label="Evimes, inicio" data-logo="header" data-ir="inicio"></a>
+    <nav class="menu__nav" id="menu-nav" aria-label="Principal">
+      <ul>
+        <li><a href="#proyectos" data-ir="proyectos" data-c="menu.proyectos">Proyectos</a></li>
+        <li><a href="#planes" data-ir="planes" data-c="menu.planes">Planes</a></li>
+        <li><a href="#servicios" data-ir="servicios" data-c="menu.servicios">Servicios</a></li>
+        <li><a href="#contacto" data-ir="contacto" data-c="menu.contacto">Contacto</a></li>
+      </ul>
     </nav>
+    <a class="boton boton--claro menu__cta" href="#contacto" data-ir="contacto" data-c="menu.cta">Pide tu propuesta</a>
+    <button class="menu__abrir" type="button" aria-expanded="false" aria-controls="menu-nav">
+      <span class="sr-only">Menú</span>
+      <span class="menu__lineas" aria-hidden="true"><span></span><span></span></span>
+    </button>
   </header>
 
-  <!-- ================= Plano (navegación) ================= -->
-  <dialog class="plan" id="plano" aria-labelledby="plano-titulo" data-lenis-prevent>
-    <div class="plan__inner">
-      <div class="plan__bar">
-        <h2 class="plan__title" id="plano-titulo">Plano</h2>
-        <button class="ui-btn plan__close" type="button">Cerrar</button>
-      </div>
+  <main id="contenido">
 
-      <div class="plan__body">
-        <div class="plan__drawing">
-          <svg viewBox="0 0 600 830" role="img" aria-label="Plano de la planta: fachada, pasillo, tres salas de cristal, arcade y balcón">
-            <defs>
-              <pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-                <line class="hatch" x1="0" y1="0" x2="0" y2="5"/>
-              </pattern>
-            </defs>
-
-            <!-- Salas (zonas de clic). El pasillo va primero: queda debajo. -->
-            <g class="room" data-goto="pasillo" data-cx="166" data-cy="180">
-              <path class="room-hit" d="M253 718V230H72V142H528V230H347V718Z"/>
-              <path class="room-fill" d="M253 718V230H72V142H528V230H347V718Z"/>
-              <text class="room-label" x="166" y="176" text-anchor="middle">Pasillo</text>
-              <text class="room-label room-label--small" x="166" y="194" text-anchor="middle">Planta noble</text>
-            </g>
-            <g class="room" data-goto="diseno-web" data-cx="162" data-cy="600">
-              <rect class="room-hit" x="72" y="480" width="178" height="238"/>
-              <rect class="room-fill" x="72" y="480" width="178" height="238"/>
-              <text class="room-label" x="162" y="596" text-anchor="middle">Diseño Web</text>
-              <text class="room-label room-label--small" x="162" y="614" text-anchor="middle">Sala I</text>
-            </g>
-            <g class="room" data-goto="product-design" data-cx="438" data-cy="600">
-              <rect class="room-hit" x="350" y="480" width="178" height="238"/>
-              <rect class="room-fill" x="350" y="480" width="178" height="238"/>
-              <text class="room-label" x="438" y="596" text-anchor="middle">Product Design</text>
-              <text class="room-label room-label--small" x="438" y="614" text-anchor="middle">Sala II</text>
-            </g>
-            <g class="room" data-goto="software-ai" data-cx="162" data-cy="355">
-              <rect class="room-hit" x="72" y="230" width="178" height="250"/>
-              <rect class="room-fill" x="72" y="230" width="178" height="250"/>
-              <text class="room-label" x="162" y="351" text-anchor="middle">Software &amp; AI</text>
-              <text class="room-label room-label--small" x="162" y="369" text-anchor="middle">Sala III</text>
-            </g>
-            <g class="room" data-goto="arcade" data-cx="438" data-cy="355">
-              <rect class="room-hit" x="350" y="230" width="178" height="250"/>
-              <rect class="room-fill" x="350" y="230" width="178" height="250"/>
-              <text class="room-label" x="438" y="351" text-anchor="middle">Arcade</text>
-              <text class="room-label room-label--small" x="438" y="369" text-anchor="middle">Sala de juego</text>
-            </g>
-            <g class="room" data-goto="balcon" data-cx="300" data-cy="62">
-              <rect class="room-hit" x="200" y="30" width="200" height="100"/>
-              <rect class="room-fill" x="220" y="74" width="160" height="56"/>
-              <text class="room-label" x="300" y="58" text-anchor="middle">Balcón</text>
-            </g>
-            <g class="room" data-goto="fachada" data-cx="160" data-cy="766">
-              <rect class="room-hit" x="40" y="732" width="520" height="90"/>
-              <rect class="room-fill" x="60" y="732" width="480" height="70"/>
-              <text class="room-label" x="160" y="766" text-anchor="middle">Fachada</text>
-              <text class="room-label room-label--small" x="160" y="784" text-anchor="middle">Calle</text>
-            </g>
-
-            <!-- Muros de carga (doble línea + rayado) -->
-            <path d="M60 130H540V730H60Z M72 142V718H528V142Z" fill="url(#hatch)" fill-rule="evenodd" pointer-events="none"/>
-            <rect class="wall" x="60" y="130" width="480" height="600" pointer-events="none"/>
-            <rect class="wall-thin" x="72" y="142" width="456" height="576" pointer-events="none"/>
-
-            <g pointer-events="none">
-              <!-- Ventanas de fachada (la central es la de entrada) -->
-              <g fill="#0e1220">
-                <rect x="110" y="716" width="60" height="16"/>
-                <rect x="270" y="716" width="60" height="16"/>
-                <rect x="430" y="716" width="60" height="16"/>
-                <rect x="270" y="128" width="60" height="16"/>
-              </g>
-              <g class="wall-thin">
-                <path d="M110 718H170M110 724H170M110 730H170"/>
-                <path d="M270 718H330M270 724H330M270 730H330"/>
-                <path d="M430 718H490M430 724H490M430 730H490"/>
-                <path d="M110 716V732M170 716V732M270 716V732M330 716V732M430 716V732M490 716V732"/>
-                <!-- puerta balconera -->
-                <path d="M270 130V142M330 130V142"/>
-                <path d="M270 142A30 30 0 0 1 300 172M330 142A30 30 0 0 0 300 172"/>
-              </g>
-
-              <!-- Balcón: losa y barandilla -->
-              <path class="wall-thin" d="M220 130V74H380V130"/>
-              <path class="glass" d="M226 130V80H374V130"/>
-              <path class="hatch" d="M240 74V80M260 74V80M280 74V80M300 74V80M320 74V80M340 74V80M360 74V80"/>
-
-              <!-- Particiones de cristal (doble línea fina) con huecos de puerta -->
-              <path class="glass" d="M250 230V600M250 640V718M253 230V600M253 640V718"/>
-              <path class="glass" d="M347 230V600M347 640V718M350 230V600M350 640V718"/>
-              <path class="glass" d="M72 480H250M350 480H528M72 483H250M350 483H528"/>
-              <path class="glass" d="M72 230H250M350 230H528M72 233H250M350 233H528"/>
-              <!-- marcas de montantes -->
-              <path class="hatch" d="M250 280H253M250 330H253M250 430H253M250 530H253M250 680H253M347 280H350M347 330H350M347 430H350M347 530H350M347 680H350"/>
-
-              <!-- Recorrido de la cámara -->
-              <path class="route" d="M300 820V700L162 680L438 668L162 438L438 440L300 300V100"/>
-            </g>
-
-            <!-- Estás aquí -->
-            <g class="here-g" pointer-events="none" style="transform: translate(160px, 800px)">
-              <circle class="here-ring" r="6"/>
-              <circle class="here" r="3"/>
-            </g>
-          </svg>
-        </div>
-
-        <nav aria-label="Salas del estudio">
-          <ol class="plan__list">
-            <li><a href="#zona-fachada" data-goto="fachada">Fachada <span class="plan__note" data-note="Calle">Calle</span></a></li>
-            <li><a href="#zona-pasillo" data-goto="pasillo">Pasillo <span class="plan__note" data-note="Planta noble">Planta noble</span></a></li>
-            <li><a href="#zona-diseno-web" data-goto="diseno-web">Diseño Web <span class="plan__note" data-note="Sala I">Sala I</span></a></li>
-            <li><a href="#zona-product-design" data-goto="product-design">Product Design <span class="plan__note" data-note="Sala II">Sala II</span></a></li>
-            <li><a href="#zona-software-ai" data-goto="software-ai">Software &amp; AI <span class="plan__note" data-note="Sala III">Sala III</span></a></li>
-            <li><a href="#zona-arcade" data-goto="arcade">Arcade <span class="plan__note" data-note="Sala de juego">Sala de juego</span></a></li>
-            <li><a href="#zona-balcon" data-goto="balcon">Balcón <span class="plan__note" data-note="Madrid">Madrid</span></a></li>
-          </ol>
-        </nav>
-      </div>
-    </div>
-  </dialog>
-
-  <!-- ================= Recorrido ================= -->
-  <main id="contenido" class="zones">
-
-    <section class="zone" id="zona-fachada" data-zone="fachada" aria-labelledby="h-fachada">
+    <!-- ========== 1–4. Hero + la oficina (zona con cámara) ========== -->
+    <section class="zone oficina" id="inicio" data-zone="oficina" aria-labelledby="h1">
       <div class="zone__stage">
-        <div class="layer">
-          <div class="fachada__copy">
-            <p class="fachada__firma" data-c="firma">Tu esencia, digital.</p>
-            <h1 class="fachada__h1" id="h-fachada" data-c="fachada.h1">Estudio de diseño web, producto y software en Madrid.</h1>
-            <p class="fachada__lead" data-c="fachada.entradilla">Somos Evimes. Creamos webs, productos digitales y software con IA para negocios que quieren que se les vea, y que les elijan.</p>
-            <a class="entra" href="#zona-pasillo"><span class="entra__linea" aria-hidden="true"></span><span data-c="fachada.entra">Entra</span></a>
+
+        <div class="hero">
+          <div class="hero__texto">
+            <h1 class="hero__h1" id="h1" data-c="hero.h1">Diseño web en Madrid que convierte visitas en clientes.</h1>
+            <p class="hero__linea" data-c="hero.linea">Webs rápidas, a medida y pensadas para vender. Desde 150 €.</p>
+            <div class="hero__botones">
+              <a class="boton boton--claro" href="#contacto" data-ir="contacto" data-c="hero.cta">Pide tu propuesta</a>
+              <a class="boton boton--texto" href="#proyectos" data-ir="proyectos" data-c="hero.secundario">Ver proyectos</a>
+            </div>
           </div>
+          <dl class="datos" data-datos></dl>
         </div>
-      </div>
-    </section>
 
-    <section class="zone" id="zona-pasillo" data-zone="pasillo" aria-label="Pasillo">
-      <div class="zone__stage">
-        <h2 class="pasillo__lines display">
-          <span data-c="pasillo.0">Si no eres visible,</span>
-          <span data-c="pasillo.1">no existes.</span>
-        </h2>
-      </div>
-    </section>
+        <!-- Capas pegadas al panorama (matrix3d con la misma cámara) -->
+        <div class="capas" aria-hidden="true"></div>
+        <div class="techo-velo" aria-hidden="true"></div>
 
-    <section class="zone" id="zona-diseno-web" data-zone="diseno-web" aria-labelledby="h-diseno-web">
-      <div class="zone__stage">
-        <h2 class="sr-only" id="h-diseno-web" data-c="disenoWeb.rotulo">Diseño Web</h2>
-        <!-- Panorama 360°: cartelas, rótulo y pantallas las coloca js/engine/pano.js -->
-      </div>
-    </section>
-
-    <section class="zone" id="zona-product-design" data-zone="product-design" aria-labelledby="h-product-design">
-      <div class="zone__stage">
-        <h2 class="sr-only" id="h-product-design" data-c="productDesign.rotulo">Product Design</h2>
-        <div class="layer layer--cartelas"></div>
-      </div>
-    </section>
-
-    <section class="zone" id="zona-software-ai" data-zone="software-ai" aria-labelledby="h-software-ai">
-      <div class="zone__stage">
-        <h2 class="sr-only" id="h-software-ai" data-c="softwareAI.rotulo">Software &amp; AI</h2>
-        <div class="layer layer--cartelas"></div>
-      </div>
-    </section>
-
-    <section class="zone" id="zona-arcade" data-zone="arcade" aria-label="Arcade">
-      <div class="zone__stage"></div>
-    </section>
-
-    <section class="zone" id="zona-balcon" data-zone="balcon" aria-labelledby="h-balcon">
-      <div class="zone__stage">
-        <div class="layer">
-          <h2 class="balcon__cta display" id="h-balcon" data-c="cta.titulo">¿Listo para empezar?</h2>
+        <!-- 3. Proyectos -->
+        <div class="proyectos" id="proyectos" role="region" aria-labelledby="h-proyectos">
+          <h2 class="sr-only" id="h-proyectos">Proyectos</h2>
+          <ul class="proyectos__lista" data-proyectos aria-roledescription="carrusel"></ul>
         </div>
+
+        <!-- 4. Cifras -->
+        <div class="cifras" role="region" aria-labelledby="h-cifras">
+          <h2 class="sr-only" id="h-cifras">Cifras</h2>
+          <ul class="cifras__lista" data-cifras></ul>
+          <p class="cifras__frase display">Diseñado para captar.</p>
+        </div>
+
+        <!-- Bloques de texto (abajo a la izquierda) -->
+        <div class="bloque" data-paso="01">
+          <p class="bloque__etiqueta" data-c="oficina.mesa.etiqueta">Proyectos</p>
+          <p class="bloque__titulo display" data-c="oficina.mesa.titulo">Webs hechas para vender.</p>
+          <p class="bloque__linea" data-c="oficina.mesa.linea1"></p>
+          <p class="bloque__linea" data-c="oficina.mesa.linea2"></p>
+          <a class="boton boton--claro" href="proyectos.html" data-c="oficina.mesa.boton">Ver todos los proyectos</a>
+        </div>
+        <div class="bloque" data-paso="02">
+          <p class="bloque__etiqueta" data-c="oficina.techo.etiqueta">Cifras</p>
+          <p class="bloque__titulo display" data-c="oficina.techo.titulo">Medido en proyectos reales.</p>
+          <p class="bloque__linea" data-c="oficina.techo.linea1"></p>
+          <p class="bloque__linea" data-c="oficina.techo.linea2"></p>
+          <a class="boton boton--claro" href="#planes" data-ir="planes" data-c="oficina.techo.boton">Ver planes</a>
+        </div>
+        <p class="contador" aria-hidden="true"><span data-contador>01</span> / 02</p>
       </div>
+    </section>
+
+    <!-- ========== 5. Planes ========== -->
+    <section class="seccion planes" id="planes" aria-labelledby="h-planes">
+      <div class="seccion__cab">
+        <h2 class="seccion__titulo" id="h-planes" data-c="planes.titulo">Planes</h2>
+        <p class="seccion__intro" data-c="planes.intro"></p>
+      </div>
+      <ol class="planes__lista" data-planes></ol>
+      <p class="planes__mas"><a href="planes.html" data-c="planes.verTodo">Ver qué incluye cada plan</a></p>
+    </section>
+
+    <!-- ========== 6. También hacemos ========== -->
+    <section class="seccion tambien" id="servicios" aria-labelledby="h-tambien">
+      <h2 class="seccion__titulo" id="h-tambien" data-c="tambien.titulo">También hacemos</h2>
+      <ul class="tambien__lista" data-tambien></ul>
+    </section>
+
+    <!-- ========== 7. Preguntas frecuentes ========== -->
+    <section class="seccion faq" id="preguntas" aria-labelledby="h-faq">
+      <h2 class="seccion__titulo" id="h-faq" data-c="faq.titulo">Preguntas frecuentes</h2>
+      <div class="faq__lista" data-faq></div>
+    </section>
+
+    <!-- ========== 8. Contacto ========== -->
+    <section class="seccion contacto" id="contacto" aria-labelledby="h-contacto">
+      <div class="contacto__texto">
+        <h2 class="seccion__titulo" id="h-contacto" data-c="contacto.titulo">Cuéntanos tu negocio.</h2>
+        <p class="seccion__intro" data-c="contacto.linea"></p>
+        <p class="contacto__directo">
+          <a data-email href="mailto:evimes@evimesweb.com">evimes@evimesweb.com</a>
+          <a data-telefono href="tel:+34636736167">+34 636 73 61 67</a>
+        </p>
+      </div>
+      <form class="formulario" data-formulario novalidate>
+        <div class="campo">
+          <label for="f-negocio" data-c="contacto.campos.negocio">Tipo de negocio</label>
+          <input id="f-negocio" name="negocio" type="text" autocomplete="organization" required>
+        </div>
+        <div class="campo">
+          <label for="f-nombre" data-c="contacto.campos.nombre">Tu nombre</label>
+          <input id="f-nombre" name="nombre" type="text" autocomplete="name" required>
+        </div>
+        <div class="campo">
+          <label for="f-whatsapp" data-c="contacto.campos.whatsapp">Tu WhatsApp</label>
+          <input id="f-whatsapp" name="whatsapp" type="tel" autocomplete="tel" inputmode="tel" required>
+        </div>
+        <div class="campo">
+          <label for="f-plan" data-c="contacto.campos.plan">Plan</label>
+          <select id="f-plan" name="plan" data-plan-select></select>
+        </div>
+        <p class="formulario__error" data-error role="alert" hidden></p>
+        <button class="boton boton--claro formulario__enviar" type="submit" data-c="contacto.enviar">Pide tu propuesta</button>
+        <p class="formulario__nota" data-c="contacto.nota"></p>
+      </form>
     </section>
   </main>
 
-  <!-- Librerías -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <script src="https://unpkg.com/lenis@1.1.20/dist/lenis.min.js"></script>
-  <!-- Three.js (salas 360°). Módulo: se ejecuta antes de DOMContentLoaded,
-       así main.js ya lo encuentra en window.THREE. -->
-  <script type="module">
-    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js';
-    window.THREE = THREE;
-  </script>
+  <!-- ========== 9. Pie ========== -->
+  <footer class="pie">
+    <a class="pie__marca" href="#inicio" data-ir="inicio" aria-label="Evimes, inicio" data-logo="pie"></a>
+    <p class="pie__firma" data-c="pie.firma">Tu esencia, digital.</p>
+    <p class="pie__contacto"><a data-email href="mailto:evimes@evimesweb.com">evimes@evimesweb.com</a> · <span data-c="pie.lugar">Madrid</span></p>
+    <nav aria-label="Textos legales">
+      <ul class="pie__legales">
+        <li><a href="aviso-legal.html">Aviso legal</a></li>
+        <li><a href="terminos.html">Términos</a></li>
+        <li><a href="privacidad.html">Privacidad</a></li>
+        <li><a href="cookies.html">Cookies</a></li>
+      </ul>
+    </nav>
+  </footer>
+
+  <a class="whatsapp" href="#contacto" data-whatsapp hidden target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 2.2a9.7 9.7 0 0 0-8.4 14.6L2.3 21.7l5-1.3A9.7 9.7 0 1 0 12 2.2Zm0 17.7a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 19.9Zm4.4-6c-.2-.1-1.4-.7-1.7-.8-.2-.1-.4-.1-.5.1l-.8 1c-.1.2-.3.2-.5.1a6.6 6.6 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.6.3 2.7 2.7 0 0 0-.9 2c0 1.2.9 2.4 1 2.5.1.2 1.8 2.7 4.3 3.8 1.6.7 2.2.7 3 .6.5-.1 1.4-.6 1.6-1.2.2-.6.2-1.1.1-1.2l-.6-.4Z"/></svg>
+  </a>
+
+  <!-- Detalle de proyecto -->
+  <dialog class="detalle" aria-labelledby="detalle-titulo" data-lenis-prevent>
+    <div class="detalle__panel">
+      <button class="detalle__cerrar" type="button" data-cerrar aria-label="Cerrar">
+        <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16" stroke="currentColor" stroke-width="1.25" fill="none"/></svg>
+      </button>
+      <div class="detalle__contenido" data-detalle></div>
+    </div>
+  </dialog>
+
+  <!-- Librerías (diferidas: el hero no las necesita para pintarse) -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script defer src="https://unpkg.com/lenis@1.1.20/dist/lenis.min.js"></script>
 
   <!-- Datos y textos -->
-  <script src="js/config.js"></script>
-  <script src="js/brand.js"></script>
-  <script src="js/content.js"></script>
-  <script src="js/zones/manifest.js"></script>
+  <script defer src="js/config.js"></script>
+  <script defer src="js/content.js"></script>
+  <script defer src="js/data/proyectos.js"></script>
+  <script defer src="js/data/mediciones.js"></script>
+  <script defer src="js/data/planes.js"></script>
+  <script defer src="js/brand.js"></script>
+  <script defer src="js/zones/manifest.js"></script>
 
   <!-- Motor -->
-  <script src="js/engine/lenis.js"></script>
-  <script src="js/engine/stage.js"></script>
-  <script src="js/engine/zones.js"></script>
-  <script src="js/engine/overlay.js"></script>
-  <script src="js/engine/ajuste.js"></script>
-  <script src="js/engine/pano.js"></script>
+  <script defer src="js/engine/util.js"></script>
+  <script defer src="js/engine/lenis.js"></script>
+  <script defer src="js/engine/stage.js"></script>
+  <script defer src="js/engine/zones.js"></script>
+  <script defer src="js/engine/overlay.js"></script>
+  <script defer src="js/engine/pano.js"></script>
 
-  <!-- Zonas -->
-  <script src="js/zones/room.js"></script>
-  <script src="js/zones/growth.js"></script>
-  <script src="js/zones/01-fachada.js"></script>
-  <script src="js/zones/02-pasillo.js"></script>
-  <script src="js/zones/03-diseno-web.js"></script>
-  <script src="js/zones/04-product-design.js"></script>
-  <script src="js/zones/05-software-ai.js"></script>
-  <script src="js/zones/06-arcade.js"></script>
-  <script src="js/zones/07-balcon.js"></script>
-
-  <script src="js/header.js"></script>
-  <script src="js/main.js"></script>
+  <!-- Página -->
+  <script defer src="js/zones/oficina.js"></script>
+  <script defer src="js/secciones.js"></script>
+  <script defer src="js/header.js"></script>
+  <script defer src="js/main.js"></script>
 </body>
 </html>

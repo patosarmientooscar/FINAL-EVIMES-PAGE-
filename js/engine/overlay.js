@@ -178,6 +178,30 @@
       c + ',' + f + ',0,1)';
   }
 
+  /* Homografía como función: (u, v) en 0–1 → punto de pantalla dentro del
+     cuadrilátero q (misma convención que quadMatrix). */
+  function quadFn(q) {
+    var x0 = q[0][0], y0 = q[0][1], x1 = q[1][0], y1 = q[1][1];
+    var x2 = q[2][0], y2 = q[2][1], x3 = q[3][0], y3 = q[3][1];
+    var sx = x0 - x1 + x2 - x3, sy = y0 - y1 + y2 - y3;
+    var a, b, c, d, e, f, g, hh;
+    if (Math.abs(sx) < 1e-9 && Math.abs(sy) < 1e-9) {
+      a = x1 - x0; b = x2 - x1; c = x0; d = y1 - y0; e = y2 - y1; f = y0; g = 0; hh = 0;
+    } else {
+      var dx1 = x1 - x2, dx2 = x3 - x2, dy1 = y1 - y2, dy2 = y3 - y2;
+      var den = dx1 * dy2 - dx2 * dy1;
+      if (Math.abs(den) < 1e-12) return null;
+      g = (sx * dy2 - dx2 * sy) / den;
+      hh = (dx1 * sy - sx * dy1) / den;
+      a = x1 - x0 + g * x1; b = x3 - x0 + hh * x3; c = x0;
+      d = y1 - y0 + g * y1; e = y3 - y0 + hh * y3; f = y0;
+    }
+    return function (u, v) {
+      var w = g * u + hh * v + 1;
+      return [(a * u + b * v + c) / w, (d * u + e * v + f) / w];
+    };
+  }
+
   /* ---------------------------------------------------------------------
      screenQuad(el, opts)
      Coloca un elemento HTML (imagen, iframe, página) sobre 4 puntos de
@@ -283,6 +307,8 @@
     var n;
     while ((n = walk.nextNode())) {
       if (!n.nodeValue.trim()) continue;
+      // Botones con fondo propio: su contraste no depende de la foto.
+      if (n.parentElement.closest('.boton')) continue;
       var cs = getComputedStyle(n.parentElement);
       var px = parseFloat(cs.fontSize), bold = parseInt(cs.fontWeight, 10) >= 700;
       var c = parseColor(cs.color);
@@ -411,6 +437,7 @@
     cartela: cartela,
     screenQuad: screenQuad,
     quadMatrix: quadMatrix,
+    quadFn: quadFn,
     scrim: scrim,
     /* Capa propia de una zona: { zone, progress?, update(p, active), hide() } */
     add: function (it) { items.push(it); return it; },
