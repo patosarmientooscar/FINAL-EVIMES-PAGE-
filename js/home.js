@@ -156,7 +156,9 @@
       var ul = $('.plan__incluye', li);
       p.incluye.forEach(function (x) { var it = document.createElement('li'); it.textContent = x; ul.appendChild(it); });
       var b = $('.plan__boton', li);
-      b.textContent = p.boton;
+      b.innerHTML = '<span class="sl"></span>';
+      b.firstChild.textContent = p.boton;
+      b.setAttribute('data-scramble', '');
       b.dataset.plan = p.id;
       b.setAttribute('aria-label', p.boton + ': plan ' + p.nombre);
       // Brillo cian que sigue al ratón por el borde.

@@ -99,7 +99,7 @@ window.EVIMES_CONTENT = {
     herramientas: 'Herramientas con las que trabajamos',
     frase: { a: 'Si no eres visible,', b: 'no existes.' },
     panel: { etiqueta: 'Proyectos', titulo: 'Siéntate. Esto es lo que hacemos.' },
-    planes: { titulo: 'Un plan para cada negocio.', intro: 'Sin letra pequeña.', verTodo: 'Ver qué incluye cada plan →', recomendado: 'Recomendado', desde: 'desde' },
+    planes: { titulo: 'Un plan para cada negocio.', intro: 'Sin letra pequeña.', verTodo: 'Ver qué incluye cada plan', recomendado: 'Recomendado', desde: 'desde' },
     contacto: { titulo: '¿Hacemos que se te vea?', cta: 'Pide tu propuesta', whatsapp: 'o escríbenos por WhatsApp' },
     pie: { firma: '© 2026 Evimes · Madrid' }
   }

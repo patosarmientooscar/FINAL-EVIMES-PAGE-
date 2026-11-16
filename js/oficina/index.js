@@ -40,7 +40,6 @@ function textos() {
   document.querySelectorAll('[data-of]').forEach(el => {
     const v = el.dataset.of.split('.').reduce((o, k) => (o ? o[k] : undefined), T);
     if (typeof v !== 'string' || !v) return;
-    if (el.matches('a')) { el.firstChild.nodeValue = v + ' '; return; }        // the link keeps its arrow
     el.innerHTML = esc(v).replace(/\[([^\]]+)\]/g, '<span class="accent">$1</span>');
   });
 }

@@ -29,7 +29,7 @@
         return '<span class="l"><span' + (o.suave ? ' class="soft"' : '') + '>' + marca(o.texto) + '</span></span>';
       }).join('\n') + '</h2>' +
       '<div class="side"><p>' + esc(d.texto) + '</p>' +
-        '<a class="cta" href="' + esc(d.href || '#contacto') + '" data-asunto="' + esc(d.asunto) + '">' + esc(d.cta) + ' <i aria-hidden="true">→</i></a></div>' +
+        '<a class="cta" href="' + esc(d.href || '#contacto') + '" data-asunto="' + esc(d.asunto) + '" data-scramble><span class="sl">' + esc(d.cta) + '</span> <i aria-hidden="true">→</i></a></div>' +
       '<div class="points">' + d.puntos.map(function (p, k) {
         return '<div class="pt"><b>' + String(k + 1).padStart(2, '0') + '</b><h3>' + esc(p.titulo) + '</h3><p>' + esc(p.texto) + '</p></div>';
       }).join('') + '</div>' +
