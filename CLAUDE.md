@@ -1,6 +1,7 @@
-# Evimes — "La oficina"
+# Evimes — home "La onda" + la oficina (aparcada)
 
-Home de una sola escena: la oficina de Evimes vista desde la silla del jefe (panorama 360°). El scroll la abre, saca los proyectos del monitor como cards, enseña las cifras en el techo y baja a las secciones planas (planes, servicios, preguntas, contacto). Ver BRIEF.md.
+Home (index.html, fase onda): fondo global de rayos + "la onda de cromo" (7 bandas Three.js con la forma de la línea del monograma EH), hero, herramientas, frase, panel gris de proyectos (con el hueco `#oficina-slot`), planes y contacto. Prototipo de referencia aprobado en estilo: `_archivo/prototipo-onda/`.
+La oficina 360° (vista desde la silla del jefe) queda APARCADA tal cual en `oficina.html` (noindex): no se toca ni se borra; entrará en `#oficina-slot`. Ver BRIEF.md.
 
 ## Reglas del proyecto
 
@@ -18,7 +19,11 @@ Home de una sola escena: la oficina de Evimes vista desde la silla del jefe (pan
 
 ## Estructura
 
-- `index.html` — hero + oficina (zona pinned) + secciones planas.
+- `index.html` — home onda. Estilos: `css/fondo.css` (capas fijas) + `css/home.css`. JS: `js/fondo/rayos.js` (2D), `js/fondo/onda.js` (Three.js), `js/home.js` (bucle, secciones). Textos en `content.js` → `inicio.*`.
+- Titulares de la home: una sola variable (`--display`, `--display-w`, `--display-track` en tokens.css). B = Fraunces 620 (elegida); A = Libre Baskerville 700; C = Schibsted Grotesk 760.
+- `assets/onda/` — póster/versión fija y OG sacados del propio render (`?onda=captura&modo=cine`, ver LEEME). Si cambian las bandas o los rayos, se vuelven a sacar.
+- `assets/tools/` — logos de simple-icons en local (máscara + currentColor).
+- `oficina.html` — la oficina aparcada (hero + oficina pinned + secciones planas).
 - `js/config.js` — contacto, WhatsApp, cifras y TODA la geometría de la oficina (paradas, monitor, detalles vivos).
 - `js/content.js` — todos los textos (editables).
 - `js/data/proyectos.js`, `js/data/planes.js`, `js/data/mediciones.js` — datos editables.
@@ -28,7 +33,16 @@ Home de una sola escena: la oficina de Evimes vista desde la silla del jefe (pan
 - `tools/render-hero.sh` — renders planos del panorama (ffmpeg v360). `tools/serve.js` — servidor local.
 - `_archivo/idea-estudio/` — la idea anterior completa. No se carga.
 
-## Motor
+## Home onda
+
+- Un solo bucle (gsap.ticker): Lenis → `tick()` de home.js (estado por scroll con posiciones cacheadas, sin lecturas de layout por fotograma) → rayos → onda.
+- Three.js 0.160.0 se importa al PRIMER GESTO (puntero, rueda, toque, tecla o scroll). Hasta entonces se ve el póster (fotograma opaco del mismo render, centrado: coincide con la cámara) y luego se funde con la onda en vivo; los rayos arrancan en t = 6 s, el mismo fotograma del póster.
+- Bandas: extremos fundidos por UV (nunca se ve el corte del tubo; en escritorio se apagan antes del bloque del H1). La luz de cada banda avanza integrando la velocidad (acelerar con el scroll no la hace saltar). Opacidad 1 en el hero → 0.3 fuera; 0 (y sin render) cuando el panel gris cubre la pantalla.
+- Grano: tesela PNG con fusión normal. NADA de mix-blend-mode ni feTurbulence a pantalla completa (costaban >1 s de TBT en Lighthouse móvil).
+- Versión fija (movimiento reducido, ahorro de datos, 2G/3G, `?modo=fijo`): póster fijo, sin Three.js, frase encendida, cinta quieta.
+- Ojo: no hay reset global de box-sizing; la home lo pone en `.inicio *`. Y `overflow-x: clip` en main: el degradado del hero es más ancho que el texto y Chrome móvil encogía la página.
+
+## Motor (oficina aparcada)
 
 - Tick único: Lenis → `zones.flush` → `stage.render` (cámara + panorama + capas) → `overlay.update` (scrims).
 - Zona `oficina` (manifest: 7 pantallas de pin). Tramos de progreso en `oficina.js` (constante `P`): apertura 0–0.10 · a mesa 0.10–0.17 · vuelo de cards 0.17–0.37 · arco quieto · a techo 0.52–0.62 · cifras 0.62–0.84 · salida a navy 0.84–1.

@@ -11,6 +11,8 @@
   --oak: #b8875a;
   --camel: #b48a5e;
   --graphite: #2b2e35;
+  --gris: #e6e4df;           /* panel claro de la home */
+  --tinta-oscura: #0b0f1a;   /* texto sobre el panel claro */
 
   /* Derivados de piedra sobre navy (todos ≥ AA para texto) */
   --ink: var(--stone);                         /* texto principal  ~16:1 */
@@ -25,6 +27,13 @@
      cifras tabulares; elegida frente a Familjen Grotesk, más caprichosa
      y débil en tamaños de cartela). */
   --font-display: "Libre Baskerville", "Baskerville", "Iowan Old Style", Georgia, serif;
+  /* Titulares de la home: UNA sola variable para cambiar de familia.
+     B (elegida) = Fraunces 620 · A = "Libre Baskerville" 700 / -0.015em · C = "Schibsted Grotesk" 760 / -0.035em */
+  --display: "Fraunces", "Libre Baskerville", Georgia, serif;
+  --display-w: 620;
+  --display-track: -0.022em;
+  --display-opsz: 144;
+
   --font-text: "Schibsted Grotesk", "Helvetica Neue", system-ui, sans-serif;
 
   /* Escala fluida 360px → 1600px (ratio ~1.25 móvil, ~1.333 escritorio) */

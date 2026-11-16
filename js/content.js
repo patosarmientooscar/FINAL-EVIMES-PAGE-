@@ -83,5 +83,24 @@ window.EVIMES_CONTENT = {
   pie: {
     firma: 'Tu esencia, digital.',
     lugar: 'Madrid'
+  },
+
+  // ===== Home nueva (index.html, fase onda). La oficina aparcada usa las claves de arriba. =====
+  inicio: {
+    menu: { herramientas: 'Herramientas', proyectos: 'Proyectos', planes: 'Planes', contacto: 'Contacto', cta: 'Pide tu propuesta' },
+    hero: {
+      linea1: 'Tu negocio merece',
+      linea2: 'una web a su altura.',
+      sub: 'Diseño web a medida en Madrid. Webs rápidas, únicas y pensadas para convertir visitas en clientes. Desde 150 €.',
+      cta: 'Pide tu propuesta',
+      secundario: 'Ver proyectos',
+      desliza: 'Desliza'
+    },
+    herramientas: 'Herramientas con las que trabajamos',
+    frase: { a: 'Si no eres visible,', b: 'no existes.' },
+    panel: { etiqueta: 'Proyectos', titulo: 'Siéntate. Esto es lo que hacemos.' },
+    planes: { titulo: 'Un plan para cada negocio.', intro: 'Sin letra pequeña.', verTodo: 'Ver qué incluye cada plan →', recomendado: 'Recomendado', desde: 'desde' },
+    contacto: { titulo: '¿Hacemos que se te vea?', cta: 'Pide tu propuesta', whatsapp: 'o escríbenos por WhatsApp' },
+    pie: { firma: '© 2026 Evimes · Madrid' }
   }
 };

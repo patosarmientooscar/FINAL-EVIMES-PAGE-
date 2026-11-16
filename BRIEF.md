@@ -35,7 +35,22 @@ Páginas planas: `proyectos.html`, `planes.html`, `software-ia.html`, `automatiz
 ## Estética
 Mundo de la foto: nogal, hormigón, ladrillo blanco, pared navy. Cards de material sólido blanco roto (#f4f1ea), radio 14 px, sombra suave, sin cristal ni brillos (tipo Apple). Libre Baskerville en titulares y cifras; Schibsted Grotesk en el resto. Navy #080b14 de base, piedra #e9e3d8 para el texto, cian solo en el foco.
 
+## Fase onda (16 nov 2026) — la home nueva
+La oficina queda aparcada (`oficina.html`, sin tocar). La home se construye desde el prototipo aprobado (`_archivo/prototipo-onda/`):
+1. Fondo global: rayos (2D) + la onda de cromo (7 bandas Three.js con la forma exacta de la línea del monograma EH, cromo pulido, una luz cian por banda) + grano fijo.
+2. Cabecera flotante de cristal (Herramientas · Proyectos · Planes · Contacto + "Pide tu propuesta"); cristal claro sobre el panel gris.
+3. Hero: "Tu negocio merece una web a su altura." + línea + "Pide tu propuesta" / "Ver proyectos" + "Desliza".
+4. Herramientas (cinta infinita de logos monocromos, se para con el ratón).
+5. Frase "Si no eres visible, no existes." (palabra a palabra con el scroll).
+6. Panel gris: "Proyectos" · "Siéntate. Esto es lo que hacemos." · hueco `#oficina-slot` (aquí entrará la oficina).
+7. Planes (tres cards de cristal; listas "incluye" en BORRADOR) + enlace a planes.html.
+8. Contacto: "¿Hacemos que se te vea?" + "Pide tu propuesta" (correo) + WhatsApp si hay número.
+9. Pie: © 2026 Evimes · Madrid + legales.
+
 ## Pendientes
+- [ ] Confirmar las listas "incluye" de cada plan (js/data/planes.js, BORRADOR, salen del prototipo).
+- [ ] Decidir si las palabras apagadas de la frase (opacidad 0,16 antes de encenderse) se aceptan: no pasan AA en ese estado.
+- [ ] Integrar la oficina en `#oficina-slot`.
 - [ ] URLs de los proyectos 2–5 (ahora "Próximamente").
 - [ ] Confirmar "24 h" de respuesta (ahora "Rápida") y "+10 proyectos entregados".
 - [ ] Textos de las preguntas frecuentes y de las líneas de cada plan.

@@ -5,7 +5,8 @@ window.EVIMES_CONFIG = {
   // Logos vectoriales (fill="currentColor"). Cada clave alimenta los
   // elementos con data-logo="<clave>"; el SVG se incrusta en línea.
   logo: {
-    header:  'assets/logo/evimes-eh.svg',       // cabecera
+    header:  'assets/logo/evimes-eh.svg',       // cabecera (oficina aparcada)
+    wordmark: 'assets/logo/evimes-wordmark.svg', // cabecera de la home
     favicon: 'assets/logo/evimes-eh.svg',       // origen de favicon.svg y apple-touch-icon.png
     pie:     'assets/logo/evimes-lockup.svg',   // pie de página
     lockup:  'assets/logo/evimes-lockup.svg'
