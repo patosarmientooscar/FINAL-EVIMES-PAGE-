@@ -25,7 +25,8 @@
   // Cuerdas acopladas: campo de desplazamiento (CPU) de W puntos × N tubos.
   // u = desplazamiento en Y local del tubo, v = velocidad. Se sube cada
   // fotograma a una DataTexture que leen los vertex shaders (cromo y luz).
-  var SIM = { W: 96, step: 1 / 90, maxSteps: 6, lim: 0.55, radio: 120, fuerza: 0.0036 };
+  // Calma (v-tubos-calma): tension 0.16 · coupling 0.09 · restore 0.010 · damping 0.10 · gain 0.0015 · max 0.28 · radio 160.
+  var SIM = { W: 96, step: 1 / 90, maxSteps: 6, lim: 0.28, radio: 160, fuerza: 0.0015, tension: 0.16, coupling: 0.09, restore: 0.010, damping: 0.10 };
   var fieldU = new Float32Array(SIM.W * N), fieldV = new Float32Array(SIM.W * N);
   var fieldTex = null, acc = 0, quieto = true;
   var ptr = { x: 0, y: 0, px: 0, py: 0, dentro: false, prev: false, vx: 0, vy: 0 };
@@ -154,7 +155,7 @@
         var q = curve.getPointAt(k / (SIM.W - 1));
         pts[k * 3] = q.x; pts[k * 3 + 1] = q.y * 1.55; pts[k * 3 + 2] = q.z * 0.38;
       }
-      bands.push({ g: g, lm: lm, pts: pts, head: i * 0.37 - 0.3, speed: 0.11 + (i % 3) * 0.025 });
+      bands.push({ g: g, lm: lm, pts: pts, head: i * 0.37 - 0.3, speed: (0.11 + (i % 3) * 0.025) * 0.5 });   // luz: a la mitad
     }
     group.rotation.set(0.18, -0.32, 0.46);
   }
@@ -200,7 +201,7 @@
         var i = b * W + k, u = fieldU[i];
         var l = k > 0 ? fieldU[i - 1] : u * 0.5, r = k < W - 1 ? fieldU[i + 1] : u * 0.5;
         var up = b > 0 ? fieldU[i - W] : u * 0.5, dn = b < N - 1 ? fieldU[i + W] : u * 0.5;
-        fieldV[i] += 0.30 * (l + r - 2 * u) + 0.15 * (up + dn - 2 * u) - 0.016 * u - 0.06 * fieldV[i];
+        fieldV[i] += SIM.tension * (l + r - 2 * u) + SIM.coupling * (up + dn - 2 * u) - SIM.restore * u - SIM.damping * fieldV[i];
       }
     }
     for (var j = 0; j < fieldU.length; j++) {
@@ -223,8 +224,9 @@
       if (ptr.prev) {
         // Velocidad del puntero por fotograma, normalizada a 60 fps y suavizada.
         var f = 1 / Math.max(dt * 60, 0.25);
-        ptr.vx += ((ptr.x - ptr.px) * f - ptr.vx) * 0.5;
-        ptr.vy += ((ptr.y - ptr.py) * f - ptr.vy) * 0.5;
+        var ks = 1 - Math.pow(0.82, dt * 60);       // suavizado lento: sin sacudidas
+        ptr.vx += ((ptr.x - ptr.px) * f - ptr.vx) * ks;
+        ptr.vy += ((ptr.y - ptr.py) * f - ptr.vy) * ks;
         pulsar();
       }
       ptr.px = ptr.x; ptr.py = ptr.y; ptr.prev = true;
@@ -256,11 +258,12 @@
   }
 
   function place(i) {
-    group.position.x = base.x + s.mx * -0.35;
-    group.position.y = base.y + s.my * 0.25 + s.hero * 2.2;
-    group.rotation.x = 0.18 + s.my * 0.06 + s.hero * 0.35;
-    group.rotation.y = -0.32 + s.mx * 0.08 - s.hero * 0.18;
-    group.rotation.z = 0.46 + s.hero * 0.16;
+    // Ratón: amplitud a la mitad. Scroll del hero: recorrido un 40 % menor.
+    group.position.x = base.x + s.mx * -0.175;
+    group.position.y = base.y + s.my * 0.125 + s.hero * 1.32;
+    group.rotation.x = 0.18 + s.my * 0.03 + s.hero * 0.21;
+    group.rotation.y = -0.32 + s.mx * 0.04 - s.hero * 0.108;
+    group.rotation.z = 0.46 + s.hero * 0.096;
   }
 
   EV.onda = {
@@ -310,8 +313,8 @@
     render: function (dt, inp) {
       if (!renderer) return;
       resize();
-      var k = 1 - Math.pow(1 - 0.05, dt * 60);     // lerp 0.05 a 60 fps
-      var kh = 1 - Math.pow(1 - 0.08, dt * 60);
+      var k = 1 - Math.pow(1 - 0.018, dt * 60);    // inclinación por el ratón: lerp 0.018 a 60 fps (antes 0.05)
+      var kh = 1 - Math.pow(1 - 0.035, dt * 60);   // scroll del hero: 0.035 (antes 0.08)
       s.mx += (inp.mx - s.mx) * k;
       s.my += (inp.my - s.my) * k;
       s.hero += (inp.hero - s.hero) * kh;
@@ -320,10 +323,10 @@
         var b = bands[i];
         if (inp.luz) {
           // La luz avanza integrando la velocidad: acelerar no la hace saltar.
-          b.head += dt * b.speed * (1 + s.hero * 1.6);
+          b.head += dt * b.speed * (1 + s.hero * 0.96);   // aceleración con el scroll, 40 % menos
           if (b.head > 1.3) b.head -= 1.6;
           b.lm.uniforms.uHead.value = b.head;
-          b.g.position.z = -i * 0.55 + Math.sin(performance.now() / 1000 * 0.35 + i * 0.7) * 0.06;
+          b.g.position.z = -i * 0.55 + Math.sin(performance.now() / 1000 * 0.175 + i * 0.7) * 0.06;   // deriva a la mitad de velocidad
         } else b.lm.uniforms.uHead.value = -2;
       }
       simular(dt, !!inp.cuerdas);
