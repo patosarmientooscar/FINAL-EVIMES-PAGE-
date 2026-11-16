@@ -12,13 +12,8 @@ export const elegirPano = (maxTextura, movil) => (!movil && maxTextura >= 8192 ?
 export const LOGO = { eh: 'assets/logo/evimes-eh.svg', wordmark: 'assets/logo/evimes-wordmark.svg' };
 
 // Dónde está cada cosa en la foto (yaw + derecha, pitch + arriba, grados).
-// Medido en oficina-4k: la pantalla (sin el marco de abajo), la boca de la taza
-// y el centro de la pared navy.
-export const SPOT = {
-  monitor: { tl: [-15.9, 3.6], tr: [22.2, 3.6], br: [22.2, -15.7], bl: [-15.9, -15.7] },
-  mug: [46.7, -17.4],
-  wall: [7.7, 24.5]
-};
+// Valores del prototipo aprobado (Downloads/evimes-oficina/index.html), tal cual.
+export const SPOT = { monitor: { tl: [-15.6, 3.7], tr: [22.1, 3.7], br: [22.1, -15.9], bl: [-15.6, -15.9] }, mug: [46.2, -12], wall: [7.7, 24.5] };
 
 // El proyecto que sale del monitor. strip: 4 capturas reales de la web
 // apiladas en vertical (1024×640 cada una); la card las recorre.
@@ -35,6 +30,6 @@ export const PROJECT = {
 // Disco, en % de la imagen (16:10 centrado en la caja proyectada de la card en P = 0.76).
 // Se rehacen con ?oficina=captura → window.__oficinaCaptura(.76).
 export const FIJA = {
-  escritorio: { img: 'assets/oficina/oficina-fija.webp', ar: 1920 / 1080, card: {"x":46.2,"y":23.77,"w":24.07,"h":26.74} },
-  movil: { img: 'assets/oficina/oficina-fija-movil.webp', ar: 390 / 844, card: {"x":10.56,"y":32,"w":75.5,"h":21.81} }
+  escritorio: { img: 'assets/oficina/oficina-fija.webp', ar: 1920 / 1080, card: {"x":36.99,"y":19.7,"w":24.82,"h":27.58} },
+  movil: { img: 'assets/oficina/oficina-fija-movil.webp', ar: 390 / 844, card: {"x":10.49,"y":31.89,"w":75.97,"h":21.94} }
 };

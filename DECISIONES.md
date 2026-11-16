@@ -35,3 +35,15 @@ Lo que decidí sin poder preguntar, y por qué. Lo que Oscar tiene que revisar e
 - NO se han tocado los textos legales (aviso legal, privacidad, cookies, términos), que llevan el email y el teléfono del titular: es texto legal (regla del proyecto) y la LSSI obliga a publicarlos. Tampoco `oficina.html` (aparcada).
 - Animación de "Recibido": anillo (scale + opacity) y check que se dibuja con clip-path; nada fuera de transform/opacity/clip-path.
 - Errores en un coral claro (#ff9b8a, ≈ 9:1 sobre el navy).
+
+## Bloque 4 · Oficina nueva con PageSpeed (`v-oficina-psi`)
+- Portada del prototipo `Downloads/evimes-oficina/index.html` (el `index-v2-tunel.html` no se ha usado): shaders, valores, tiempos y `SPOT` tal cual (incluida la taza en −12°, aunque en la foto la boca está más abajo: manda el prototipo). Track de 470vh.
+- No se porta el túnel (`uWarp`), que en el prototipo vale siempre 0: el resultado visual es el mismo.
+- Se mantienen del proyecto: panorama 4K o 4096 según la GPU, carga diferida con la foto desenfocada, progreso desde Lenis, bucle en gsap.ticker, cabecera oscura, versión fija y `?oficina=captura`.
+- Contraste: el prototipo pone los textos del pie a .6 / .74 de opacidad, que no pasan AA sobre la foto; se quedan los valores reforzados de la fase anterior (velo más fuerte y textos a .86–.94).
+- Indicadores: la etiqueta del tercero es "Prácticas recomendadas" (la del prototipo y la que usa PageSpeed Insights en español), no "Buenas prácticas" como decía el prompt: es una cifra citada de una herramienta real y conviene que se llame igual que allí. El dato sigue en `buenasPracticas` en js/data/pagespeed.js.
+- **Hay que confirmar que los datos de PageSpeed (99 / 100 / 100 / 100, Agentic 2/2) son de discoproduccion.com** (salen de una captura de Oscar).
+- El texto accesible del bloque (role="img") se genera desde js/data/pagespeed.js: lee la fuente, la web, la fecha y las cuatro cifras.
+- Cabecera: oscura con la ventana abierta más del 60 % (con el 50 % se quedaba oscura sobre la card cerrada por un redondeo).
+- Versión fija: render sin la card (P = 0.76) + la web de Disco en HTML + los 4 indicadores quietos (a los lados en escritorio, en fila debajo en móvil; tamaño en cqw para que escalen con la imagen). En móvil el texto de Disco va debajo de la foto, porque encima tapaba la fila de indicadores.
+- El botón "Ver la web →" pasa al de cristal del prototipo (antes era una pastilla clara).

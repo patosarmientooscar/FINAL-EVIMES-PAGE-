@@ -215,8 +215,9 @@
         </div>
       </div>
 
-      <!-- 2. Trabajo selecto + la oficina (#oficina-slot, track de 820vh): la ventana se abre desde una card,
-           entra en el monitor, sale con la web de Disco y se vuelve a cerrar en card.
+      <!-- 2. Trabajo selecto + la oficina (#oficina-slot, track de 470vh): la ventana se abre desde una card,
+           EVIMES se enciende, la cámara va al monitor, la web de Disco sube como una card (con su PageSpeed)
+           y se vuelve a cerrar en card. Prototipo aprobado: Downloads/evimes-oficina/index.html.
            Textos: js/data/oficina.js (BORRADOR) · proyecto y rutas: js/oficina/config.js
            Escena: js/oficina/ · estilos: css/oficina.css -->
       <div class="intro" id="trabajo" role="group" aria-labelledby="ts">
@@ -233,12 +234,13 @@
               <img src="assets/oficina/oficina-espera.webp" alt="" width="480" height="270" decoding="async">
             </picture>
             <canvas aria-hidden="true"></canvas>
-            <div class="flash" aria-hidden="true"></div>
             <div class="scrim"></div>
             <div class="cap" data-cap="1"><p class="k" data-of="cap1.k">El estudio</p><h3 class="display" data-of="cap1.titulo">Aquí se hacen.</h3><p data-of="cap1.texto">Una oficina pequeña en Madrid, gente que diseña y programa cada web a mano.</p></div>
             <div class="cap" data-cap="2"><p class="k" data-of="cap2.k">Trabajo selecto · 01</p><h3 class="display" data-of="cap2.titulo">Disco <span class="accent">Producción</span></h3><p data-of="cap2.texto">Productora audiovisual en Madrid. Su web ya está dando que hablar.</p>
               <a class="btn" href="https://discoproduccion.com" target="_blank" rel="noopener" data-scramble aria-label="Ver la web de Disco Producción (abre en una pestaña nueva)"><span class="sl" data-of="cap2.boton">Ver la web</span> <i aria-hidden="true">→</i></a></div>
             <div class="hud" aria-hidden="true" data-of="hud">Desliza</div>
+            <!-- PageSpeed de la web de Disco (js/data/pagespeed.js): 4 indicadores + píldora, colocados junto a la card -->
+            <div class="psi" data-psi role="img" aria-label="PageSpeed Insights de discoproduccion.com"></div>
           </div>
         </div>
       </div>
@@ -397,6 +399,7 @@
   <script defer src="js/data/planes.js"></script>
   <script defer src="js/data/servicios.js"></script>
   <script defer src="js/data/oficina.js"></script>
+  <script defer src="js/data/pagespeed.js"></script>
   <script defer src="js/data/clientes.js"></script>
   <script defer src="js/brand.js"></script>
   <script defer src="js/engine/util.js"></script>
