@@ -46,10 +46,10 @@ La oficina 360° (vista desde la silla del jefe) queda APARCADA tal cual en `ofi
 
 ## Panel gris (fase gris)
 
-- `js/gris/oficios.js`: carrusel de scroll horizontal nativo con snap (arrastre con inercia, flechas, Shift+rueda, teclado; la rueda vertical pasa a Lenis). Un canvas del tamaño de la ventana dibuja la línea EH con el scrollLeft exacto; lo que se interpola (lerp 0,1) es el estado de forma `pS`. Mezcla espacial entre slides con smoothstep(0,28–0,72): sin cortes. Solo dibuja con la sección en pantalla.
+- "Qué hacemos" = bento de 4 cards 3D (fase bento, v-bento-1), portado TAL CUAL del prototipo aprobado `Downloads/evimes-cards/bento.html`: `css/bento.css` + `js/bento/` (shared · web · star · pin · ia · index). Cada card es un renderer WebGL propio que solo pinta si está visible; un único bucle para las cuatro dentro de gsap.ticker. Three.js 0.160.0 con la misma URL que la onda, importado al acercarse al bento. El EH grabado del destello se lee de `assets/logo/evimes-eh.svg`. Versión fija o sin WebGL: pósters `assets/bento/<card>-escritorio|movil.png` (se rehacen con `?bento=captura` → `window.__bentoPosters()`). Textos BORRADOR en `js/data/servicios.js`. Los tubos no renderizan sobre el gris (opacidad 0).
 - `js/gris/trabajo.js`: datos en `EVIMES_TRABAJO` (proyectos.js; sin url o media no se ven; `?borradores=1` los enseña). Flash de cámara (WAAPI 80 ms), cursor "Ver", vuelo de las cards al visor `#oficina-slot` (scrub con medidas cacheadas).
 - `js/gris/clientes.js`: tablist accesible; al cambiar, `EV.onda.pulso()` en los tubos. Textos en `js/data/clientes.js`.
-- `EV.home` (home.js) expone `lenis`, `ir`, `cine`… para los módulos del panel. `servicios.html`: los 5 oficios (anclas #web #3d #seo #ia #mantenimiento), póster fijo, sin Three.js.
+- `EV.home` (home.js) expone `lenis`, `ir`, `cine`… para los módulos del panel. `servicios.html`: los 4 oficios (anclas #web #3d #seo #ia), póster fijo, sin Three.js.
 - Grabación de una web real (assets/proyectos/discoproduccion/): screencast CDP + ffmpeg, visitando SOLO esa URL.
 
 ## Motor (oficina aparcada)
