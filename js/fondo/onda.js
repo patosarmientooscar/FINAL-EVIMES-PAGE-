@@ -5,6 +5,9 @@
      blancas y vetas cian/violeta: reflejan "los rayos".
    · Una línea de luz cian por banda que la recorre de punta a punta
      (shader aditivo sobre la UV del tubo), cada una con su desfase.
+   · Cuerdas acopladas: el puntero empuja un campo de desplazamiento (96
+     puntos × 7 tubos, CPU, paso fijo 1/90 s) que los vertex shaders leen de
+     una DataTexture; la onda recorre cada tubo y pasa a sus vecinos.
    · Los dos extremos de cada banda se funden (alpha sobre la UV): nunca se
      ve el corte del tubo y la banda se apaga antes de llegar al texto.
    Un solo renderer. No tiene bucle propio: js/home.js llama a render() desde
@@ -18,6 +21,25 @@
   // x 0..1, y 0..1 de arriba abajo). NO TOCAR: es la forma de la marca.
   var P = [[0, .506], [.107, .536], [.203, .545], [.574, .485], [.67, .467], [.813, .455], [.909, .467], [1, .495]];
   var N = 7;
+
+  // Cuerdas acopladas: campo de desplazamiento (CPU) de W puntos × N tubos.
+  // u = desplazamiento en Y local del tubo, v = velocidad. Se sube cada
+  // fotograma a una DataTexture que leen los vertex shaders (cromo y luz).
+  var SIM = { W: 96, step: 1 / 90, maxSteps: 6, lim: 0.55, radio: 120, fuerza: 0.0036 };
+  var fieldU = new Float32Array(SIM.W * N), fieldV = new Float32Array(SIM.W * N);
+  var fieldTex = null, acc = 0, quieto = true;
+  var ptr = { x: 0, y: 0, px: 0, py: 0, dentro: false, prev: false, vx: 0, vy: 0 };
+  var _v, _o;                                    // vectores de trabajo
+
+  var EV_GLSL =
+    'uniform sampler2D uField;uniform float uBand;uniform float uW;uniform float uN;attribute float aS;\n' +
+    // Interpolación manual Catmull-Rom (4 muestras): pasa por los 96 valores
+    // sin aristas; la lineal dibujaba una poligonal (~30 px entre muestras).
+    'float evTap(float i,float y){return texture2D(uField,vec2((clamp(i,0.,uW-1.)+.5)/uW,y)).r;}\n' +
+    'float evField(float s){float x=clamp(s,0.,1.)*(uW-1.);float i1=floor(x);float t=x-i1;float y=(uBand+.5)/uN;' +
+    'float p0=evTap(i1-1.,y),p1=evTap(i1,y),p2=evTap(i1+1.,y),p3=evTap(i1+2.,y);' +
+    'return p1+.5*t*(p2-p0+t*(2.*p0-5.*p1+4.*p2-p3+t*(3.*(p1-p2)+p3-p0)));}\n' +
+    'vec3 evDisplace(vec3 p){return p+vec3(0.,evField(aS),0.);}\n';
 
   var T, renderer, scene, camera, group, canvas;
   var bands = [];
@@ -58,28 +80,32 @@
     return new T.CatmullRomCurve3(pts, false, 'centripetal');
   }
 
-  // Fundido de los extremos en el cromo (inyectado en el shader físico).
-  function withFade(mat) {
+  // Cromo de un tubo: el físico compartido + fundido de extremos + campo de
+  // cuerdas. Un material por tubo (uBand), un solo programa (cache key).
+  function makeChrome(base, u) {
+    var mat = base.clone();
     mat.onBeforeCompile = function (sh) {
       sh.uniforms.uFade = fadeU;
+      Object.assign(sh.uniforms, u);
       sh.vertexShader = sh.vertexShader
-        .replace('#include <common>', '#include <common>\nvarying float vAlong;')
-        .replace('#include <begin_vertex>', '#include <begin_vertex>\nvAlong = uv.x;');
+        .replace('#include <common>', '#include <common>\nvarying float vAlong;\n' + EV_GLSL)
+        .replace('#include <begin_vertex>', 'vec3 transformed = evDisplace(vec3(position));\nvAlong = uv.x;');
       sh.fragmentShader = sh.fragmentShader
         .replace('#include <common>', '#include <common>\nvarying float vAlong;\nuniform vec4 uFade;')
         .replace('#include <dithering_fragment>',
           '#include <dithering_fragment>\ngl_FragColor.a *= smoothstep(uFade.x, uFade.y, vAlong) * (1.0 - smoothstep(uFade.z, uFade.w, vAlong));');
     };
+    mat.customProgramCacheKey = function () { return 'ev-chrome'; };
     return mat;
   }
 
-  function lightMat(col) {
+  function lightMat(col, u) {
     return new T.ShaderMaterial({
       transparent: true, depthWrite: false, blending: T.AdditiveBlending,
-      uniforms: { uHead: { value: -2 }, uCol: { value: new T.Color(col) }, uAlpha: { value: 1 }, uFade: fadeU },
+      uniforms: Object.assign({ uHead: { value: -2 }, uCol: { value: new T.Color(col) }, uAlpha: { value: 1 }, uFade: fadeU }, u),
       vertexShader:
-        'varying vec2 vUv;varying vec3 vN;varying vec3 vV;' +
-        'void main(){vUv=uv;vec4 mv=modelViewMatrix*vec4(position,1.);vN=normalize(normalMatrix*normal);vV=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}',
+        EV_GLSL + 'varying vec2 vUv;varying vec3 vN;varying vec3 vV;' +
+        'void main(){vUv=uv;vec4 mv=modelViewMatrix*vec4(evDisplace(position),1.);vN=normalize(normalMatrix*normal);vV=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}',
       fragmentShader:
         'uniform float uHead;uniform vec3 uCol;uniform float uAlpha;uniform vec4 uFade;varying vec2 vUv;varying vec3 vN;varying vec3 vV;' +
         'void main(){float d=vUv.x-uHead;float trail=d<0.?exp(d*14.):exp(-d*260.);float core=d<0.?exp(d*90.):exp(-d*260.);' +
@@ -97,29 +123,119 @@
     env();
     fadeU.value = new T.Vector4(0.06, 0.3, 0.97, 1.0);
 
-    var chrome = withFade(new T.MeshPhysicalMaterial({
+    var chrome = new T.MeshPhysicalMaterial({
       color: 0xdfe6f0, metalness: 1, roughness: 0.13, clearcoat: 0.8, clearcoatRoughness: 0.08,
       envMapIntensity: 1.7, transparent: true
-    }));
+    });
+    fieldTex = new T.DataTexture(fieldU, SIM.W, N, T.RedFormat, T.FloatType);
+    fieldTex.minFilter = fieldTex.magFilter = T.NearestFilter;
+    fieldTex.needsUpdate = true;
+    _v = new T.Vector3(); _o = new T.Vector3();
     var tub = mobile ? 260 : 420, rad = mobile ? 18 : 28, radL = mobile ? 12 : 20;
 
     group = new T.Group(); scene.add(group);
     for (var i = 0; i < N; i++) {
       var L = 20 + i * 0.9, r = 0.12;
       var curve = bandCurve(L, 0.95);
-      var geo = new T.TubeGeometry(curve, tub, r, rad, false); geo.scale(1, 1.55, 0.38);
-      var mesh = new T.Mesh(geo, chrome);
+      var geo = new T.TubeGeometry(curve, tub, r, rad, false); geo.scale(1, 1.55, 0.38); addS(geo);
+      var u = { uField: { value: fieldTex }, uBand: { value: i }, uW: { value: SIM.W }, uN: { value: N } };
+      var mesh = new T.Mesh(geo, makeChrome(chrome, u));
       mesh.renderOrder = N - i;                     // de atrás hacia delante
-      var lgeo = new T.TubeGeometry(curve, tub, r * 1.04, radL, false); lgeo.scale(1, 1.55, 0.38);
-      var lm = lightMat(i % 3 === 1 ? 0x9ef6ff : 0x00e5ff);
+      var lgeo = new T.TubeGeometry(curve, tub, r * 1.04, radL, false); lgeo.scale(1, 1.55, 0.38); addS(lgeo);
+      var lm = lightMat(i % 3 === 1 ? 0x9ef6ff : 0x00e5ff, u);
       var light = new T.Mesh(lgeo, lm);
       light.renderOrder = 100 + i;
       var g = new T.Group(); g.add(mesh, light);
       g.position.set(i * 0.12, i * 0.62, -i * 0.55);
       group.add(g);
-      bands.push({ g: g, lm: lm, head: i * 0.37 - 0.3, speed: 0.11 + (i % 3) * 0.025 });
+      // Los 96 puntos de la cuerda en el espacio del tubo (misma escala que la geometría).
+      var pts = new Float32Array(SIM.W * 3);
+      for (var k = 0; k < SIM.W; k++) {
+        var q = curve.getPointAt(k / (SIM.W - 1));
+        pts[k * 3] = q.x; pts[k * 3 + 1] = q.y * 1.55; pts[k * 3 + 2] = q.z * 0.38;
+      }
+      bands.push({ g: g, lm: lm, pts: pts, head: i * 0.37 - 0.3, speed: 0.11 + (i % 3) * 0.025 });
     }
     group.rotation.set(0.18, -0.32, 0.46);
+  }
+
+  // aS = posición a lo largo del tubo (0..1): índice en el campo de cuerdas.
+  function addS(geo) {
+    var uv = geo.attributes.uv, a = new Float32Array(uv.count);
+    for (var i = 0; i < uv.count; i++) a[i] = uv.getX(i);
+    geo.setAttribute('aS', new T.BufferAttribute(a, 1));
+  }
+
+  /* Empuje del puntero: cada punto de cada cuerda recibe la velocidad del
+     puntero proyectada sobre su normal en pantalla, con caída gaussiana. */
+  function pulsar() {
+    var sp = ptr.vx * ptr.vx + ptr.vy * ptr.vy;
+    if (sp < 0.01) return;
+    var r2 = SIM.radio * SIM.radio, W = SIM.W;
+    group.updateMatrixWorld();
+    for (var b = 0; b < N; b++) {
+      var m = bands[b].g.matrixWorld, pts = bands[b].pts;
+      for (var k = 0; k < W; k++) {
+        _v.set(pts[k * 3], pts[k * 3 + 1], pts[k * 3 + 2]);
+        _o.copy(_v); _o.y += 0.1;
+        _v.applyMatrix4(m).project(camera);
+        var sx = (_v.x * 0.5 + 0.5) * w, sy = (-_v.y * 0.5 + 0.5) * h;
+        var dx = sx - ptr.x, dy = sy - ptr.y, d2 = dx * dx + dy * dy;
+        if (d2 > r2 * 9) continue;                 // más allá de 3 radios: exp ≈ 0
+        _o.applyMatrix4(m).project(camera);
+        var nx = (_o.x * 0.5 + 0.5) * w - sx, ny = (-_o.y * 0.5 + 0.5) * h - sy;
+        var nl = Math.sqrt(nx * nx + ny * ny) || 1;
+        fieldV[b * W + k] += ((ptr.vx * nx + ptr.vy * ny) / nl) * Math.exp(-d2 / r2) * SIM.fuerza;
+        quieto = false;
+      }
+    }
+  }
+
+  /* Un paso de 1/90 s. Donde falta un vecino (tubos de los bordes, extremos
+     de cada cuerda) se usa u·0.5. */
+  function paso() {
+    var W = SIM.W, lim = SIM.lim, e = 0;
+    for (var b = 0; b < N; b++) {
+      for (var k = 0; k < W; k++) {
+        var i = b * W + k, u = fieldU[i];
+        var l = k > 0 ? fieldU[i - 1] : u * 0.5, r = k < W - 1 ? fieldU[i + 1] : u * 0.5;
+        var up = b > 0 ? fieldU[i - W] : u * 0.5, dn = b < N - 1 ? fieldU[i + W] : u * 0.5;
+        fieldV[i] += 0.30 * (l + r - 2 * u) + 0.15 * (up + dn - 2 * u) - 0.016 * u - 0.06 * fieldV[i];
+      }
+    }
+    for (var j = 0; j < fieldU.length; j++) {
+      var nu = fieldU[j] + fieldV[j];
+      fieldU[j] = nu > lim ? lim : nu < -lim ? -lim : nu;
+      e += Math.abs(fieldU[j]) + Math.abs(fieldV[j]);
+    }
+    return e;
+  }
+
+  /* Paso fijo (acumulador, máx. 6 pasos por fotograma): igual a cualquier fps. */
+  var ultimo = 0;
+  function simular(dt, activo) {
+    // Si no se ha simulado en un rato (canvas a opacidad 0), la posición previa
+    // del puntero no vale: sin esto saldría un empujón falso al volver.
+    var ahora = performance.now();
+    if (ahora - ultimo > 120) ptr.prev = false;
+    ultimo = ahora;
+    if (activo && ptr.dentro) {
+      if (ptr.prev) {
+        // Velocidad del puntero por fotograma, normalizada a 60 fps y suavizada.
+        var f = 1 / Math.max(dt * 60, 0.25);
+        ptr.vx += ((ptr.x - ptr.px) * f - ptr.vx) * 0.5;
+        ptr.vy += ((ptr.y - ptr.py) * f - ptr.vy) * 0.5;
+        pulsar();
+      }
+      ptr.px = ptr.x; ptr.py = ptr.y; ptr.prev = true;
+    } else { ptr.prev = false; ptr.vx = ptr.vy = 0; }
+
+    if (quieto) { acc = 0; return; }
+    acc = Math.min(acc + dt, SIM.step * SIM.maxSteps);
+    var e = -1;
+    while (acc >= SIM.step) { e = paso(); acc -= SIM.step; }
+    if (e >= 0 && e < 1e-4 * fieldU.length) { fieldU.fill(0); fieldV.fill(0); quieto = true; }
+    fieldTex.needsUpdate = true;
   }
 
   function resize() {
@@ -175,7 +291,10 @@
 
     resize: resize,
 
-    /* dt: segundos · inp: { mx, my (−0.5..0.5), hero (0..1), luz (bool) } */
+    /* Puntero en px de la ventana (ratón o dedo). dentro=false: sin empuje. */
+    pointer: function (x, y, dentro) { ptr.x = x; ptr.y = y; ptr.dentro = dentro; },
+
+    /* dt: segundos · inp: { mx, my (−0.5..0.5), hero (0..1), luz, cuerdas (bool) } */
     render: function (dt, inp) {
       if (!renderer) return;
       resize();
@@ -195,6 +314,7 @@
           b.g.position.z = -i * 0.55 + Math.sin(performance.now() / 1000 * 0.35 + i * 0.7) * 0.06;
         } else b.lm.uniforms.uHead.value = -2;
       }
+      simular(dt, !!inp.cuerdas);
       renderer.render(scene, camera);
 
       // Calidad adaptativa: si los fotogramas pasan de ~22 ms, baja el dpr.
@@ -209,6 +329,7 @@
     capture: function () {
       s.mx = s.my = s.hero = 0; place();
       bands.forEach(function (b, i) { b.lm.uniforms.uHead.value = -2; b.g.position.z = -i * 0.55; });
+      fieldU.fill(0); fieldV.fill(0); quieto = true; fieldTex.needsUpdate = true;
       renderer.render(scene, camera);
       return canvas.toDataURL('image/png');
     },

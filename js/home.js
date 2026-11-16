@@ -103,7 +103,8 @@
   /* ---------- herramientas: segunda copia para el bucle infinito ---------- */
   function herramientas() {
     var lista = $('[data-herramientas]');
-    if (!cine) return;                      // versión fija: una sola fila, sin movimiento
+    // Solo se queda quieta con movimiento reducido (o ?modo=fijo), no por conexión lenta.
+    if (EV.reducedMotion || /[?&]modo=fijo/.test(location.search)) return;
     var copia = lista.cloneNode(true);
     copia.setAttribute('aria-hidden', 'true');
     copia.removeAttribute('data-herramientas');
@@ -262,7 +263,7 @@
       if (!st.cubierta) EV.rayos.render(tRayos, st.hero);
       var op = st.op * intro;
       ondaOpacity = setOpacity(el.onda, op, ondaOpacity);
-      if (op > 0.001) EV.onda.render(dt, { mx: mouse.x, my: mouse.y, hero: st.hero, luz: true });
+      if (op > 0.001) EV.onda.render(dt, { mx: mouse.x, my: mouse.y, hero: st.hero, luz: true, cuerdas: !EV.reducedMotion });
     }
   }
 
@@ -312,7 +313,17 @@
     if (cine && !captura) {
       window.addEventListener('pointermove', function (e) {
         mouse.x = e.clientX / vw - 0.5; mouse.y = e.clientY / vh - 0.5;
+        if (EV.onda.pointer) EV.onda.pointer(e.clientX, e.clientY, true);
       }, { passive: true });
+      // Cuerdas con el dedo: el scroll táctil cancela los pointer events, touchmove no.
+      window.addEventListener('touchmove', function (e) {
+        var t = e.touches[0]; if (t && EV.onda.pointer) EV.onda.pointer(t.clientX, t.clientY, true);
+      }, { passive: true });
+      var fuera = function () { if (EV.onda.pointer) EV.onda.pointer(0, 0, false); };
+      document.documentElement.addEventListener('pointerleave', fuera);
+      window.addEventListener('touchend', fuera, { passive: true });
+      window.addEventListener('touchcancel', fuera, { passive: true });
+      window.addEventListener('blur', fuera);
       gsap.ticker.add(tick);
       // Three.js al primer gesto (como la oficina): el hero no lo espera y quien
       // no interactúa no paga los ~600 KB ni la compilación de shaders.
