@@ -2,10 +2,9 @@
    paginas/planes.js — planes.html: las 3 cards (las mismas de la home, en
    grande, con el brillo cian que sigue al ratón por el borde), la tabla
    comparativa (filas = todos los puntos de js/data/planes.js; en móvil,
-   acordeón por plan) y las preguntas frecuentes (js/data/faq-planes.js).
+   acordeón por plan). Las preguntas frecuentes las pinta js/paginas/faq.js.
    Todo se pinta desde los datos; el HTML trae lo mismo (SEO y sin JS).
-   Los botones llevan a index.html#contacto?plan=… (el formulario lo
-   preselecciona).
+   Los botones llevan a contacto.html?plan=… (el formulario lo preselecciona).
    ========================================================================== */
 (function (raiz) {
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -23,7 +22,7 @@
         '<p class="plan__para">' + esc(p.para) + '</p>' +
         '<p class="display plan__precio">' + R.precio(p) + '</p>' +
         '<ul class="plan__incluye">' + p.incluye.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' +
-        '<a class="pastilla plan__boton' + (p.recomendado ? '' : ' pastilla--linea') + '" href="index.html#contacto?plan=' + esc(p.id) + '" data-scramble><span class="sl">' + esc(p.boton) + '</span><span class="sr-only"> · plan ' + esc(p.nombre) + '</span></a>' +
+        '<a class="pastilla plan__boton' + (p.recomendado ? '' : ' pastilla--linea') + '" href="contacto.html?plan=' + esc(p.id) + '" data-scramble><span class="sl">' + esc(p.boton) + '</span><span class="sr-only"> · plan ' + esc(p.nombre) + '</span></a>' +
         '</li>';
     }).join('');
   };
@@ -46,21 +45,13 @@
         '<ul class="acord__panel" id="' + id + '"' + (i === 1 ? '' : ' hidden') + '>' + f.map(function (x) { var si = p.incluye.indexOf(x) >= 0; return '<li class="' + (si ? 'is-si' : 'is-no') + '">' + (si ? SI : NO) + '<span>' + esc(x) + '</span></li>'; }).join('') + '</ul></div>';
     }).join('');
   };
-  R.faq = function (F) {
-    return F.map(function (q, i) {
-      var id = 'faq-' + (i + 1);
-      return '<div class="faq__item"><h3><button type="button" class="faq__p" aria-expanded="false" aria-controls="' + id + '" data-acordeon><span>' + esc(q.p) + '</span><i aria-hidden="true"></i></button></h3>' +
-        '<div class="faq__r" id="' + id + '" hidden><p>' + esc(q.r) + '</p></div></div>';
-    }).join('');
-  };
 
   if (typeof module !== 'undefined' && module.exports) { module.exports = R; return; }
 
   /* ---------- en el navegador: repintar desde los datos ---------- */
-  var d = raiz.document, P = raiz.EVIMES_PLANES || [], F = raiz.EVIMES_FAQ_PLANES || [];
+  var d = raiz.document, P = raiz.EVIMES_PLANES || [];
   var put = function (sel, html) { var n = d.querySelector(sel); if (n && html) n.innerHTML = html; };
   if (P.length) { put('[data-planes-cards]', R.cards(P)); put('[data-planes-tabla]', R.tabla(P)); put('[data-planes-acordeon]', R.acordeon(P)); }
-  if (F.length) put('[data-faq]', R.faq(F));
   // brillo cian que sigue al ratón por el borde (como en la home)
   Array.prototype.forEach.call(d.querySelectorAll('.plan'), function (li) {
     li.addEventListener('pointermove', function (e) { var r = li.getBoundingClientRect(); li.style.setProperty('--mx', (e.clientX - r.left) + 'px'); li.style.setProperty('--my', (e.clientY - r.top) + 'px'); });

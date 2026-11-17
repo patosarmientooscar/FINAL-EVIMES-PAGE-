@@ -67,6 +67,11 @@
     addEventListener('load', function () {
       setTimeout(function () { if (EV.home && EV.home.ir) EV.home.ir('contacto'); else document.getElementById('contacto').scrollIntoView(); }, 60);
     });
+  } else if (inicial && !location.hash && form.hasAttribute('data-form-ir')) {
+    // contacto.html?plan=… (desde planes.html): bajar al formulario con el plan ya marcado
+    addEventListener('load', function () {
+      setTimeout(function () { var id = form.getAttribute('data-form-ir'); if (EV.home && EV.home.ir) EV.home.ir(id); else document.getElementById(id).scrollIntoView(); }, 120);
+    });
   }
   // botones de los planes de la home (data-plan) y CTA de Con quién (data-perfil)
   document.addEventListener('click', function (e) {

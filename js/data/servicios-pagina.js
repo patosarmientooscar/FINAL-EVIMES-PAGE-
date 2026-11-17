@@ -21,7 +21,7 @@ window.EVIMES_SERVICIOS_PAGINA = {
         'El resultado es una web rápida, que se ve perfecta en cualquier pantalla y que lleva a cada visita hacia lo que te importa: una llamada, una reserva, una venta.'
       ],
       incluye: ['Diseño a medida (UI/UX)', 'Desarrollo a mano, HTML/JS o React según el proyecto', 'Adaptada a móvil, tablet y escritorio', 'Velocidad optimizada (Core Web Vitals)', 'Formularios, WhatsApp y reservas', 'Textos legales y cookies', 'Te enseñamos a editar tus contenidos'],
-      ctas: [{ texto: 'Ver planes y precios', href: 'planes.html' }, { texto: 'Pide tu propuesta', href: 'index.html#contacto' }]
+      ctas: [{ texto: 'Ver planes y precios', href: 'planes.html' }, { texto: 'Pide tu propuesta', href: 'contacto.html' }]
     },
     {
       id: '3d', kind: 'star', num: '02', nombre: 'Animaciones 3D',
@@ -31,7 +31,7 @@ window.EVIMES_SERVICIOS_PAGINA = {
         'Todo optimizado para que vaya fluido también en el móvil, con una versión ligera para quien prefiera menos movimiento.'
       ],
       incluye: ['Escenas y objetos 3D a medida', 'Animaciones con scroll (scrollytelling)', 'Interacción con ratón y táctil', 'Shaders y efectos de luz', 'Modelos optimizados (glTF)', 'Versión ligera y accesible'],
-      ctas: [{ texto: 'Pide tu propuesta', href: 'index.html#contacto' }, { texto: 'Ver un proyecto', href: 'index.html#oficina' }]
+      ctas: [{ texto: 'Pide tu propuesta', href: 'contacto.html' }, { texto: 'Ver un proyecto', href: 'proyectos.html#disco' }]
     },
     {
       id: 'seo', kind: 'pin', num: '03', nombre: 'Posicionamiento',
@@ -41,7 +41,7 @@ window.EVIMES_SERVICIOS_PAGINA = {
         'Medimos con datos reales. Sin prometer primeras posiciones y sin atajos que luego penalizan.'
       ],
       incluye: ['Auditoría SEO', 'SEO técnico y velocidad', 'Investigación de palabras clave', 'Google Business Profile', 'SEO local en Madrid', 'Datos estructurados (schema)', 'Optimización para respuestas de IA (AEO/GEO)', 'Informe de resultados'],
-      ctas: [{ texto: 'Ver planes y precios', href: 'planes.html' }, { texto: 'Pide tu propuesta', href: 'index.html#contacto' }]
+      ctas: [{ texto: 'Ver planes y precios', href: 'planes.html' }, { texto: 'Pide tu propuesta', href: 'contacto.html' }]
     },
     {
       id: 'ia', kind: 'ia', num: '04', nombre: 'Software IA',
@@ -51,7 +51,7 @@ window.EVIMES_SERVICIOS_PAGINA = {
         'Empezamos por lo que más tiempo te quita y lo automatizamos, con supervisión humana donde hace falta.'
       ],
       incluye: ['Chatbots para web y WhatsApp', 'Agentes que responden y clasifican', 'Automatización de tareas repetitivas', 'Integraciones (APIs, Google, CRM)', 'Paneles internos a medida', 'Formación a tu equipo'],
-      ctas: [{ texto: 'Hablemos de tu caso', href: 'index.html#contacto' }]
+      ctas: [{ texto: 'Hablemos de tu caso', href: 'contacto.html' }]
     }
   ],
   // También los usa planes.html ("Qué pasa después", versión corta).
@@ -67,6 +67,6 @@ window.EVIMES_SERVICIOS_PAGINA = {
   fin: {
     titulo: '¿Tienes un proyecto en mente?',
     texto: 'Cuéntanoslo. Te respondemos con una propuesta clara.',
-    ctas: [{ texto: 'Pide tu propuesta', href: 'index.html#contacto' }, { texto: 'Ver planes', href: 'planes.html' }]
+    ctas: [{ texto: 'Pide tu propuesta', href: 'contacto.html' }, { texto: 'Ver planes', href: 'planes.html' }]
   }
 };

@@ -193,7 +193,7 @@
     var wa = $('[data-whatsapp]'), em = $('[data-email]'), tel = $('[data-telefono]');
     if (wa && cfg.whatsapp) { wa.href = 'https://wa.me/' + cfg.whatsapp; wa.hidden = false; hay = true; }
     if (em && cfg.email) { em.href = 'mailto:' + cfg.email; em.textContent = cfg.email; em.hidden = false; hay = true; }
-    if (tel && cfg.telefono) { tel.href = cfg.telefonoHref || ('tel:' + cfg.telefono.replace(/s/g, '')); tel.textContent = cfg.telefono; tel.hidden = false; hay = true; }
+    if (tel && cfg.telefono) { tel.href = cfg.telefonoHref || ('tel:' + cfg.telefono.replace(/\s/g, '')); tel.textContent = cfg.telefono; tel.hidden = false; hay = true; }
     if (cont) cont.hidden = !hay;
   }
 

@@ -218,3 +218,6 @@ input, textarea { caret-color: var(--cyan); }
   }
   .grain { animation: none; }
 }
+
+/* El atributo hidden manda siempre (ninguna regla display lo pisa). */
+[hidden] { display: none !important; }

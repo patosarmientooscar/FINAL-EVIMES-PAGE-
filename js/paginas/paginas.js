@@ -1,7 +1,10 @@
 /* ==========================================================================
-   paginas/paginas.js — lo común de servicios.html y planes.html.
+   paginas/paginas.js — lo común de servicios, proyectos, planes y contacto.
    · Textos: [data-sp] ← EVIMES_SERVICIOS_PAGINA · [data-pl] ← EVIMES_PLANES_PAGINA
+     · [data-pr] ← EVIMES_PROYECTOS_PAGINA · [data-ct] ← EVIMES_CONTACTO_PAGINA
      (rutas con puntos; *-parrafos / *-lista repintan bloques enteros).
+   · Contacto directo ([data-directo]): WhatsApp, email y teléfono salen de
+     js/config.js; vacíos, no se muestran.
    · Entrada con scroll (IntersectionObserver, solo transform/opacity):
      [data-lineas] sube línea a línea con máscara (se parte en líneas reales
      según el ancho), las listas aparecen escalonadas y las secciones grises
@@ -29,6 +32,18 @@
   }
   textos('data-sp', window.EVIMES_SERVICIOS_PAGINA);
   textos('data-pl', window.EVIMES_PLANES_PAGINA);
+  textos('data-pr', window.EVIMES_PROYECTOS_PAGINA);
+  textos('data-ct', window.EVIMES_CONTACTO_PAGINA);
+
+  /* ---------- contacto directo (desde config.js) ---------- */
+  var cfg = window.EVIMES_CONFIG || {};
+  $$('[data-directo]').forEach(function (cont) {
+    var hay = false, wa = cont.querySelector('[data-whatsapp]'), em = cont.querySelector('[data-email]'), tel = cont.querySelector('[data-telefono]');
+    if (wa && cfg.whatsapp) { wa.href = 'https://wa.me/' + cfg.whatsapp; wa.hidden = false; hay = true; }
+    if (em && cfg.email) { em.href = 'mailto:' + cfg.email; (em.querySelector('[data-valor]') || em).textContent = cfg.email; em.hidden = false; hay = true; }
+    if (tel && cfg.telefono) { tel.href = cfg.telefonoHref || ('tel:' + cfg.telefono.replace(/\s/g, '')); tel.textContent = cfg.telefono; tel.hidden = false; hay = true; }
+    cont.hidden = !hay;
+  });
 
   /* ---------- acordeones ---------- */
   $$('[data-acordeon]').forEach(function (b) {
