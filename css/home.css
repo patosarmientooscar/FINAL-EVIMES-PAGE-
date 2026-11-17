@@ -126,13 +126,16 @@
 .cabecera__cta { justify-self: end; }
 .cabecera__abrir { display: none; }
 
-/* Sobre el panel gris: cristal claro, texto oscuro. */
+/* Sobre el panel gris: cristal claro (casi opaco y con filo y sombra, para que
+   nunca quede gris sobre gris), texto ink y el botón navy. Sobre navy: cristal
+   oscuro con texto claro (arriba). */
 .cabecera.is-clara {
   color: var(--tinta-oscura);
-  background: rgb(255 255 255 / 0.55);
-  border-color: rgb(11 15 26 / 0.1);
+  background: rgb(251 250 247 / 0.88);
+  border-color: rgb(11 15 26 / 0.12);
+  box-shadow: 0 10px 30px -14px rgb(11 15 26 / 0.35), inset 0 1px 0 rgb(255 255 255 / 0.9);
 }
-.cabecera.is-clara .cabecera__nav a { color: rgb(11 15 26 / 0.7); }
+.cabecera.is-clara .cabecera__nav a { color: rgb(11 15 26 / 0.78); }
 .cabecera.is-clara .cabecera__nav a:hover { color: var(--tinta-oscura); }
 .cabecera.is-clara .cabecera__cta { background: var(--tinta-oscura); color: var(--stone); }
 .cabecera.is-clara .cabecera__cta:hover { background: #1c2333; }

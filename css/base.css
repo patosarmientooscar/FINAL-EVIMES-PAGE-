@@ -245,3 +245,7 @@ input, textarea { caret-color: var(--cyan); }
 .con-luz--sutil::before { opacity: .5; }
 .con-luz--sutil::after { opacity: .2; }
 @media (prefers-reduced-motion: reduce) { .con-luz::before, .con-luz::after { animation: none; --angle: 210deg; } }
+
+/* Anclas: la cabecera flotante (≈ 80 px) + 16 px no tapan el título de la sección. */
+:where(main, footer) :where(section, article, div, header)[id] { scroll-margin-top: 96px; }
+@media (max-width: 51.24rem) { :where(main, footer) :where(section, article, div, header)[id] { scroll-margin-top: 88px; } }

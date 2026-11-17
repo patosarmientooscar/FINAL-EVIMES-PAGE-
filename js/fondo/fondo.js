@@ -26,7 +26,8 @@
   function measure() {
     vw = innerWidth; vh = innerHeight;
     var y = scrollY();
-    grises = $$('[data-cubre]').map(function (n) { var r = n.getBoundingClientRect(); return { top: r.top + y, bottom: r.bottom + y }; });
+    // posición de layout (sin el translateY de la entrada de [data-cubre]): si no, la cabecera cambiaba 72 px tarde
+    grises = $$('[data-cubre]').map(function (n) { var t = 0, m = n; while (m) { t += m.offsetTop; m = m.offsetParent; } return { top: t, bottom: t + n.offsetHeight }; });
     var c = el.cab.getBoundingClientRect(); cabMid = (c.top + c.bottom) / 2;
     if (EV.rayos) EV.rayos.resize();
   }
@@ -65,7 +66,11 @@
 
   function ir(id) {
     var t = document.getElementById(id); if (!t) return;
-    if (lenis) lenis.scrollTo(t, { offset: 0, duration: Math.min(2.2, 0.8 + Math.abs(t.getBoundingClientRect().top) / 4000) });
+    // la cabecera flotante + 16 px no tapan el título
+    var off = -Math.round((el.cab ? el.cab.getBoundingClientRect().bottom : 80) + 16);
+    // destino en posición de layout: getBoundingClientRect incluiría el translateY de la entrada de [data-cubre]
+    var yT = 0, m = t; while (m) { yT += m.offsetTop; m = m.offsetParent; }
+    if (lenis) lenis.scrollTo(Math.max(0, yT + off), { duration: Math.min(2.2, 0.8 + Math.abs(t.getBoundingClientRect().top) / 4000) });
     else t.scrollIntoView({ behavior: EV.reducedMotion ? 'auto' : 'smooth' });
     if (!t.hasAttribute('tabindex')) t.setAttribute('tabindex', '-1');
     setTimeout(function () { t.focus({ preventScroll: true }); }, lenis ? 900 : 50);

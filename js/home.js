@@ -74,7 +74,9 @@
     // Mientras dura el salto, la oficina no arranca su visita automática al cruzarla (EV.home.saltando).
     EV.saltando = true;
     var fin = function () { EV.saltando = false; };
-    if (lenis) lenis.scrollTo(id === 'inicio' ? 0 : t, { duration: Math.min(2.2, 0.8 + Math.abs(t.getBoundingClientRect().top) / 4000), onComplete: fin });
+    var off = id === 'inicio' ? 0 : -Math.round((el.cab ? el.cab.getBoundingClientRect().bottom : 80) + 16);
+    var yT = 0, m = t; while (m) { yT += m.offsetTop; m = m.offsetParent; }
+    if (lenis) lenis.scrollTo(id === 'inicio' ? 0 : Math.max(0, yT + off), { duration: Math.min(2.2, 0.8 + Math.abs(t.getBoundingClientRect().top) / 4000), onComplete: fin });
     else { t.scrollIntoView({ behavior: EV.reducedMotion ? 'auto' : 'smooth' }); setTimeout(fin, 1200); }
     setTimeout(fin, 2600);
     if (id !== 'inicio') {
