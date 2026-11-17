@@ -15,6 +15,23 @@ vec4 s0=floor(b0)*2.+1.;vec4 s1=floor(b1)*2.+1.;vec4 sh=-step(h,vec4(0.));vec4 a
 vec3 p0=vec3(a0.xy,h.x);vec3 p1=vec3(a0.zw,h.y);vec3 p2=vec3(a1.xy,h.z);vec3 p3=vec3(a1.zw,h.w);
 vec4 norm=tis(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));p0*=norm.x;p1*=norm.y;p2*=norm.z;p3*=norm.w;
 vec4 m=max(.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.);m=m*m;return 42.*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));}`;
+// El estudio del metal líquido: los mismos tonos que studioEnv (shared.js), en bandas
+// difuminadas (canvas con blur) para que el reflejo no tenga aristas.
+function envLiquido(renderer){
+  const c=document.createElement('canvas');c.width=1024;c.height=512;const g=c.getContext('2d');
+  const bg=g.createLinearGradient(0,0,0,512);bg.addColorStop(0,'#1c2748');bg.addColorStop(.5,'#0a0f1d');bg.addColorStop(1,'#04060c');g.fillStyle=bg;g.fillRect(0,0,1024,512);
+  g.filter='blur(7px)';
+  const banda=(y,h,col,a)=>{const gr=g.createLinearGradient(0,y,0,y+h);gr.addColorStop(0,`rgba(${col},0)`);gr.addColorStop(.5,`rgba(${col},${a})`);gr.addColorStop(1,`rgba(${col},0)`);g.fillStyle=gr;g.fillRect(-60,y,1144,h);};
+  const mancha=(x,y,rx,ry,col,a)=>{g.fillStyle=`rgba(${col},${a})`;g.beginPath();g.ellipse(x,y,rx,ry,0,0,Math.PI*2);g.fill();};
+  // cielo: una ventana grande blanca y dos luces de estudio (bordes redondeados, sin aristas)
+  mancha(390,70,300,62,'255,255,255',.95);mancha(820,110,120,30,'240,246,255',.85);
+  // horizonte: una línea fina y brillante (el reflejo "líquido") y la banda cian de Evimes
+  banda(196,16,'255,255,255',.95);banda(248,34,'0,229,255',.55);banda(330,26,'60,100,255',.7);
+  // suelo oscuro con dos brillos
+  mancha(210,395,150,14,'0,229,255',.45);mancha(760,345,190,22,'235,242,255',.55);
+  const t=new THREE.CanvasTexture(c);t.mapping=THREE.EquirectangularReflectionMapping;t.colorSpace=THREE.SRGBColorSpace;
+  const pm=new THREE.PMREMGenerator(renderer);const env=pm.fromEquirectangular(t).texture;t.dispose();pm.dispose();return env;
+}
 export function iaCard(ctx){
   const {scene,camera}=ctx;
   const BU=ctx.setBg(`uniform vec2 uC;void main(){vec3 navy=vec3(.027,.039,.075),blue=vec3(.17,.33,1.),cyan=vec3(0.,.9,1.);
@@ -22,6 +39,10 @@ export function iaCard(ctx){
     gl_FragColor=vec4(finish(col,vUv,uA,uT),1.);}`,{uC:{value:new THREE.Vector2(.5,.58)}});
   const U={uT:{value:0},uM:{value:new THREE.Vector3(0,0,1)},uPull:{value:0},uAmp:{value:1}};
   const mat=chromeMat({roughness:.04,envMapIntensity:2.5});
+  // Mercurio, no roca: con roughness .04 el estudio común (rectángulos con bordes
+  // duros) se reflejaba como costuras rectas. El metal líquido usa el mismo estudio
+  // pero suavizado (bandas difuminadas, sin bordes): reflejos continuos, como un líquido.
+  mat.envMap=envLiquido(ctx.renderer);
   mat.onBeforeCompile=sh=>{Object.assign(sh.uniforms,U);
     const DISP=`uniform float uT,uPull,uAmp;uniform vec3 uM;\n${NOISE}
       vec3 dispP(vec3 p){vec3 n=normalize(p);float d=.13*snoise(n*.75+vec3(0.,0.,uT*.30))+.05*snoise(n*1.3+vec3(uT*.36,4.,0.))+.02*sin(uT*.9);

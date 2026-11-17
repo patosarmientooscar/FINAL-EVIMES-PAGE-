@@ -20,7 +20,9 @@
   line-height: normal;
 }
 /* El prototipo no equilibra titulares ni párrafos: igual aquí. */
-.que-hacemos h2, .que-hacemos h3, .que-hacemos p { margin: 0; text-wrap: wrap; }
+.que-hacemos h2, .que-hacemos h3, .que-hacemos p { margin: 0; }
+.que-hacemos h2, .que-hacemos h3 { text-wrap: balance; }
+.que-hacemos p { text-wrap: pretty; }
 
 .que-hacemos .label { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: rgba(11,16,32,.62); } /* prototipo .55 = 3,9:1; .62 = 4,9:1 (AA) */
 .que-hacemos h2 { font-size: clamp(38px,5.6vw,84px); line-height: 1; margin-top: 18px; max-width: 15ch; }
@@ -32,7 +34,7 @@
   box-shadow: 0 1px 0 rgba(255,255,255,.7), 0 40px 80px -40px rgba(7,10,19,.55), 0 18px 36px -24px rgba(7,10,19,.4); }
 /* Entrada (solo con JS: la clase is-cine / is-still la pone el script del <head>):
    opacidad + subida de 40 px al entrar en pantalla, 0,08 s entre cards. */
-:is(.is-cine, .is-still) .bento .card { opacity: 0; transform: translateY(40px) scale(.98); transition: opacity 1s cubic-bezier(.2,.7,.2,1), transform 1.2s cubic-bezier(.2,.7,.2,1); }
+:is(.is-cine, .is-still) .bento .card { opacity: .6; transform: translateY(40px) scale(.98); transition: opacity 1s cubic-bezier(.2,.7,.2,1), transform 1.2s cubic-bezier(.2,.7,.2,1); }
 :is(.is-cine, .is-still) .bento .card.in { opacity: 1; transform: none; }
 .bento .card:nth-child(2) { transition-delay: .08s; }
 .bento .card:nth-child(3) { transition-delay: .16s; }

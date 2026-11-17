@@ -22,7 +22,9 @@
   font-size: 16px;
   line-height: normal;
 }
-.cq h2, .cq h3, .cq p { margin: 0; text-wrap: wrap; }
+.cq h2, .cq h3, .cq p { margin: 0; }
+.cq h2, .cq h3 { text-wrap: balance; }
+.cq p { text-wrap: pretty; }
 .cq .display { letter-spacing: -.025em; }
 
 .cq .top { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }

@@ -20,7 +20,9 @@
   font-size: 16px;
   line-height: normal;
 }
-.intro h2, .intro p, .track h3, .track p { margin: 0; text-wrap: wrap; }
+.intro h2, .intro p, .track h3, .track p { margin: 0; }
+.intro h2, .track h3 { text-wrap: balance; }
+.intro p, .track p { text-wrap: pretty; }
 
 .intro { padding: clamp(80px,14vh,160px) 0 0; color: var(--b-ink); }
 .intro .label { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: rgba(11,16,32,.62); } /* .55 = 3,9:1; .62 = 4,9:1 (AA) */

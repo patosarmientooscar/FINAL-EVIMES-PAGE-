@@ -91,7 +91,8 @@ window.EVIMES_CONTENT = {
     hero: {
       linea1: 'Tu negocio merece',
       linea2: 'una web a su altura.',      // en index.html "altura" va en <span class="accent"> (cian): si cambias esta frase, cámbiala también allí
-      sub: 'Diseño web a medida en Madrid. Webs rápidas, únicas y pensadas para convertir visitas en clientes. Desde 150 €.',
+      sub: 'Diseño web a medida en Madrid. Webs rápidas, únicas y pensadas para convertir visitas en clientes.',
+      desde: 'Desde 150\u00a0€.',
       cta: 'Pide tu propuesta',
       secundario: 'Ver proyectos',
       desliza: 'Desliza'

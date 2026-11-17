@@ -6,7 +6,8 @@
    ========================================================================== */
 .pag { --gris-linea: rgb(11 15 26 / 0.14); --nav-linea: rgb(233 227 216 / 0.16); --tinta-2: rgb(11 15 26 / 0.7); /* secundario sobre el gris ≥ 6:1 */ }
 .pag main { position: relative; z-index: 2; }
-.pag h1, .pag h2, .pag h3, .pag p { text-wrap: pretty; }
+.pag h1, .pag h2, .pag h3, .pag .display { text-wrap: balance; }
+.pag p:not(.display) { text-wrap: pretty; }
 
 /* menú: la página actual */
 .cabecera__nav a[aria-current="page"] { color: var(--stone); }

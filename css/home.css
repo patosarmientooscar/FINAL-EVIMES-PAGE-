@@ -216,10 +216,11 @@
 .portada__sub {
   margin-top: 26px;
   max-width: 34rem;
-  font-size: clamp(16px, 1.25vw, 19px);
-  line-height: 1.6;
-  color: var(--texto-2);
+  font-size: clamp(17px, 1.45vw, 21px);
+  line-height: 1.55;
+  color: rgb(233 227 216 / 0.82);           /* stone al 82 %: ≥ 7:1 sobre el scrim del hero */
 }
+.portada__sub strong { font-weight: 600; color: var(--stone); white-space: nowrap; }
 .portada__botones { margin-top: 34px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 26px; }
 .portada__desliza {
   position: absolute;
