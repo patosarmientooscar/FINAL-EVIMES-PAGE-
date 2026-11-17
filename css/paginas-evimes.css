@@ -256,7 +256,7 @@
 .psi-caso__pill b { font-weight: 600; }
 .psi-caso__nota { margin-top: 18px; font-size: 14px; color: var(--texto-2); }
 
-/* Amad Peña (gris) */
+/* el ejemplo sobre gris (León's) */
 .caso--gris { background: var(--gris); color: var(--tinta-oscura); border-radius: 30px; box-shadow: 0 -40px 90px -40px rgb(0 0 0 / 0.5); padding-top: clamp(96px, 14vh, 160px); }
 .captura { margin: 0; padding: 8px; border-radius: 30px; background: rgb(11 15 26 / 0.06); box-shadow: inset 0 0 0 1px rgb(11 15 26 / 0.08); }
 .captura a { display: block; overflow: hidden; border-radius: 23px; box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3), 0 40px 80px -46px rgb(11 15 26 / 0.65); }
@@ -268,18 +268,49 @@
 .caso--gris .pastilla { background: var(--tinta-oscura); color: var(--stone); border-color: var(--tinta-oscura); }
 .caso--gris :focus-visible { outline-color: var(--tinta-oscura); }
 
-/* próximos proyectos: cristal esmerilado sobre fondo borroso, sin nombres */
+/* el tipo de cliente de cada ejemplo, encima del nombre */
+.caso__etiqueta { margin-bottom: 18px; font-size: 13px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--texto-2); }
+.caso--gris .caso__etiqueta { color: var(--tinta-2); }
+
+/* la vista de la web: vídeo, captura o card de espera */
+.vitrina__video { display: block; width: 100%; height: 100%; object-fit: cover; }
+a.vitrina { cursor: pointer; }
+.vitrina--espera .vitrina__pantalla { display: grid; place-items: center; }
+.vitrina__fondo { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; filter: brightness(.7); }
+.vitrina__espera { position: relative; display: grid; justify-items: center; gap: 12px; text-align: center; padding: 24px; }
+.vitrina__espera .display { font-size: clamp(44px, 5.4vw, 88px); line-height: 1; letter-spacing: -.02em; color: var(--stone); }
+.vitrina__espera-t { font-size: 13px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: rgb(233 227 216 / 0.82); }
+
+/* resultados (León's): porcentaje grande + barras que se dibujan al entrar */
+.res { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: clamp(24px, 4vw, 64px); align-items: end; margin-top: 28px; }
+.res__pct { display: grid; gap: 10px; }
+.res__pct .display { font-size: clamp(72px, 8vw, 136px); line-height: .9; letter-spacing: -.03em; background: linear-gradient(90deg, #2b4dff, #00e5ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.caso--gris .res__pct .display { background: none; color: #1f3fd8; }
+.res__pct-t { font-size: 15px; color: var(--tinta-2); }
+.res__graf { margin: 0; }
+.res__graf svg { display: block; width: 100%; height: auto; overflow: visible; }
+.res__graf figcaption { margin-top: 12px; font-size: 14px; color: var(--tinta-2); }
+.res-base { stroke: rgb(11 15 26 / 0.18); stroke-width: 1; }
+.res-eti { font: 500 13px var(--font-text); fill: rgb(11 15 26 / 0.7); }
+.res-barra { transform-box: fill-box; transform-origin: bottom; }
+.res-linea { fill: none; stroke: #00a3c4; stroke-width: 2; stroke-dasharray: 1; stroke-dashoffset: 0; }
+.pag-viva .res:not(.is-dibujada) .res-barra { transform: scaleY(0); }
+.pag-viva .res:not(.is-dibujada) .res-linea { stroke-dashoffset: 1; }
+.pag-viva .res .res-barra { transition: transform 1s cubic-bezier(.2,.75,.15,1) calc(var(--i) * 80ms); }
+.pag-viva .res .res-linea { transition: stroke-dashoffset 1.4s cubic-bezier(.2,.75,.15,1) .5s; }
+.res-espera { display: grid; grid-template-columns: auto 1fr; column-gap: 14px; align-items: baseline; margin-top: 24px; padding: 26px 0 4px; border-top: 1px solid var(--gris-linea); max-width: 40rem; }
+.res-espera__punto { width: 10px; height: 10px; border-radius: 50%; background: #1f3fd8; box-shadow: 0 0 0 6px rgb(31 63 216 / 0.12); }
+.res-espera__t { font-size: clamp(28px, 2.6vw, 40px); line-height: 1.05; letter-spacing: -.02em; }
+.res-espera__x { grid-column: 2; margin-top: 8px; font-size: 16px; color: var(--tinta-2); }
+
+/* En el horno: cristal esmerilado sobre fondo borroso, el nombre centrado y "Coming soon"; la luz del borde, más sutil (.con-luz--sutil) */
 .horno { padding: clamp(110px, 16vh, 180px) var(--g) 0; }
-.horno__lista { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(16px, 2vw, 32px); margin: 0; padding: 0; list-style: none; }
-.horno__card { position: relative; isolation: isolate; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; aspect-ratio: 16 / 10; padding: clamp(24px, 3vw, 44px); border-radius: 30px;
+.horno__lista { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 3vw, 44px); margin: 0; padding: 0; list-style: none; }
+.horno__card { --luz-r: 30px; position: relative; display: grid; place-content: center; justify-items: center; gap: 14px; aspect-ratio: 16 / 10; padding: clamp(24px, 3vw, 44px); border-radius: 30px; text-align: center;
   box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.14), inset 0 1px 0 rgb(255 255 255 / 0.22), 0 40px 90px -50px rgb(0 0 0 / 0.9); }
-.horno__card img { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; max-width: none; object-fit: cover; transform: scale(1.08); }
-.horno__card::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgb(8 11 20 / 0.18), rgb(8 11 20 / 0.62)); }
-.horno__t { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: rgb(233 227 216 / 0.86); }
-.horno__t i { width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); }
-.is-cine .horno__t i { animation: latido 2.4s var(--ease) infinite; }
-@keyframes latido { 50% { opacity: .25; } }
-.horno__estado { margin-top: 12px; font-size: clamp(34px, 3.4vw, 56px); line-height: 1; letter-spacing: -.02em; }
+.horno__card img { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; max-width: none; object-fit: cover; border-radius: inherit; filter: brightness(.72); }
+.horno__nombre { font-size: clamp(36px, 3.8vw, 64px); line-height: 1; letter-spacing: -.02em; color: var(--stone); }
+.horno__estado { font-size: 13px; font-weight: 500; letter-spacing: .2em; text-transform: uppercase; color: rgb(233 227 216 / 0.86); }
 
 /* ==========================================================================
    contacto.html
@@ -299,6 +330,7 @@
   .psi-caso__lista { display: grid; grid-template-columns: repeat(2, max-content); justify-content: start; gap: 18px 22px; }
   .psi-g { --s: clamp(120px, 36vw, 150px); }
   .horno__lista { grid-template-columns: 1fr; }
+  .res { grid-template-columns: 1fr; }
   .contacto--pagina .contacto__form, .contacto--pagina .contacto__directo--linea { grid-column: 1 / -1; }
 }
-@media (prefers-reduced-motion: reduce) { .vitrina__tira, .horno__t i { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .vitrina__tira { animation: none !important; } }

@@ -1,14 +1,10 @@
 /* ==========================================================================
    contacto.css — "¿Hacemos que se te vea?" con formulario (sobre el fondo global).
    El formulario está QUIETO: sin entradas ni etiquetas que se mueven. Va en
-   una card de cristal (blur 18px + saturate 140 %) con una luz que recorre el
-   contorno por fuera sin parar: conic-gradient que gira con @property --angle
-   (6 s, lineal), 1,5 px, y un halo difuminado que sigue a la luz. Con
-   movimiento reducido, la luz se queda quieta. Etiquetas encima del campo;
+   una card de cristal (blur 18px + saturate 140 %) con la luz que recorre el
+   contorno (.con-luz, en css/base.css). Etiquetas encima del campo;
    foco en cian; errores en línea. JS: js/contacto/form.js
    ========================================================================== */
-@property --angle { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
-
 .contacto {
   --f-line: rgb(233 227 216 / 0.24);
   --f-err: #ff9b8a;                              /* sobre el cristal oscuro ≈ 8:1 */
@@ -27,7 +23,6 @@
 
 /* ---- la card de cristal con la luz que recorre el borde ---- */
 .form-card {
-  --luz: conic-gradient(from var(--angle), transparent 0deg, #00e5ff 36deg, #2b4dff 84deg, transparent 132deg, transparent 360deg);
   position: relative; isolation: isolate;
   padding: clamp(28px, 3.4vw, 52px) clamp(22px, 3.2vw, 48px) clamp(26px, 3vw, 44px);
   border-radius: 28px; border: 1px solid rgb(255 255 255 / 0.14);
@@ -35,21 +30,7 @@
   -webkit-backdrop-filter: blur(18px) saturate(140%); backdrop-filter: blur(18px) saturate(140%);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 40px 90px -50px rgb(0 0 0 / 0.85);
 }
-/* la luz: un anillo de 1,5 px justo por fuera del borde */
-.form-card::before, .form-card::after {
-  content: ""; position: absolute; pointer-events: none; border-radius: inherit;
-  background: var(--luz);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
-  animation: luz-gira 6s linear infinite;
-}
-.form-card::before { inset: -2.5px; padding: 1.5px; border-radius: 30.5px; z-index: 2; }
-/* el halo: la misma luz, difuminada, solo por fuera (la máscara recorta el interior) */
-.form-card::after { inset: -16px; padding: 14px; border-radius: 44px; z-index: -1; filter: blur(10px); opacity: .55; }
-@keyframes luz-gira { to { --angle: 360deg; } }
-.form-card--sutil::before { opacity: .55; }
-.form-card--sutil::after { opacity: .22; }
-@media (prefers-reduced-motion: reduce) { .form-card::before, .form-card::after { animation: none; --angle: 210deg; } }
+/* la luz del borde es .con-luz (css/base.css): la comparte con las cards "En el horno" de proyectos.html */
 
 .form { display: grid; gap: 4px; }
 .form__hp { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; left: -9999px; }

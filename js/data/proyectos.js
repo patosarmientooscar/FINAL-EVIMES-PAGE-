@@ -32,3 +32,23 @@ window.EVIMES_PROYECTOS = {
     { id: 'p5', proximamente: true }
   ]
 };
+
+/* --------------------------------------------------------------------------
+   proyectos.html: los dos ejemplos, uno por tipo de cliente. EDITABLE.
+   - url:   la web publicada. null = sin enlace.
+   - video: el recorrido por la web (16:10, sin audio), comprimido con
+            tools/video.sh → { mp4, webm, poster }. null = la captura (Disco)
+            o la card de espera (León's).
+   -------------------------------------------------------------------------- */
+window.EVIMES_PROYECTOS.casos = {
+  disco: {
+    nombre: 'Disco Producción',
+    url: 'https://discoproduccion.com',
+    video: null    // { mp4: 'assets/proyectos/disco-recorrido.mp4', webm: 'assets/proyectos/disco-recorrido.webm', poster: 'assets/proyectos/disco-recorrido.jpg' }
+  },
+  leons: {
+    nombre: "León's",
+    url: null,     // PENDIENTE: la URL de la web de León's
+    video: null    // { mp4: 'assets/proyectos/leons-recorrido.mp4', webm: 'assets/proyectos/leons-recorrido.webm', poster: 'assets/proyectos/leons-recorrido.jpg' }
+  }
+};

@@ -221,3 +221,27 @@ input, textarea { caret-color: var(--cyan); }
 
 /* El atributo hidden manda siempre (ninguna regla display lo pisa). */
 [hidden] { display: none !important; }
+
+/* ==========================================================================
+   .con-luz — una luz que recorre el contorno por fuera, sin parar: anillo de
+   1,5 px con conic-gradient (cian → azul → transparente) que gira con
+   @property --angle en 6 s lineal, y un halo difuminado que la sigue (la
+   misma luz con blur, recortada para que solo se vea por fuera). El elemento
+   necesita position y border-radius propios. .con-luz--sutil = más tenue.
+   Con movimiento reducido, quieta. La usan el formulario y "En el horno".
+   ========================================================================== */
+@property --angle { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+.con-luz { --luz: conic-gradient(from var(--angle), transparent 0deg, #00e5ff 36deg, #2b4dff 84deg, transparent 132deg, transparent 360deg); --luz-r: 28px; isolation: isolate; }
+.con-luz::before, .con-luz::after {
+  content: ""; position: absolute; pointer-events: none;
+  background: var(--luz);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  animation: luz-gira 6s linear infinite;
+}
+.con-luz::before { inset: -2.5px; padding: 1.5px; border-radius: calc(var(--luz-r) + 2.5px); z-index: 2; }
+.con-luz::after { inset: -16px; padding: 14px; border-radius: calc(var(--luz-r) + 16px); z-index: -1; filter: blur(10px); opacity: .55; }
+@keyframes luz-gira { to { --angle: 360deg; } }
+.con-luz--sutil::before { opacity: .5; }
+.con-luz--sutil::after { opacity: .2; }
+@media (prefers-reduced-motion: reduce) { .con-luz::before, .con-luz::after { animation: none; --angle: 210deg; } }
