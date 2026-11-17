@@ -134,3 +134,8 @@ Lo que decidí sin poder preguntar, y por qué. Lo que Oscar tiene que revisar e
 - Movimiento reducido: la versión fija de siempre, sin reproducción ni bloqueo.
 - Con la visita automática no sale el "Desliza" del hud.
 - De paso, en móvil las etiquetas de los indicadores dentro de la oficina tenían poco ancho ("Rendimiento" se cortaba). Ahora van sin espaciado y con el 90 % de ancho.
+
+## Bloque 2 · Preparar la subida a GitHub
+- `.gitignore` con `.env*` (antes `.env` y `.env.*`, que es lo mismo); `.nojekyll` ya estaba. Grep limpio; `config.js` vacío; rutas relativas.
+- **El remote `origin` existe:** es el repo PRIVADO `evimes-web`, con la historia completa. Hago `git push origin HEAD --tags`, como dice el prompt, pero NO lo hago público: su historia lleva el email y el teléfono antiguos y el gmail como autor. Lo dejo explicado en INFORME.md, con los pasos por si Oscar quiere el público con el nombre `evimes-web`.
+- No subo nada al repo público `evimes-web-2026` (remoto `publico`): esta vez el prompt solo permite push a `origin`. Oscar lo actualiza con `sh tools/publicar.sh`.

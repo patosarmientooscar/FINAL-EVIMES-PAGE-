@@ -5,8 +5,7 @@ playwright-report/
 
 # Dependencias, entorno y registros
 node_modules/
-.env
-.env.*
+.env*
 *.log
 
 # Sistema
