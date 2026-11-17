@@ -3,7 +3,7 @@
    Portado tal cual del prototipo aprobado (Downloads/evimes-cards/con-quien.html):
    interruptor pequeño de cromo (role="radiogroup", flechas del teclado),
    titular cuyas líneas salen y entran con máscara, subrayado cian que se
-   dibuja solo, columna lateral y tres puntos. Primera entrada al verse
+   dibuja solo y columna lateral (párrafo, lista corta con filetes y CTA). Primera entrada al verse
    (umbral .3); al cambiar, el panel que sale se va hacia arriba y el nuevo
    entra (600 ms).
    Cambios de estructura: los paneles se pintan desde js/data/clientes.js
@@ -29,10 +29,8 @@
         return '<span class="l"><span' + (o.suave ? ' class="soft"' : '') + '>' + marca(o.texto) + '</span></span>';
       }).join('\n') + '</h2>' +
       '<div class="side"><p>' + esc(d.texto) + '</p>' +
+        '<ul class="lista">' + (d.lista || []).map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' +
         '<a class="cta" href="' + esc(d.href || '#contacto') + '" data-perfil="' + esc(d.perfil) + '" data-scramble><span class="sl">' + esc(d.cta) + '</span> <i aria-hidden="true">→</i></a></div>' +
-      '<div class="points">' + d.puntos.map(function (p, k) {
-        return '<div class="pt"><b>' + String(k + 1).padStart(2, '0') + '</b><h3>' + esc(p.titulo) + '</h3><p>' + esc(p.texto) + '</p></div>';
-      }).join('') + '</div>' +
     '</div>';
   }).join('');
   root.classList.add('js');

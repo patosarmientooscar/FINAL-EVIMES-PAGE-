@@ -12,12 +12,12 @@
        idle: la oficina es una card cerrada en el gris (progreso 0).
        play: cuando el principio del track llega arriba, el scroll se queda
          ahí (lenis.stop() + rueda, toque y teclas bloqueados) y TODA la visita
-         se reproduce sola, por tiempo (0 → 0.86 en 11 s). El scroll hacia
+         se reproduce sola, por tiempo (0 → 0.86 en 6,5 s). El scroll hacia
          abajo se ignora; hacia arriba, desbloquea y deja la oficina como está.
        quieta: la visita ha terminado; la oficina espera en su estado final,
          con el scroll aún bloqueado.
        salida: el siguiente gesto (rueda, toque o tecla) cierra la oficina en
-         card, por tiempo (0.86 → 1 en 1,2 s).
+         card, por tiempo (0.86 → 1 en 0,8 s).
        done: el scroll vuelve (lenis.start()) y la página sigue.
      Barra fina de progreso abajo. No arranca si se cruza la oficina con un
      salto de ancla (EV.saltando) ni si la página se carga por debajo de ella.
@@ -154,7 +154,7 @@ async function arrancar(captura) {
   }
 
   /* ---------- un scroll para entrar, otro para salir ---------- */
-  const FIN = .86, DURA = 11, SALIDA = 1.2;          // progreso al acabar la visita · segundos de la visita · segundos del cierre
+  const FIN = .86, AUTO_DUR = 6.5, SALIDA = 0.8;     // progreso al acabar la visita · segundos de la visita · segundos del cierre
   const barra = track.querySelector('[data-of-barra]');
   let estado = 'idle', auto = 0, tEstado = 0;
   const lenis = () => EV.home && EV.home.lenis;
@@ -211,7 +211,7 @@ async function arrancar(captura) {
       }
     }
     if (bloqueado() && Math.abs(y - top) > 1) irA(top);                       // la página no se mueve
-    if (estado === 'play') { auto = Math.min(FIN, auto + dt * FIN / DURA); if (auto >= FIN) { estado = 'quieta'; tEstado = 0; } }
+    if (estado === 'play') { auto = Math.min(FIN, auto + dt * FIN / AUTO_DUR); if (auto >= FIN) { estado = 'quieta'; tEstado = 0; } }
     if (estado === 'salida') { auto = Math.min(1, auto + dt * (1 - FIN) / SALIDA); if (auto >= 1) soltar('done'); }
     tl.progreso(auto);
     if (barra) barra.style.transform = 'scaleX(' + Math.min(1, auto / FIN).toFixed(4) + ')';

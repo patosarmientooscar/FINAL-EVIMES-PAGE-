@@ -6,6 +6,7 @@
    lineas: las tres líneas del titular. Entre corchetes, la palabra que lleva
    el subrayado cian ("tu [sí]."). suave: true = línea en gris más suave.
    perfil: lo que el CTA marca en "Soy…" del formulario de contacto.
+   lista: la lista corta de la columna derecha (una línea cada punto).
    ========================================================================== */
 window.EVIMES_CLIENTES = [
   {
@@ -16,11 +17,7 @@ window.EVIMES_CLIENTES = [
     cta: 'Hablemos de un proyecto',
     href: '#contacto',
     perfil: 'Agencia creativa',
-    puntos: [
-      { titulo: 'Marca blanca', texto: 'Lo presentáis como vuestro. Nosotros, detrás.' },
-      { titulo: '3D y WebGL a medida', texto: 'Lo que otros no se atreven a programar.' },
-      { titulo: 'Plazos claros', texto: 'Sabéis qué llega y cuándo, desde el primer día.' }
-    ]
+    lista: ['Marca blanca', 'NDA antes de empezar', '3D y WebGL a medida', 'Plazos claros desde el primer día']
   },
   {
     id: 'locales',
@@ -30,10 +27,6 @@ window.EVIMES_CLIENTES = [
     cta: 'Pide tu propuesta',
     href: '#contacto',
     perfil: 'Negocio local',
-    puntos: [
-      { titulo: 'Web rápida', texto: 'Carga al instante, también en el móvil.' },
-      { titulo: 'Google y Maps', texto: 'Que te encuentren cuando te buscan cerca.' },
-      { titulo: 'Reservas y WhatsApp', texto: 'Del "me interesa" al cliente, en un clic.' }
-    ]
+    lista: ['Web rápida, también en el móvil', 'Google y Maps al día', 'Reservas y WhatsApp en un clic', 'Hecha a medida, sin plantillas']
   }
 ];

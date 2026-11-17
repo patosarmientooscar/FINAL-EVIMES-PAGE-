@@ -259,6 +259,8 @@
 .psi-caso__pill i { width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); }
 .psi-caso__pill b { font-weight: 600; }
 .psi-caso__nota { margin-top: 18px; font-size: 14px; color: var(--texto-2); }
+.caso--gris .psi-caso__nota { color: var(--tinta-2); }
+.res-caja .psi-caso + .res { margin-top: 48px; }
 
 /* el ejemplo sobre gris (León's) */
 .caso--gris { background: var(--gris); color: var(--tinta-oscura); border-radius: 30px; box-shadow: 0 -40px 90px -40px rgb(0 0 0 / 0.5); padding-top: clamp(96px, 14vh, 160px); }
