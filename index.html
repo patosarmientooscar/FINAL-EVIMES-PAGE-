@@ -229,6 +229,9 @@
 
       <div class="track" id="oficina-slot" data-oficina>
         <div class="stage">
+          <!-- Visita automática: saltar al final y progreso (js/oficina/index.js) -->
+          <button class="of-saltar" type="button" data-of-saltar data-scramble tabindex="-1" aria-hidden="true" aria-label="Saltar la visita a la oficina"><span class="sl">Saltar</span></button>
+          <div class="of-barra" aria-hidden="true"><i data-of-barra></i></div>
           <div class="window" id="win">
             <picture class="espera" aria-hidden="true">
               <source media="(max-aspect-ratio: 9/10)" srcset="assets/oficina/oficina-espera-movil.webp">

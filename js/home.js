@@ -71,8 +71,12 @@
   function ir(id) {
     var t = document.getElementById(id);
     if (!t) return;
-    if (lenis) lenis.scrollTo(id === 'inicio' ? 0 : t, { duration: Math.min(2.2, 0.8 + Math.abs(t.getBoundingClientRect().top) / 4000) });
-    else t.scrollIntoView({ behavior: EV.reducedMotion ? 'auto' : 'smooth' });
+    // Mientras dura el salto, la oficina no arranca su visita automática al cruzarla (EV.home.saltando).
+    EV.saltando = true;
+    var fin = function () { EV.saltando = false; };
+    if (lenis) lenis.scrollTo(id === 'inicio' ? 0 : t, { duration: Math.min(2.2, 0.8 + Math.abs(t.getBoundingClientRect().top) / 4000), onComplete: fin });
+    else { t.scrollIntoView({ behavior: EV.reducedMotion ? 'auto' : 'smooth' }); setTimeout(fin, 1200); }
+    setTimeout(fin, 2600);
     if (id !== 'inicio') {
       if (!t.hasAttribute('tabindex')) t.setAttribute('tabindex', '-1');
       setTimeout(function () { t.focus({ preventScroll: true }); }, lenis ? 900 : 50);
@@ -338,7 +342,7 @@
     var h = location.hash.slice(1);
     if (h && document.getElementById(h)) setTimeout(function () { ir(h); }, 80);
     // API mínima para los módulos del panel gris (js/gris/*): mismo scroll, mismo bucle.
-    EV.home = { scrollY: scrollY, get lenis() { return lenis; }, cine: cine, ir: ir, elegirPlan: elegirPlan };
+    EV.home = { scrollY: scrollY, get lenis() { return lenis; }, get saltando() { return !!EV.saltando; }, cine: cine, ir: ir, elegirPlan: elegirPlan };
     root.classList.add('is-ready');
   }
 

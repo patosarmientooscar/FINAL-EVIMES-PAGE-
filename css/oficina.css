@@ -1,7 +1,7 @@
 /* ==========================================================================
    oficina.css — "Trabajo selecto" + la oficina (#oficina-slot), panel gris.
    Portado del prototipo aprobado (Downloads/evimes-oficina/index.html):
-   .intro, .track (470vh), .stage sticky, .window (se abre desde una card del
+   .intro, .track (240vh), .stage sticky, .window (se abre desde una card del
    gris: clip-path inset con esquinas de 30 px → pantalla completa, y al
    final se vuelve a cerrar en card), .scrim, .cap, .btn, .hud y .psi (los
    indicadores de PageSpeed junto a la card de Disco).
@@ -28,7 +28,7 @@
 .intro p { margin-top: 22px; max-width: 46ch; font-size: clamp(15px,1.2vw,18px); line-height: 1.55; color: rgba(11,16,32,.66); }
 
 /* El track ocupa todo el ancho (sale del padding del panel). */
-.track { position: relative; height: 470vh; margin-inline: calc(-1 * var(--g)); }
+.track { position: relative; height: 240vh; margin-inline: calc(-1 * var(--g)); }
 .stage { position: sticky; top: 0; height: 100vh; overflow: hidden; }
 /* the office opens like one of the bento cards growing to fill the screen, and closes back into one */
 .window { position: absolute; inset: 0; background: var(--b-navy); will-change: clip-path;
@@ -111,3 +111,21 @@
 .intro .intro__mas { margin-top: 26px; }
 .intro__mas .enlace { color: var(--b-ink); text-decoration-color: rgba(11,16,32,.35); }
 .intro__mas .enlace:focus-visible { outline: 2px solid var(--b-ink); outline-offset: 3px; }
+
+/* ---------- visita automática (js/oficina/index.js) ----------
+   "Saltar" arriba a la derecha (cristal oscuro, con scramble) y la barra de
+   progreso fina abajo. Solo se ven mientras la visita se reproduce. */
+.of-saltar { position: absolute; z-index: 6; top: clamp(84px, 12vh, 112px); right: var(--g); display: inline-flex; align-items: center; min-height: 44px; padding: 0 20px; border: 0; border-radius: 999px; cursor: pointer;
+  background: rgba(7,10,19,.62); color: #ece7dd; font: 500 14px/1 var(--font-text); letter-spacing: .02em;
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: inset 0 0 0 1px rgba(255,255,255,.14), inset 0 1px 0 rgba(255,255,255,.18), 0 16px 36px -18px rgba(0,0,0,.8);
+  opacity: 0; visibility: hidden; transform: translateY(-6px); transition: opacity .5s var(--ease), transform .5s var(--ease), visibility 0s linear .5s, background-color .25s var(--ease-boton); }
+.of-saltar:hover { background: rgba(7,10,19,.8); }
+.of-saltar:active { transform: scale(.98); }
+.of-saltar:focus-visible { outline: 2px solid var(--b-cyan); outline-offset: 3px; }
+.of-barra { position: absolute; z-index: 6; left: 0; right: 0; bottom: 0; height: 3px; pointer-events: none; opacity: 0; transition: opacity .6s var(--ease); background: rgba(255,255,255,.06); }
+.of-barra i { position: absolute; inset: 0; background: linear-gradient(90deg, #2b4dff, #00e5ff); transform: scaleX(0); transform-origin: left; }
+.track.is-play .of-saltar { opacity: 1; visibility: visible; transform: none; transition: opacity .5s var(--ease), transform .5s var(--ease), visibility 0s, background-color .25s var(--ease-boton); }
+.track.is-play .of-barra { opacity: 1; }
+/* con la visita automática no hay "Desliza": la oficina avanza sola */
+.track.is-auto .hud { display: none; }
+.track.is-fija :is(.of-saltar, .of-barra) { display: none; }

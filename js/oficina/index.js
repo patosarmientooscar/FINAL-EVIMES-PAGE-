@@ -8,7 +8,17 @@
      rootMargin); mientras, la ventana enseña la foto desenfocada (WebP).
    · Un solo bucle (dentro de gsap.ticker, el bucle único de la web; si no
      hay GSAP, requestAnimationFrame) que se para con la sección fuera (IO).
-   · El progreso sale de Lenis (posiciones cacheadas) y se suaviza en timeline.js.
+   · Visita automática (idle → play → done):
+       idle: la oficina es una card cerrada en el gris (progreso 0).
+       play: cuando el principio del track llega arriba, el scroll se queda
+         ahí (lenis.stop() + rueda, toque y teclas de scroll bloqueados) y la
+         visita avanza sola, por tiempo: progreso 0 → 0.86 en 11 s. Si se
+         intenta hacer scroll (pasado 1,2 s), acelera hasta ×4. "Saltar" (o
+         Esc) va al final. Barra fina de progreso abajo.
+       done: el scroll vuelve (lenis.start()) y el resto del track solo hace
+         el cierre: 0.86 → 1 según el scroll de Lenis.
+     No arranca si se cruza la oficina con un salto de ancla (EV.saltando) ni
+     si la página se carga por debajo de ella. Movimiento reducido: versión fija.
    · Mientras la ventana cubre la pantalla, cabecera oscura (EV.cabeceraOscura).
    · Versión fija (movimiento reducido, ahorro de datos, ?modo=fijo) o sin
      WebGL: la oficina en una card con la web de Disco encima, los indicadores
@@ -22,7 +32,12 @@ const track = document.querySelector('[data-oficina]');
 const PSI = window.EVIMES_PAGESPEED || null;
 const MEDIDAS = [['rendimiento', 'Rendimiento'], ['accesibilidad', 'Accesibilidad'], ['buenasPracticas', 'Prácticas recomendadas'], ['seo', 'SEO']];
 
+// ¿Se ha cargado la página por debajo de la oficina? Entonces no hay visita automática.
+let pasada = false;
+const mirarPasada = () => { if (track && track.getBoundingClientRect().top < -2) pasada = true; };
+
 function init() {
+  mirarPasada(); addEventListener('load', () => setTimeout(mirarPasada, 60), { once: true });
   textos();
   pageSpeed();
   const captura = new URLSearchParams(location.search).get('oficina') === 'captura';
@@ -113,7 +128,6 @@ async function arrancar(captura) {
   medir();
   addEventListener('resize', medir);
   new ResizeObserver(medir).observe(document.querySelector('main') || document.body);
-  const leer = () => { const y = scrollY(); tl.progreso((y - top) / Math.max(1, alto - vh)); return y; };
 
   // Solo lectura (QA y otros módulos): el progreso de la oficina.
   EV.oficina = { get P() { return tl.P; }, get hover() { return tl.hovered; } };
@@ -136,10 +150,75 @@ async function arrancar(captura) {
     return;
   }
 
+  /* ---------- visita automática ---------- */
+  const FIN = .86, DURA = 11;                       // progreso al acabar la visita y segundos a velocidad normal
+  const saltar = track.querySelector('[data-of-saltar]'), barra = track.querySelector('[data-of-barra]');
+  let estado = 'idle', auto = 0, vel = 1, tPlay = 0, intento = -1;
+  const lenis = () => EV.home && EV.home.lenis;
+  const irA = y => { const l = lenis(); if (l) l.scrollTo(y, { immediate: true, force: true }); else window.scrollTo(0, y); };
+  const TECLAS = new Set([' ', 'Spacebar', 'PageDown', 'PageUp', 'ArrowDown', 'ArrowUp', 'Home', 'End']);
+  const enCampo = e => e.target && e.target.closest && e.target.closest('input, textarea, select, [contenteditable]');
+  const quiere = () => { if (tPlay > 1.2) intento = tPlay; };   // intento de scroll: avance rápido
+  const bloquea = e => { if (estado !== 'play') return; e.preventDefault(); quiere(); };
+  const tecla = e => {
+    if (estado !== 'play') return;
+    if (e.key === 'Escape') { e.preventDefault(); terminar(); return; }
+    if (TECLAS.has(e.key) && !enCampo(e)) { e.preventDefault(); quiere(); }
+  };
+  function empezar() {
+    estado = 'play'; auto = 0; vel = 1; tPlay = 0; intento = -1;
+    irA(top);
+    const l = lenis(); if (l) l.stop(); else document.documentElement.style.overflow = 'hidden';
+    addEventListener('wheel', bloquea, { passive: false, capture: true });
+    addEventListener('touchmove', bloquea, { passive: false, capture: true });
+    addEventListener('keydown', tecla, { capture: true });
+    track.classList.add('is-play');
+    if (saltar) { saltar.removeAttribute('tabindex'); saltar.removeAttribute('aria-hidden'); }
+  }
+  function terminar() {
+    if (estado === 'done') return;
+    estado = 'done'; auto = FIN;
+    tl.progreso(FIN);
+    removeEventListener('wheel', bloquea, { capture: true });
+    removeEventListener('touchmove', bloquea, { capture: true });
+    removeEventListener('keydown', tecla, { capture: true });
+    const l = lenis(); if (l) l.start(); else document.documentElement.style.overflow = '';
+    track.classList.remove('is-play'); track.classList.add('is-hecha');
+    if (saltar) { if (document.activeElement === saltar) saltar.blur(); saltar.setAttribute('tabindex', '-1'); saltar.setAttribute('aria-hidden', 'true'); }
+  }
+  if (saltar) saltar.addEventListener('click', terminar);
+  track.classList.add('is-auto');
+  if (pasada || scrollY() > top + 4) { estado = 'done'; track.classList.add('is-hecha'); }
+
+  const avanzar = (y, dt) => {
+    if (estado === 'idle') {
+      if (y >= top - 1) {
+        // cruzar la oficina en un salto de ancla (o de golpe) no arranca la visita
+        if ((EV.home && EV.home.saltando) || y > top + vh * .6) { estado = 'done'; track.classList.add('is-hecha'); }
+        else empezar();
+      } else tl.progreso(0);
+    }
+    if (estado === 'play') {
+      tPlay += dt;
+      if (Math.abs(y - top) > 1) irA(top);                    // la página no se mueve
+      const rapido = intento >= 0 && tPlay - intento < .45;
+      vel += ((rapido ? 4 : 1) - vel) * (1 - Math.pow(.02, dt));
+      auto = Math.min(FIN, auto + dt * vel * FIN / DURA);
+      tl.progreso(auto);
+      if (barra) barra.style.transform = 'scaleX(' + (auto / FIN).toFixed(4) + ')';
+      if (auto >= FIN) terminar();
+    }
+    if (estado === 'done') tl.progreso(FIN + (1 - FIN) * Math.min(1, Math.max(0, (y - top) / Math.max(1, alto - vh))));
+  };
+  // Solo lectura (QA): el estado de la visita.
+  Object.defineProperty(EV.oficina, 'estado', { get: () => estado });
+  Object.defineProperty(EV.oficina, 'auto', { get: () => auto });
+
   new IntersectionObserver(es => { running = es[0].isIntersecting; if (!running) EV.cabeceraOscura = false; }, { rootMargin: '300px' }).observe(track);
   const frame = dt => {
-    if (!running) return;
-    const y = leer();
+    if (!running && estado !== 'play') return;
+    const y = scrollY();
+    avanzar(y, dt);
     tl.update(dt);
     E.renderer.render(E.scene, E.camera);
     if (tl.hovered !== cursor) { cursor = tl.hovered; cv.style.cursor = cursor ? 'pointer' : ''; }
