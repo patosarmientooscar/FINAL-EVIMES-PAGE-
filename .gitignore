@@ -14,3 +14,13 @@ Thumbs.db
 
 # Copia local de la historia antes de limpiarla (lleva datos privados: nunca se sube)
 _respaldo/
+
+# Archivos internos (se quedan en local, no se suben)
+BRIEF.md
+CLAUDE.md
+DECISIONES.md
+INFORME.md
+PRODUCT.md
+seo-antiguo.md
+_archivo/
+.impeccable/
