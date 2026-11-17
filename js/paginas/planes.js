@@ -23,14 +23,14 @@
         '<p class="plan__para">' + esc(p.para) + '</p>' +
         '<p class="display plan__precio">' + R.precio(p) + '</p>' +
         '<ul class="plan__incluye">' + p.incluye.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' +
-        '<a class="pastilla plan__boton' + (p.recomendado ? '' : ' pastilla--linea') + '" href="index.html#contacto?plan=' + esc(p.id) + '" data-scramble aria-label="' + esc(p.boton) + ': plan ' + esc(p.nombre) + '"><span class="sl">' + esc(p.boton) + '</span></a>' +
+        '<a class="pastilla plan__boton' + (p.recomendado ? '' : ' pastilla--linea') + '" href="index.html#contacto?plan=' + esc(p.id) + '" data-scramble><span class="sl">' + esc(p.boton) + '</span><span class="sr-only"> · plan ' + esc(p.nombre) + '</span></a>' +
         '</li>';
     }).join('');
   };
   // filas: todos los puntos de planes.js, en orden de aparición, sin repetir
   R.filas = function (P) { var f = []; P.forEach(function (p) { p.incluye.forEach(function (x) { if (f.indexOf(x) < 0) f.push(x); }); }); return f; };
-  var SI = '<span class="si" aria-label="Incluido"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5 6.5 12 13 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
-  var NO = '<span class="no" aria-label="No incluido">—</span>';
+  var SI = '<span class="si" role="img" aria-label="Incluido"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5 6.5 12 13 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+  var NO = '<span class="no" role="img" aria-label="No incluido">—</span>';
   R.tabla = function (P) {
     var f = R.filas(P);
     return '<table class="comp__tabla"><caption class="sr-only">Qué incluye cada plan</caption>' +

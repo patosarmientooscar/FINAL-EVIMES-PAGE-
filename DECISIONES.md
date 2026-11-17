@@ -69,3 +69,13 @@ Lo que decidí sin poder preguntar, y por qué. Lo que Oscar tiene que revisar e
 - Preguntas frecuentes en `js/data/faq-planes.js`: cuatro respuestas prudentes, sin IVA, plazos, permanencias ni promesas; todas marcadas `confirmar: true`. "¿La web es mía?" remite a la propuesta escrita en vez de afirmar condiciones que no conozco.
 - Textos de la página en `js/data/planes-pagina.js` (BORRADOR). `js/paginas/planes.js` pinta cards, tabla, acordeón y FAQ desde los datos (y es la misma plantilla que generó el HTML).
 - JSON-LD: OfferCatalog con un Offer por plan (Fundamento con precio mínimo 150 €, Inmersión 500 €, Impacto sin precio).
+
+## Bloque 7 · Menú, enlaces, fondo común y QA (`v-autonomo-final`)
+- Menú igual en las 3 páginas: Servicios → servicios.html, Proyectos → index.html#oficina, Planes → planes.html, Contacto → index.html#contacto, con la página actual marcada (`aria-current="page"`). En la home, "Proyectos" y "Contacto" son anclas de la misma página.
+- Las páginas planas (legales, proyectos, automatización, software IA, plantillas) llevan los mismos 4 enlaces en su cabecera (`.doc-nav`, con scramble); en móvil se ocultan y queda el logo, que vuelve a la home. Los textos legales no se han tocado.
+- Los "Ver más" del bento van a servicios.html#web, #3d, #seo y #ia (desde `js/data/servicios.js`). Comprobado con un script que abre todas las páginas: todos los enlaces internos existen y sus anclas también.
+- Fondo común: servicios y planes usan `js/fondo/fondo.js` con los mismos rayos, bandas y póster que la home (ver bloque 5).
+- Lighthouse móvil de servicios daba TBT 920 ms: el bento creaba los 4 renderers WebGL a la vez (~1,8 s de CPU). Ahora, con varios `[data-bento]` en la página, cada card se crea al quedar a una pantalla. La home no cambia (un solo bento).
+- planes.html: los botones "Empezar" llevan texto oculto (" · plan Fundamento") en vez de aria-label, porque Lighthouse (SEO) los marcaba como enlaces sin texto descriptivo; los ✓ / — de la tabla llevan role="img" (un aria-label en un span sin rol no vale).
+- Home: las palabras apagadas de la frase "Si no eres visible, no existes." pasan de .16 a .45 de opacidad. Con .16 no cumplía AA (Lighthouse lo marcaba); con .45 el blanco y el cian dan al menos 3:1 (texto grande) sobre el fondo oscuro y el encendido palabra a palabra sigue viéndose.
+- Las cifras de Lighthouse van en INFORME.md tal cual salieron (servidor local, Edge headless, sin caché de CDN: en producción pueden cambiar).

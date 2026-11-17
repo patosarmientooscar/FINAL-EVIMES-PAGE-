@@ -148,6 +148,10 @@ input, textarea { caret-color: var(--cyan); }
 }
 .brand .logo-svg { display: block; height: var(--logo-h); width: auto; }
 
+/* Menú común (Servicios · Proyectos · Planes · Contacto) en las páginas de texto; en móvil, solo los dos botones. */
+.doc-nav { display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; font-size: var(--step--1, 15px); color: var(--ink-2, rgb(233 227 216 / 0.78)); text-decoration: none; }
+.doc-nav:hover { color: var(--ink, #e9e3d8); }
+@media (max-width: 899px) { .doc-nav { display: none; } }
 .header-actions {
   display: flex;
   align-items: center;

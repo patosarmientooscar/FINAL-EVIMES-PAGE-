@@ -75,9 +75,16 @@ async function arrancar(els, captura) {
   ]);
   /* ---------- boot + one shared loop ---------- */
   const kinds = { web: webCard, star: starCard, pin: pinCard, ia: iaCard };
-  els.forEach(el => S.makeCard(el, kinds[el.dataset.kind], { captura }));
   const { cards, reduce } = S;
-  cards.forEach(c => { c.step(reduce || captura ? 1.5 : 0); });
+  const crear = el => { if (el.__card) return; el.__card = true; const c = S.makeCard(el, kinds[el.dataset.kind], { captura }); c.step(reduce || captura ? 1.5 : 0); if (reduce || captura) { c.render(); c.step(0); } };
+  // Con todas las cards juntas (la home) se crean a la vez; repartidas por la página
+  // (servicios.html, un contenedor por oficio) cada una se crea a una pantalla de
+  // distancia: crear los 4 renderers de golpe costaba ~1,8 s de CPU en móvil.
+  if (roots.length < 2 || captura) els.forEach(crear);
+  else {
+    const cercaCard = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { cercaCard.unobserve(e.target); crear(e.target); } }), { rootMargin: '100% 0px' });
+    els.forEach(el => cercaCard.observe(el));
+  }
   // Pose fija: el primer step corre antes de que la cámara tenga sus matrices (el
   // centro de la ráfaga del destello salía fuera de la card). Un render y un
   // step(0) las ponen al día sin mover el tiempo.

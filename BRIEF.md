@@ -42,12 +42,16 @@ La oficina queda aparcada (`oficina.html`, sin tocar). La home se construye desd
 3. Hero: "Tu negocio merece una web a su altura." + línea + "Pide tu propuesta" / "Ver proyectos" + "Desliza".
 4. Herramientas (cinta infinita de logos monocromos, se para con el ratón).
 5. Frase "Si no eres visible, no existes." (palabra a palabra con el scroll).
-6. Panel gris (fase gris, v-gris-1): "Cuatro oficios. Un mismo nivel." (bento de 4 cards 3D, v-bento-1: web · destello EH · pin · IA) · "Webs que dan que hablar." + la oficina en `#oficina-slot` (v-oficina-3): la ventana se abre desde una card, EVIMES se enciende en cian, la cámara entra en el monitor, cae por un túnel de luz, flash, y sale con la web de Disco Producción en una card que recorre sus secciones; al final se cierra otra vez en card y se queda en el gris · "Con quién trabajamos" (interruptor Agencias creativas | Negocios locales, v-oficina-3). El gris termina aquí con el borde inferior redondeado.
+6. Panel gris: "Cuatro oficios. Un mismo nivel." (bento 3D) · "Webs que dan que hablar." + la oficina (v-oficina-psi: la ventana se abre, EVIMES se enciende en cian, la cámara va al monitor, la web de Disco sube como una card y hace scroll sola, con su PageSpeed a los lados; se cierra en card) · "Con quién trabajamos". El gris termina con el borde inferior redondeado.
 7. Planes (tres cards de cristal; listas "incluye" en BORRADOR) + enlace a planes.html.
-8. Contacto: "¿Hacemos que se te vea?" + "Pide tu propuesta" (correo) + WhatsApp si hay número.
+8. Contacto: "¿Hacemos que se te vea?" con formulario (Web3Forms) + WhatsApp / email si están en config.js.
+10. Páginas: servicios.html (los 4 oficios con su card 3D, cómo trabajamos, CTA) y planes.html (cards, tabla comparativa, qué pasa después, preguntas).
 9. Pie: © 2026 Evimes · Madrid + legales.
 
 ## Pendientes
+- [ ] Rellenar `js/config.js`: WEB3FORMS_KEY, email, teléfono y WhatsApp (ver DECISIONES.md, bloque 3).
+- [ ] Confirmar que los datos de PageSpeed (js/data/pagespeed.js) son de discoproduccion.com.
+- [ ] Confirmar los textos BORRADOR de servicios.html, planes.html y sus preguntas frecuentes.
 - [ ] Más proyectos en la oficina: hoy solo sale Disco Producción (config.js → PROJECT). Amad Peña Barbershop ya no aparece en la home.
 - [ ] Textos de la oficina (BORRADOR en js/data/oficina.js), sobre todo "Una oficina pequeña en Madrid, gente que diseña y programa cada web a mano." y "Su web ya está dando que hablar."
 - [x] Panorama 4K (v-oficina-3).
