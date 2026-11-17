@@ -86,10 +86,10 @@ window.EVIMES_CONFIG = {
   },
 
   // Teléfono y email tomados del aviso legal de la web antigua.
-  telefono: '+34 636 73 61 67',
-  telefonoHref: 'tel:+34636736167',
-  whatsapp: '',          // pendiente de confirmar, p. ej. "https://wa.me/34636736167"
-  email: 'evimes@evimesweb.com',
+  telefono: '',
+  telefonoHref: '',
+  whatsapp: '',          // pendiente de confirmar, p. ej. "https://wa.me/34600000000"
+  email: '',
   redes: {
     instagram: '',
     linkedin: '',

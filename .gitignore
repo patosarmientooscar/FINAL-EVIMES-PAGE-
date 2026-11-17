@@ -12,3 +12,6 @@ node_modules/
 # Sistema
 .DS_Store
 Thumbs.db
+
+# Copia local de la historia antes de limpiarla (lleva datos privados: nunca se sube)
+_respaldo/

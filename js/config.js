@@ -102,12 +102,12 @@ window.EVIMES_CONFIG = {
     tiktok: ''
   },
   urls: {
-    home: '/',
-    proyectos: '/proyectos.html',
-    planes: '/planes.html',
-    avisoLegal: '/aviso-legal.html',
-    terminos: '/terminos.html',
-    privacidad: '/privacidad.html',
-    cookies: '/cookies.html'
+    home: './',
+    proyectos: 'proyectos.html',
+    planes: 'planes.html',
+    avisoLegal: 'aviso-legal.html',
+    terminos: 'terminos.html',
+    privacidad: 'privacidad.html',
+    cookies: 'cookies.html'
   }
 };
