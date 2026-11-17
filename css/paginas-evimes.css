@@ -102,3 +102,80 @@
 }
 @media (max-width: 560px) { .sp-serv__incluye { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { .pag * { transition: none !important; } }
+
+/* ==========================================================================
+   planes.html
+   ========================================================================== */
+.pag-hero--planes { min-height: 62vh; min-height: 62svh; }
+.pag-hero__texto--cian { color: var(--cyan); font-family: var(--display); font-weight: var(--display-w); font-size: clamp(26px, 2.6vw, 40px); letter-spacing: -.02em; }
+
+/* las cards de la home, en grande */
+.planes--pag { padding: 0 var(--g) clamp(96px, 14vh, 160px); }
+.planes--pag .planes__lista { margin-top: 0; gap: clamp(16px, 1.6vw, 24px); }
+.planes--pag .plan { padding: clamp(36px, 3vw, 48px) clamp(28px, 2.6vw, 40px) clamp(32px, 2.6vw, 40px); border-radius: 30px; min-height: clamp(560px, 44vw, 680px); }
+.planes--pag .plan--rec { border-color: rgb(0 229 255 / 0.55); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.14), 0 0 0 1px rgb(0 229 255 / 0.22), 0 30px 80px -40px rgb(0 229 255 / 0.35); }
+.planes--pag .plan__nombre { font-size: clamp(34px, 2.8vw, 44px); }
+.planes--pag .plan__para { font-size: 17px; }
+.planes--pag .plan__precio { margin-top: 40px; font-size: clamp(54px, 4.6vw, 76px); }
+.planes--pag .plan__incluye { margin: 36px 0 40px; gap: 14px; font-size: 17px; }
+.planes--pag .plan__boton { align-self: flex-start; min-height: 52px; padding-inline: 26px; font-size: 16px; }
+
+/* tabla comparativa (gris) */
+.comp, .faq { padding: clamp(96px, 14vh, 160px) var(--g); background: var(--gris); color: var(--tinta-oscura); border-radius: 30px; box-shadow: 0 -40px 90px -40px rgb(0 0 0 / 0.5); }
+.comp__titulo, .despues__titulo, .faq__titulo { font-size: clamp(44px, 6vw, 104px); line-height: .98; }
+.comp__nota { margin-top: 18px; font-size: 18px; color: var(--tinta-2); }
+.comp__tabla { width: 100%; margin-top: clamp(40px, 6vh, 64px); border-collapse: collapse; font-size: 17px; }
+.comp__tabla th, .comp__tabla td { padding: 18px 16px; border-top: 1px solid var(--gris-linea); text-align: left; font-weight: 400; vertical-align: middle; }
+.comp__tabla thead th { border-top: 0; padding-bottom: 22px; font-family: var(--display); font-weight: var(--display-w); font-size: clamp(24px, 2vw, 32px); letter-spacing: -.02em; }
+.comp__tabla thead th span { display: block; margin-top: 6px; font: 400 15px/1.3 var(--font-text); letter-spacing: 0; color: var(--tinta-2); }
+.comp__tabla thead th .plan__desde { display: inline; margin-right: 4px; color: var(--tinta-2); }
+.comp__tabla tbody th { width: 40%; }
+.comp__tabla td { text-align: center; width: 20%; }
+.comp__tabla thead th:not(:first-child) { text-align: center; }
+.comp__tabla .is-rec { background: rgb(0 229 255 / 0.07); }
+.comp__tabla thead th.is-rec { border-radius: 18px 18px 0 0; }
+.si { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--tinta-oscura); color: var(--cyan); }
+.si svg { width: 16px; height: 16px; }
+.no { color: rgb(11 15 26 / 0.45); font-size: 18px; }
+.comp__movil { display: none; }
+.acord { border-top: 1px solid var(--gris-linea); }
+.acord:last-child { border-bottom: 1px solid var(--gris-linea); }
+.acord__boton, .faq__p { display: flex; align-items: center; gap: 16px; width: 100%; min-height: 64px; padding: 18px 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.acord__boton .display { font-size: 28px; }
+.acord__precio { margin-left: auto; font-size: 15px; color: var(--tinta-2); }
+.acord__boton i, .faq__p i { position: relative; flex: 0 0 20px; height: 20px; }
+.acord__boton i::before, .acord__boton i::after, .faq__p i::before, .faq__p i::after { content: ""; position: absolute; left: 3px; right: 3px; top: 9px; height: 2px; background: currentColor; transition: transform .4s var(--ease); }
+.acord__boton i::after, .faq__p i::after { transform: rotate(90deg); }
+[aria-expanded="true"] > i::after { transform: rotate(0deg); }
+.acord__panel { margin: 0; padding: 0 0 20px; list-style: none; display: grid; gap: 12px; }
+.acord__panel li { display: flex; align-items: center; gap: 14px; font-size: 16px; }
+.acord__panel li.is-no { color: var(--tinta-2); }
+.acord__panel .no { width: 30px; text-align: center; }
+
+/* qué pasa después (sobre el fondo global) */
+.despues { padding: clamp(110px, 18vh, 200px) var(--g); }
+.despues__lista { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(20px, 2.4vw, 40px); margin: clamp(40px, 6vh, 64px) 0 0; padding: 0; list-style: none; }
+.despues__lista li { padding-top: 22px; border-top: 1px solid var(--nav-linea); }
+.despues__n { font-size: 13px; letter-spacing: .16em; color: var(--texto-2); }
+.despues__lista h3 { margin-top: 12px; font-size: clamp(26px, 2.2vw, 36px); line-height: 1.02; }
+.despues__lista p { margin-top: 12px; font-size: 16px; line-height: 1.5; color: var(--texto-2); }
+
+/* preguntas frecuentes (gris) */
+.faq__lista { margin-top: clamp(40px, 6vh, 64px); max-width: 64rem; }
+.faq__item { border-top: 1px solid var(--gris-linea); }
+.faq__item:last-child { border-bottom: 1px solid var(--gris-linea); }
+.faq__p { font-family: var(--display); font-weight: var(--display-w); font-size: clamp(22px, 2vw, 30px); letter-spacing: -.015em; padding: 24px 0; }
+.faq__p span { flex: 1; }
+.faq__r p { padding: 0 0 26px; max-width: 60ch; font-size: 17px; line-height: 1.6; color: var(--tinta-2); }
+.comp :focus-visible, .faq :focus-visible { outline: 2px solid var(--tinta-oscura); outline-offset: 3px; }
+
+@media (max-width: 899px) {
+  .comp__ancha { display: none; }
+  .comp__movil { display: block; margin-top: 36px; }
+  .despues__lista { grid-template-columns: 1fr; gap: 0; }
+  .despues__lista li { padding: 22px 0; }
+  .planes--pag .plan { min-height: 0; }
+}
+/* display:grid de los paneles no debe pisar el atributo hidden */
+.acord__panel[hidden], .faq__r[hidden] { display: none; }
+.acord__precio .plan__desde { margin-right: 4px; font-size: 13px; color: var(--tinta-2); }

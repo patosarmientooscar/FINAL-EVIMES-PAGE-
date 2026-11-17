@@ -60,3 +60,12 @@ Lo que decidí sin poder preguntar, y por qué. Lo que Oscar tiene que revisar e
 - `servicios.html` deja de ser noindex (antes lo era porque los textos eran un borrador vacío). Los textos siguen en BORRADOR: Oscar debe confirmarlos antes de publicar.
 - Se borra `css/servicios.css` (solo lo usaba la versión anterior de la página).
 - `.enlace` (home.css) lleva `gap: .4em`: era inline-flex y se comía el espacio antes de la flecha.
+
+## Bloque 6 · Página de planes (`v-planes`)
+- `planes.html` rehecha sobre el fondo global (mismo `js/fondo/fondo.js` que servicios). Antes era una página de texto (doc.css).
+- Las 3 cards son las de la home (mismas clases y el mismo borde de luz que sigue al ratón), en grande; la recomendada con borde cian. Botones a `index.html#contacto?plan=fundamento|inmersion|impacto` (el formulario lo preselecciona y baja a él).
+- Tabla comparativa: filas = todos los puntos de `js/data/planes.js` (12, cada plan tiene 4 propios), columnas = los 3 planes, ✓ cian o "—". Nada inventado: como cada plan solo lista lo suyo, la tabla enseña exactamente eso (no se supone que Inmersión incluye lo de Fundamento). Cuando Oscar complete las listas, la tabla sale sola. En móvil, acordeón por plan (Inmersión abierto).
+- "Qué pasa después": los 4 pasos de servicios en versión corta (campo `corto` en `js/data/servicios-pagina.js`).
+- Preguntas frecuentes en `js/data/faq-planes.js`: cuatro respuestas prudentes, sin IVA, plazos, permanencias ni promesas; todas marcadas `confirmar: true`. "¿La web es mía?" remite a la propuesta escrita en vez de afirmar condiciones que no conozco.
+- Textos de la página en `js/data/planes-pagina.js` (BORRADOR). `js/paginas/planes.js` pinta cards, tabla, acordeón y FAQ desde los datos (y es la misma plantilla que generó el HTML).
+- JSON-LD: OfferCatalog con un Offer por plan (Fundamento con precio mínimo 150 €, Inmersión 500 €, Impacto sin precio).
