@@ -24,7 +24,14 @@
 .sp-indice a { display: flex; align-items: baseline; gap: 14px; padding: 22px 16px 6px 0; color: var(--stone); text-decoration: none; font-size: clamp(16px, 1.3vw, 19px); }
 .sp-indice li + li a { padding-left: 16px; border-left: 1px solid var(--nav-linea); }
 .sp-indice__n { font-size: 13px; letter-spacing: .14em; color: var(--texto-2); }
-.sp-indice a:hover span:last-child { text-decoration: underline; text-decoration-color: var(--cyan); text-underline-offset: .3em; }
+/* la línea de cada enlace: una barra de carga que se dibuja de izquierda a derecha (hover, foco o clic) y se recoge hacia la derecha */
+.sp-indice a { position: relative; }
+.sp-indice a::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: linear-gradient(90deg, #2b4dff, #00e5ff);
+  transform: scaleX(0); transform-origin: right; transition: transform .3s cubic-bezier(.2,.75,.15,1); }
+.sp-indice li + li a::after { left: 16px; }
+.sp-indice a:hover::after, .sp-indice a:focus-visible::after, .sp-indice a.is-ir::after { transform: scaleX(1); transform-origin: left; transition-duration: .45s; }
+.sp-indice a:focus-visible { outline: none; }
+.sp-indice a:focus-visible span:last-child { color: #fff; }
 
 /* ---------- secciones de servicio ---------- */
 .sp-serv { position: relative; display: grid; grid-template-columns: repeat(12, 1fr); column-gap: clamp(16px, 2vw, 32px); align-items: center;
@@ -101,7 +108,7 @@
   .paso::before { top: 2px; }
 }
 @media (max-width: 560px) { .sp-serv__incluye { grid-template-columns: 1fr; } }
-@media (prefers-reduced-motion: reduce) { .pag * { transition: none !important; } }
+@media (prefers-reduced-motion: reduce) { .pag *, .pag *::after { transition: none !important; } }
 
 /* ==========================================================================
    planes.html

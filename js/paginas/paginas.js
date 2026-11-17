@@ -45,6 +45,11 @@
     cont.hidden = !hay;
   });
 
+  /* ---------- índice de servicios: al hacer clic la barra se completa (el scroll suave lo hace fondo.js) ---------- */
+  $$('.sp-indice a').forEach(function (a) {
+    a.addEventListener('click', function () { a.classList.add('is-ir'); setTimeout(function () { a.classList.remove('is-ir'); }, 1100); });
+  });
+
   /* ---------- acordeones ---------- */
   $$('[data-acordeon]').forEach(function (b) {
     var p = document.getElementById(b.getAttribute('aria-controls')); if (!p) return;
