@@ -100,7 +100,7 @@ export function crearTimeline(E, K, dom, opts = {}) {
     BU.uA.value = (Ec * .45 + hov * .3) * (1 - X * .3);
     // inside the card the site scrolls by itself, down and back up, pausing on each section
     if (Ec > .9 && !reduce) autoT += dt;
-    { const n = PROJECT.frames - 1, cyc = autoT * .3, st = Math.floor(cyc), ph = cyc - st, k = st % (2 * n), up = k < n, base = up ? k : 2 * n - k; CU.uFrame.value = base + (up ? 1 : -1) * eio(clamp((ph - .5) / .5)); }
+    if (CU.uFrames.value > 1) { const n = PROJECT.frames - 1, cyc = autoT * .3, st = Math.floor(cyc), ph = cyc - st, k = st % (2 * n), up = k < n, base = up ? k : 2 * n - k; CU.uFrame.value = base + (up ? 1 : -1) * eio(clamp((ph - .5) / .5)); }
     CU.uSheen.value = -.6 + ((t * .12) % 1) * 2.6 + hx * .4 * hov;
     // copy
     const c1 = seg(P, .17, .2) * (1 - seg(P, .25, .28)), c2 = seg(P, .56, .61);

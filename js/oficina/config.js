@@ -22,6 +22,9 @@ export const PROJECT = {
   url: 'https://discoproduccion.com',
   strip: 'assets/proyectos/disco-strip.webp',
   frames: 4,
+  // Vídeo del recorrido por la web (16:10). Si se pone, la card lo usa en lugar de la tira.
+  // Se comprime con tools/video.sh (1280 px, H.264 CRF 26 + WebM + póster). null = la tira.
+  video: null, // p. ej. { mp4: 'assets/proyectos/disco-recorrido.mp4', webm: 'assets/proyectos/disco-recorrido.webm', poster: 'assets/proyectos/disco-recorrido.jpg' }
   frameAr: 1024 / 640
 };
 

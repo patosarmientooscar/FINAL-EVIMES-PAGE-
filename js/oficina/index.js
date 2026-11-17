@@ -8,17 +8,20 @@
      rootMargin); mientras, la ventana enseña la foto desenfocada (WebP).
    · Un solo bucle (dentro de gsap.ticker, el bucle único de la web; si no
      hay GSAP, requestAnimationFrame) que se para con la sección fuera (IO).
-   · Visita automática (idle → play → done):
+   · Un scroll para entrar, otro para salir:
        idle: la oficina es una card cerrada en el gris (progreso 0).
        play: cuando el principio del track llega arriba, el scroll se queda
-         ahí (lenis.stop() + rueda, toque y teclas de scroll bloqueados) y la
-         visita avanza sola, por tiempo: progreso 0 → 0.86 en 11 s. Si se
-         intenta hacer scroll (pasado 1,2 s), acelera hasta ×4. "Saltar" (o
-         Esc) va al final. Barra fina de progreso abajo.
-       done: el scroll vuelve (lenis.start()) y el resto del track solo hace
-         el cierre: 0.86 → 1 según el scroll de Lenis.
-     No arranca si se cruza la oficina con un salto de ancla (EV.saltando) ni
-     si la página se carga por debajo de ella. Movimiento reducido: versión fija.
+         ahí (lenis.stop() + rueda, toque y teclas bloqueados) y TODA la visita
+         se reproduce sola, por tiempo (0 → 0.86 en 11 s). El scroll hacia
+         abajo se ignora; hacia arriba, desbloquea y deja la oficina como está.
+       quieta: la visita ha terminado; la oficina espera en su estado final,
+         con el scroll aún bloqueado.
+       salida: el siguiente gesto (rueda, toque o tecla) cierra la oficina en
+         card, por tiempo (0.86 → 1 en 1,2 s).
+       done: el scroll vuelve (lenis.start()) y la página sigue.
+     Barra fina de progreso abajo. No arranca si se cruza la oficina con un
+     salto de ancla (EV.saltando) ni si la página se carga por debajo de ella.
+     Movimiento reducido: versión fija.
    · Mientras la ventana cubre la pantalla, cabecera oscura (EV.cabeceraOscura).
    · Versión fija (movimiento reducido, ahorro de datos, ?modo=fijo) o sin
      WebGL: la oficina en una card con la web de Disco encima, los indicadores
@@ -150,71 +153,77 @@ async function arrancar(captura) {
     return;
   }
 
-  /* ---------- visita automática ---------- */
-  const FIN = .86, DURA = 11;                       // progreso al acabar la visita y segundos a velocidad normal
-  const saltar = track.querySelector('[data-of-saltar]'), barra = track.querySelector('[data-of-barra]');
-  let estado = 'idle', auto = 0, vel = 1, tPlay = 0, intento = -1;
+  /* ---------- un scroll para entrar, otro para salir ---------- */
+  const FIN = .86, DURA = 11, SALIDA = 1.2;          // progreso al acabar la visita · segundos de la visita · segundos del cierre
+  const barra = track.querySelector('[data-of-barra]');
+  let estado = 'idle', auto = 0, tEstado = 0;
   const lenis = () => EV.home && EV.home.lenis;
   const irA = y => { const l = lenis(); if (l) l.scrollTo(y, { immediate: true, force: true }); else window.scrollTo(0, y); };
-  const TECLAS = new Set([' ', 'Spacebar', 'PageDown', 'PageUp', 'ArrowDown', 'ArrowUp', 'Home', 'End']);
+  const ABAJO = new Set([' ', 'Spacebar', 'PageDown', 'ArrowDown', 'End']), ARRIBA = new Set(['PageUp', 'ArrowUp', 'Home']);
   const enCampo = e => e.target && e.target.closest && e.target.closest('input, textarea, select, [contenteditable]');
-  const quiere = () => { if (tPlay > 1.2) intento = tPlay; };   // intento de scroll: avance rápido
-  const bloquea = e => { if (estado !== 'play') return; e.preventDefault(); quiere(); };
+  const bloqueado = () => estado === 'play' || estado === 'quieta' || estado === 'salida';
+  // un gesto: dir = 1 hacia abajo, -1 hacia arriba
+  function gesto(dir) {
+    if (dir < 0 && (estado === 'play' || estado === 'quieta')) { soltar('idle'); return; }   // sube: desbloquea y deja la oficina como está
+    if (dir > 0 && estado === 'quieta' && tEstado > .35) { estado = 'salida'; tEstado = 0; }  // el siguiente gesto cierra
+  }
+  let y0Toque = null;
+  const rueda = e => { if (!bloqueado()) return; e.preventDefault(); if (Math.abs(e.deltaY) > 2) gesto(Math.sign(e.deltaY)); };
+  const toqueIni = e => { y0Toque = e.touches[0] ? e.touches[0].clientY : null; };
+  const toque = e => { if (!bloqueado()) return; e.preventDefault(); if (y0Toque == null || !e.touches[0]) return; const d = y0Toque - e.touches[0].clientY; if (Math.abs(d) > 24) { y0Toque = null; gesto(Math.sign(d)); } };
   const tecla = e => {
-    if (estado !== 'play') return;
-    if (e.key === 'Escape') { e.preventDefault(); terminar(); return; }
-    if (TECLAS.has(e.key) && !enCampo(e)) { e.preventDefault(); quiere(); }
+    if (!bloqueado() || enCampo(e)) return;
+    if (ABAJO.has(e.key)) { e.preventDefault(); gesto(1); } else if (ARRIBA.has(e.key)) { e.preventDefault(); gesto(-1); }
   };
-  function empezar() {
-    estado = 'play'; auto = 0; vel = 1; tPlay = 0; intento = -1;
+  function bloquear() {
     irA(top);
     const l = lenis(); if (l) l.stop(); else document.documentElement.style.overflow = 'hidden';
-    addEventListener('wheel', bloquea, { passive: false, capture: true });
-    addEventListener('touchmove', bloquea, { passive: false, capture: true });
+    addEventListener('wheel', rueda, { passive: false, capture: true });
+    addEventListener('touchstart', toqueIni, { passive: true, capture: true });
+    addEventListener('touchmove', toque, { passive: false, capture: true });
     addEventListener('keydown', tecla, { capture: true });
-    track.classList.add('is-play');
-    if (saltar) { saltar.removeAttribute('tabindex'); saltar.removeAttribute('aria-hidden'); }
   }
-  function terminar() {
-    if (estado === 'done') return;
-    estado = 'done'; auto = FIN;
-    tl.progreso(FIN);
-    removeEventListener('wheel', bloquea, { capture: true });
-    removeEventListener('touchmove', bloquea, { capture: true });
+  function soltar(siguiente) {
+    estado = siguiente;
+    removeEventListener('wheel', rueda, { capture: true });
+    removeEventListener('touchstart', toqueIni, { capture: true });
+    removeEventListener('touchmove', toque, { capture: true });
     removeEventListener('keydown', tecla, { capture: true });
     const l = lenis(); if (l) l.start(); else document.documentElement.style.overflow = '';
-    track.classList.remove('is-play'); track.classList.add('is-hecha');
-    if (saltar) { if (document.activeElement === saltar) saltar.blur(); saltar.setAttribute('tabindex', '-1'); saltar.setAttribute('aria-hidden', 'true'); }
+    track.classList.remove('is-play');
+    if (siguiente === 'done') track.classList.add('is-hecha');
   }
-  if (saltar) saltar.addEventListener('click', terminar);
+  function entrar() {
+    bloquear(); tEstado = 0;
+    estado = auto < FIN ? 'play' : 'quieta';       // si se subió a medias, sigue donde estaba
+    track.classList.add('is-play');
+  }
   track.classList.add('is-auto');
-  if (pasada || scrollY() > top + 4) { estado = 'done'; track.classList.add('is-hecha'); }
+  if (pasada || scrollY() > top + 4) { estado = 'done'; auto = 1; track.classList.add('is-hecha'); }
 
   const avanzar = (y, dt) => {
+    tEstado += dt;
     if (estado === 'idle') {
       if (y >= top - 1) {
         // cruzar la oficina en un salto de ancla (o de golpe) no arranca la visita
-        if ((EV.home && EV.home.saltando) || y > top + vh * .6) { estado = 'done'; track.classList.add('is-hecha'); }
-        else empezar();
-      } else tl.progreso(0);
+        if ((EV.home && EV.home.saltando) || y > top + vh * .6) { estado = 'done'; auto = 1; track.classList.add('is-hecha'); }
+        else entrar();
+      }
     }
-    if (estado === 'play') {
-      tPlay += dt;
-      if (Math.abs(y - top) > 1) irA(top);                    // la página no se mueve
-      const rapido = intento >= 0 && tPlay - intento < .45;
-      vel += ((rapido ? 4 : 1) - vel) * (1 - Math.pow(.02, dt));
-      auto = Math.min(FIN, auto + dt * vel * FIN / DURA);
-      tl.progreso(auto);
-      if (barra) barra.style.transform = 'scaleX(' + (auto / FIN).toFixed(4) + ')';
-      if (auto >= FIN) terminar();
-    }
-    if (estado === 'done') tl.progreso(FIN + (1 - FIN) * Math.min(1, Math.max(0, (y - top) / Math.max(1, alto - vh))));
+    if (bloqueado() && Math.abs(y - top) > 1) irA(top);                       // la página no se mueve
+    if (estado === 'play') { auto = Math.min(FIN, auto + dt * FIN / DURA); if (auto >= FIN) { estado = 'quieta'; tEstado = 0; } }
+    if (estado === 'salida') { auto = Math.min(1, auto + dt * (1 - FIN) / SALIDA); if (auto >= 1) soltar('done'); }
+    tl.progreso(auto);
+    if (barra) barra.style.transform = 'scaleX(' + Math.min(1, auto / FIN).toFixed(4) + ')';
   };
   // Solo lectura (QA): el estado de la visita.
   Object.defineProperty(EV.oficina, 'estado', { get: () => estado });
   Object.defineProperty(EV.oficina, 'auto', { get: () => auto });
 
-  new IntersectionObserver(es => { running = es[0].isIntersecting; if (!running) EV.cabeceraOscura = false; }, { rootMargin: '300px' }).observe(track);
+  // el vídeo de la card (si lo hay) solo corre con la oficina en pantalla
+  const video = () => K.video;
+  new IntersectionObserver(es => { running = es[0].isIntersecting; if (!running) EV.cabeceraOscura = false;
+    const v = video(); if (v) { if (running) v.play().catch(() => {}); else v.pause(); } }, { rootMargin: '300px' }).observe(track);
   const frame = dt => {
     if (!running && estado !== 'play') return;
     const y = scrollY();
