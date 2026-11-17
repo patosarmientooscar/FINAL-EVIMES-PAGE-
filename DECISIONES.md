@@ -108,3 +108,9 @@ Lo que decidí sin poder preguntar, y por qué. Lo que Oscar tiene que revisar e
   - `--tinta-2` no existía fuera del panel de la home, así que el texto secundario sobre gris de servicios y planes salía a tinta plena. Ahora está definido en `.pag`.
   - home.js limpiaba el teléfono con `/s/g` en vez de `/\s/g`.
 - Rutas: todas relativas (comprobado con grep: nada empieza por "/").
+
+## Bloque 3 · GitHub público + GitHub Pages (`v-publicado`)
+- Privacidad: el email y el teléfono estaban escritos en los 4 textos legales, en `oficina.html` (aparcada) y en `_archivo/`. Los he quitado. En los legales, la línea "Correo electrónico / Email" y "Teléfono" sigue con el mismo texto, pero el dato sale de `js/config.js` (`js/datos-legales.js`); vacío = la línea no se muestra. El domicilio no estaba en la lista y es obligatorio en el aviso legal: se queda (ver INFORME).
+- `js/config.js`: todos los datos de contacto y la clave vacíos; `urls` pasan a relativas.
+- `.nojekyll` en la raíz (GitHub Pages sirve los archivos tal cual).
+- **Historia:** las versiones antiguas llevan el email y el teléfono, y todos los commits el gmail como autor. Reescribir la historia (`git filter-branch`) lo bloqueó la protección de Claude Code por destructivo, y no lo forcé. Hacer público el repo privado `evimes-web` expondría esa historia: GitHub muestra los commits antiguos en la actividad. Decisión: `evimes-web` se queda PRIVADO con la historia completa (copia de seguridad) y la web va a un repo PÚBLICO nuevo, `evimes-web-2026` (el nombre de reserva del prompt, porque `evimes-web` ya existe), con una sola "foto" del estado actual y el email noreply de GitHub como autor. Se publica con `tools/publicar.sh`. Los tags `v-…` solo están en local y en el privado.
