@@ -2,22 +2,35 @@
 
 Los dos bloques están hechos y no se ha revertido nada. Las decisiones están en `DECISIONES.md` ("Tercera tanda autónoma").
 
-## Antes de crear el repositorio: importante
+## El repositorio: lee esto primero
 
-- **El remote `origin` ya existe:** es `github.com/patosarmientooscar/evimes-web`, PRIVADO, que creé en la primera tanda. Como pide el prompt, he hecho `git push origin HEAD --tags` ahí.
-- **No hagas público ese repositorio.** Su historia (los commits antiguos) lleva el email y el teléfono que había en el código, y todos los commits llevan tu gmail como autor. El código actual está limpio; la historia, no.
-- **Para la web pública ya existe `evimes-web-2026`**, de la tanda anterior. Es PÚBLICO, tiene GitHub Pages activado y solo tiene "fotos" limpias del código:
-  - **Web:** https://patosarmientooscar.github.io/evimes-web-2026/ (aún enseña la versión anterior, sin la oficina automática).
-  - **Para actualizarla con esta versión:** `sh tools/publicar.sh "oficina automática"`. No lo he hecho porque esta vez el prompt solo permitía push a `origin`.
-- **Si prefieres un repo público nuevo llamado `evimes-web`** (para que la web quede en `/evimes-web/`):
-  1. renombra o borra antes el privado actual en GitHub;
-  2. crea el nuevo repo VACÍO;
-  3. haz `git remote set-url publico https://github.com/patosarmientooscar/evimes-web.git`;
-  4. ejecuta `sh tools/publicar.sh "Evimes"`;
-  5. activa Pages: Settings → Pages → rama `main`, carpeta `/`.
+- **Mientras yo trabajaba, cambiaste el remote `origin`** a tu repo nuevo `FINAL-EVIMES-PAGE-` (PÚBLICO, con GitHub Pages) e hiciste push de toda la historia y sus 35 tags. También hiciste el commit `1639b5d "Oficina automática"`, con mi trabajo a medias de ese momento.
+- Mi `git push origin HEAD --tags` fue a ese repo y añadió los 2 últimos commits, que están limpios, y el tag `v-oficina-auto`.
+- **La web ya está publicada y funciona:** https://patosarmientooscar.github.io/FINAL-EVIMES-PAGE-/
+  - comprobado con Playwright a 390×844 tras el build de `bebe824`, con la oficina automática;
+  - las 5 páginas responden 200;
+  - CSS, fuentes, tubos y la oficina cargan;
+  - 0 respuestas 404 y 0 errores.
+- **Problema de privacidad:** ese repo público tiene la historia completa.
+  - Los commits antiguos llevan escritos el email (`evimes@…`) y el teléfono que había en el código: 33 archivos a lo largo de la historia.
+  - Los 36 commits llevan tu gmail como autor.
+  - El código actual está limpio; la historia, no.
+  - Por eso en la tanda anterior hice la versión pública aparte, `evimes-web-2026`, con solo fotos limpias.
+  - Esto no lo he arreglado yo. Cambiar la visibilidad o borrar un repo público es decisión tuya, y reescribir la historia me lo bloqueó la protección de Claude Code.
+- **Opciones:**
+  1. **Dejarlo así.** El email y el teléfono son los del aviso legal de tu web actual, que ya son públicos allí. El gmail queda visible como autor.
+  2. **Dejar una web pública sin historia:**
+     1. borra o pon privado `FINAL-EVIMES-PAGE-` en GitHub (Settings → Danger Zone);
+     2. créalo de nuevo VACÍO;
+     3. ejecuta `git remote set-url publico https://github.com/patosarmientooscar/FINAL-EVIMES-PAGE-.git`;
+     4. ejecuta `sh tools/publicar.sh "Evimes"`, que sube una foto limpia con tu email noreply;
+     5. activa Pages: Settings → Pages → `main`, carpeta `/`.
 
-  Nunca hagas `git push` de la rama `main` a un repo público: subiría la historia antigua.
-- Las rutas internas son todas relativas, así que la web funciona igual en `/evimes-web/`, en `/evimes-web-2026/` o en el dominio propio.
+     A partir de ahí, publica siempre con `tools/publicar.sh` y no con `git push`.
+  3. **Usar `evimes-web-2026`,** que ya está limpio y con Pages: https://patosarmientooscar.github.io/evimes-web-2026/. Ahora enseña la versión anterior; para actualizarlo, ejecuta `sh tools/publicar.sh "oficina automática"`.
+- Para que tus commits nuevos no lleven el gmail: `git config user.email "266553066+patosarmientooscar@users.noreply.github.com"` (solo en este repo).
+- El repo privado `evimes-web` sigue existiendo, con la historia completa.
+- Rutas: todas relativas, así que la web funciona en `/FINAL-EVIMES-PAGE-/`, en `/evimes-web/` o en el dominio propio.
 
 ## Lo que tienes que hacer tú
 
@@ -67,7 +80,7 @@ Los dos bloques están hechos y no se ha revertido nada. Las decisiones están e
   - El único resultado es `access_key: cfg.WEB3FORMS_KEY` en el formulario: es el nombre del campo de Web3Forms y lee la clave vacía de `config.js`.
   - `js/config.js` tiene todos los datos de contacto, las redes y la clave vacíos.
 - **Rutas internas:** todas relativas; no hay ninguna que empiece por "/".
-- **Commit y push:** commit "oficina automática + listo para GitHub Pages" y `git push origin HEAD --tags` al repo privado `evimes-web`.
+- **Commit y push:** commit "oficina automática + listo para GitHub Pages" y `git push origin HEAD --tags`. `origin` ya era tu repo público `FINAL-EVIMES-PAGE-` (ver arriba).
 
 ---
 
