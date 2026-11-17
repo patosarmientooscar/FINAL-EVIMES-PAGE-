@@ -11,7 +11,7 @@ window.EVIMES_CLIENTES = [
   {
     id: 'agencias',
     pestana: 'Agencias creativas',
-    lineas: ['Tenéis la idea.', 'Nosotros la creamos.', { texto: 'Solo nos falta tu [sí].', suave: true }],
+    lineas: ['Nosotros ponemos la idea.', 'La diseñamos, la programamos.', { texto: 'Solo nos falta tu [sí].', suave: true }],
     texto: 'Somos el estudio técnico de agencias creativas e innovadoras. Webs 3D, WebGL e interacción a medida, con vuestra marca y a vuestro ritmo.',
     cta: 'Hablemos de un proyecto',
     href: '#contacto',
