@@ -79,3 +79,14 @@ Lo que decidí sin poder preguntar, y por qué. Lo que Oscar tiene que revisar e
 - planes.html: los botones "Empezar" llevan texto oculto (" · plan Fundamento") en vez de aria-label, porque Lighthouse (SEO) los marcaba como enlaces sin texto descriptivo; los ✓ / — de la tabla llevan role="img" (un aria-label en un span sin rol no vale).
 - Home: las palabras apagadas de la frase "Si no eres visible, no existes." pasan de .16 a .45 de opacidad. Con .16 no cumplía AA (Lighthouse lo marcaba); con .45 el blanco y el cian dan al menos 3:1 (texto grande) sobre el fondo oscuro y el encendido palabra a palabra sigue viéndose.
 - Las cifras de Lighthouse van en INFORME.md tal cual salieron (servidor local, Edge headless, sin caché de CDN: en producción pueden cambiar).
+
+---
+
+# Segunda tanda autónoma (páginas propias + GitHub Pages)
+
+## Bloque 1 · Oficina vista de lejos (`v-oficina-lejos`)
+- Valores copiados del prototipo `Downloads/evimes-oficina/index.html` (versión del 17-11, 15:28) en `js/oficina/timeline.js`: hacia el monitor pitch monPitch+6 y fov 70; card fuera: pitch monPitch+8 / +13 (móvil) y fov 64 / 66; cierre fov 68 (74 en móvil, como el prototipo).
+- Tamaño final de la card: mW·0,6 en escritorio, como pide el prompt. El prototipo pone mW·0,5; me quedo con el 0,6 del prompt porque es el valor que se pidió de forma explícita, y con 0,6 los indicadores siguen cabiendo a los lados. En móvil mW·0,85 (prompt y prototipo coinciden).
+- Indicadores: el mismo cálculo del prototipo (a los lados, tamaño = 42 % del alto de la card, mínimo 70 px). En escritorio no tapan ni el monitor ni el texto de Disco (capturas 0.2 / 0.45 / 0.6 / 0.75).
+- **A revisar en móvil:** con estos valores (los del prototipo) la card tapa EVIMES en 0.6–0.75, y la fila de indicadores y el texto de Disco quedan encima de la mitad baja del monitor. El monitor está en cuadro, pero no se ve limpio. No lo he cambiado porque el prompt pide copiar los valores tal cual; si se quiere, la palanca es `cardPitch` en móvil (monPitch+13) y el tamaño de la card (mW·0,85).
+- Versión fija rehecha con la nueva cámara (`assets/oficina/oficina-fija*.webp` y `FIJA` en `js/oficina/config.js`).

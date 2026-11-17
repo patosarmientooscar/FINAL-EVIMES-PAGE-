@@ -69,10 +69,10 @@ export function crearTimeline(E, K, dom, opts = {}) {
     win.style.setProperty('--edge', String(Math.min(1, ins * 2)));
     // camera path
     let yaw = mix(-6, 2, A), pitch = mix(2, -4, A), fov = mix(90, 76, A);
-    yaw = mix(yaw, monYaw, C); pitch = mix(pitch, monPitch + 4, C); fov = mix(fov, 60, C);
-    const cardPitch = mobile ? monPitch + 16 : monPitch + 11;
-    pitch = mix(pitch, cardPitch, Ec); fov = mix(fov, mobile ? 64 : 56, Ec); yaw = mix(yaw, monYaw, Ec);
-    pitch = mix(pitch, monPitch + 7, X); fov = mix(fov, mobile ? 74 : 64, X);
+    yaw = mix(yaw, monYaw, C); pitch = mix(pitch, monPitch + 6, C); fov = mix(fov, 70, C);   // se queda lejos: la mesa, el monitor y EVIMES siempre en cuadro
+    const cardPitch = mobile ? monPitch + 13 : monPitch + 8;
+    pitch = mix(pitch, cardPitch, Ec); fov = mix(fov, mobile ? 66 : 64, Ec); yaw = mix(yaw, monYaw, Ec);
+    pitch = mix(pitch, monPitch + 7, X); fov = mix(fov, mobile ? 74 : 68, X);
     if (mobile) fov = Math.min(100, fov * 1.3);
     const lookAmt = reduce ? 0 : (1 - C * .6) + Ec * .5;
     yaw += mx * 7 * lookAmt; pitch += my * 3.5 * lookAmt;
@@ -84,7 +84,7 @@ export function crearTimeline(E, K, dom, opts = {}) {
     // EVIMES lights up as the window finishes opening, with two quick flickers
     const ig = seg(P, .12, .18); WU.uOn.value = ig <= 0 ? 0 : ig >= 1 ? 1 : (ig < .25 ? .9 : ig < .4 ? .15 : ig < .55 ? 1 : ig < .65 ? .35 : 1);
     // the card: starts as the screen itself, then lifts up and toward us
-    const cs0 = mW * .94 / CWd, cs1 = (mobile ? mW * .95 : mW * .64) / CWd;
+    const cs0 = mW * .94 / CWd, cs1 = (mobile ? mW * .85 : mW * .6) / CWd;
     const s = mix(cs0, cs1, Ec);
     const endUp = mH * .5 + CHt * cs1 * .52, endZ = mobile ? 1.2 : 1.7;
     card.position.copy(mC).addScaledVector(mU, mix(0, endUp, Ec)).addScaledVector(mN, mix(.02, endZ, Ec) + Math.sin(Ec * Math.PI) * .8);

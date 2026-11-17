@@ -30,6 +30,6 @@ export const PROJECT = {
 // Disco, en % de la imagen (16:10 centrado en la caja proyectada de la card en P = 0.76).
 // Se rehacen con ?oficina=captura → window.__oficinaCaptura(.76).
 export const FIJA = {
-  escritorio: { img: 'assets/oficina/oficina-fija.webp', ar: 1920 / 1080, card: {"x":36.99,"y":19.7,"w":24.82,"h":27.58} },
-  movil: { img: 'assets/oficina/oficina-fija-movil.webp', ar: 390 / 844, card: {"x":10.49,"y":31.89,"w":75.97,"h":21.94} }
+  escritorio: { img: 'assets/oficina/oficina-fija.webp', ar: 1920 / 1080, card: {"x":38.38,"y":20.61,"w":22.25,"h":23.25} },
+  movil: { img: 'assets/oficina/oficina-fija-movil.webp', ar: 390 / 844, card: {"x":10.08,"y":31.3,"w":77.09,"h":19.88} }
 };
