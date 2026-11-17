@@ -20,7 +20,7 @@ window.EVIMES_SERVICIOS_PAGINA = {
         'Diseñamos y programamos cada web a mano, desde cero. Sin plantillas, sin constructores visuales y sin código que no necesitas.',
         'El resultado es una web rápida, que se ve perfecta en cualquier pantalla y que lleva a cada visita hacia lo que te importa: una llamada, una reserva, una venta.'
       ],
-      incluye: ['Diseño a medida (UI/UX)', 'Desarrollo a mano, HTML/JS o React según el proyecto', 'Adaptada a móvil, tablet y escritorio', 'Velocidad optimizada (Core Web Vitals)', 'Formularios, WhatsApp y reservas', 'Textos legales y cookies', 'Te enseñamos a editar tus contenidos'],
+      incluye: ['Diseño a medida (UI/UX)', 'Desarrollo a mano, HTML/JS o React según el proyecto', 'Adaptada a móvil, tablet y escritorio', 'Velocidad optimizada (Core Web Vitals)', 'Formularios, WhatsApp y reservas', 'Textos legales y cookies', 'Cambios cuando los necesites'],
       ctas: [{ texto: 'Ver planes y precios', href: 'planes.html' }, { texto: 'Pide tu propuesta', href: 'contacto.html' }]
     },
     {
