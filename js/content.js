@@ -53,9 +53,9 @@ window.EVIMES_CONTENT = {
   tambien: {
     titulo: 'También hacemos',
     filas: [
-      { titulo: 'Software e IA', linea: 'Herramientas a medida que automatizan lo repetitivo.', href: 'software-ia.html' },
-      { titulo: 'Automatización de servicios', linea: 'Reservas, citas y avisos que funcionan solos.', href: 'automatizacion.html' },
-      { titulo: 'Plantillas de portfolio para fotógrafos', linea: 'Un portfolio rápido y elegante, listo en días.', href: 'plantillas-fotografos.html' }
+      { titulo: 'Software e IA', linea: 'Herramientas a medida que automatizan lo repetitivo.', href: 'servicios.html#ia' },
+      { titulo: 'Automatización de servicios', linea: 'Reservas, citas y avisos que funcionan solos.', href: 'servicios.html#ia' },
+      { titulo: 'Plantillas de portfolio para fotógrafos', linea: 'Un portfolio rápido y elegante, listo en días.', href: 'servicios.html' }
     ]
   },
 
