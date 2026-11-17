@@ -20,10 +20,14 @@ NOMBRE="$(git config user.name)"
 if [ -n "$(git status --porcelain)" ]; then echo "Hay cambios sin commitear en main. Commitéalos antes." >&2; exit 1; fi
 ARBOL=$(git rev-parse 'main^{tree}')
 PADRE=$(git rev-parse --verify -q publica || true)
-# Comprobación de privacidad sobre lo que se va a subir
-if git grep -I -q -E '@gmail|@hotmail|evimes@evimesweb\.com|636 ?73 ?61 ?67|636736167' main -- . ':(exclude)tools/publicar.sh'; then
+# Comprobación de privacidad sobre lo que se va a subir.
+# Los patrones de TUS datos (email, teléfono…) van en .privado (una expresión
+# regular extendida por línea). Ese archivo está en .gitignore: nunca se sube.
+PAT='@gmail|@hotmail'
+if [ -f .privado ]; then PAT="$PAT|$(grep -v '^#' .privado | grep -v '^$' | paste -sd'|' -)"; fi
+if git grep -I -q -E "$PAT" main -- . ':(exclude)tools/publicar.sh'; then
   echo "Hay datos privados en main (email o teléfono). No se publica." >&2
-  git grep -I -n -E '@gmail|@hotmail|evimes@evimesweb\.com|636 ?73 ?61 ?67|636736167' main -- . ':(exclude)tools/publicar.sh' >&2
+  git grep -I -n -E "$PAT" main -- . ':(exclude)tools/publicar.sh' >&2
   exit 1
 fi
 if [ -n "$PADRE" ] && [ "$(git rev-parse "$PADRE^{tree}")" = "$ARBOL" ]; then echo "Nada nuevo que publicar."; exit 0; fi
