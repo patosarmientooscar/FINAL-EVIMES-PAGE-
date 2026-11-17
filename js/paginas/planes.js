@@ -9,6 +9,10 @@
 (function (raiz) {
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   var R = {};
+  // la lista completa de un plan (acumulativa): js/data/planes.js → EVIMES_PLANES_TODO
+  R.todo = function (P, p) { var g = typeof window !== 'undefined' ? window : globalThis; if (g.EVIMES_PLANES_TODO) return g.EVIMES_PLANES_TODO(p);
+    var base = []; if (p.hereda) { var padre = P.filter(function (x) { return x.id === p.hereda; })[0]; if (padre) base = R.todo(P, padre); }
+    base = base.filter(function (x) { return (p.quita || []).indexOf(x) < 0; }); p.incluye.forEach(function (x) { if (base.indexOf(x) < 0) base.push(x); }); return base; };
 
   R.precio = function (p) {
     var m = /^desde\s+(.*)$/i.exec(p.precio);
@@ -22,19 +26,21 @@
         '<p class="plan__para">' + esc(p.para) + '</p>' +
         '<p class="display plan__precio">' + R.precio(p) + '</p>' +
         '<ul class="plan__incluye">' + p.incluye.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' +
+        (p.unica ? '<p class="plan__unica">' + esc(p.unica) + '</p>' : '') +
         '<a class="pastilla plan__boton' + (p.recomendado ? '' : ' pastilla--linea') + '" href="contacto.html?plan=' + esc(p.id) + '" data-scramble><span class="sl">' + esc(p.boton) + '</span><span class="sr-only"> · plan ' + esc(p.nombre) + '</span></a>' +
         '</li>';
     }).join('');
   };
   // filas: todos los puntos de planes.js, en orden de aparición, sin repetir
   R.filas = function (P) { var f = []; P.forEach(function (p) { p.incluye.forEach(function (x) { if (f.indexOf(x) < 0) f.push(x); }); }); return f; };
+  R.tiene = function (P, p, x) { return R.todo(P, p).indexOf(x) >= 0; };
   var SI = '<span class="si" role="img" aria-label="Incluido"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5 6.5 12 13 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
   var NO = '<span class="no" role="img" aria-label="No incluido">—</span>';
   R.tabla = function (P) {
     var f = R.filas(P);
     return '<table class="comp__tabla"><caption class="sr-only">Qué incluye cada plan</caption>' +
       '<thead><tr><th scope="col"><span class="sr-only">Punto</span></th>' + P.map(function (p) { return '<th scope="col"' + (p.recomendado ? ' class="is-rec"' : '') + '>' + esc(p.nombre) + '<span>' + R.precio(p) + '</span></th>'; }).join('') + '</tr></thead>' +
-      '<tbody>' + f.map(function (x) { return '<tr><th scope="row">' + esc(x) + '</th>' + P.map(function (p) { return '<td' + (p.recomendado ? ' class="is-rec"' : '') + '>' + (p.incluye.indexOf(x) >= 0 ? SI : NO) + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table>';
+      '<tbody>' + f.map(function (x) { return '<tr><th scope="row">' + esc(x) + '</th>' + P.map(function (p) { return '<td' + (p.recomendado ? ' class="is-rec"' : '') + '>' + (R.tiene(P, p, x) ? SI : NO) + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table>';
   };
   R.acordeon = function (P) {
     var f = R.filas(P);
@@ -42,7 +48,7 @@
       var id = 'comp-' + p.id;
       return '<div class="acord' + (p.recomendado ? ' is-rec' : '') + '"><h3><button type="button" class="acord__boton" aria-expanded="' + (i === 1) + '" aria-controls="' + id + '" data-acordeon>' +
         '<span class="display">' + esc(p.nombre) + '</span><span class="acord__precio">' + R.precio(p) + '</span><i aria-hidden="true"></i></button></h3>' +
-        '<ul class="acord__panel" id="' + id + '"' + (i === 1 ? '' : ' hidden') + '>' + f.map(function (x) { var si = p.incluye.indexOf(x) >= 0; return '<li class="' + (si ? 'is-si' : 'is-no') + '">' + (si ? SI : NO) + '<span>' + esc(x) + '</span></li>'; }).join('') + '</ul></div>';
+        '<ul class="acord__panel" id="' + id + '"' + (i === 1 ? '' : ' hidden') + '>' + f.map(function (x) { var si = R.tiene(P, p, x); return '<li class="' + (si ? 'is-si' : 'is-no') + '">' + (si ? SI : NO) + '<span>' + esc(x) + '</span></li>'; }).join('') + '</ul></div>';
     }).join('');
   };
 

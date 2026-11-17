@@ -154,11 +154,13 @@
         '<p class="plan__para"></p>' +
         '<p class="display plan__precio">' + precio + '</p>' +
         '<ul class="plan__incluye"></ul>' +
+        (p.unica ? '<p class="plan__unica"></p>' : '') +
         '<a class="pastilla plan__boton' + (p.recomendado ? '' : ' pastilla--linea') + '" href="#contacto"></a>';
       $('.plan__nombre', li).textContent = p.nombre;
       $('.plan__para', li).textContent = p.para;
       var ul = $('.plan__incluye', li);
       p.incluye.forEach(function (x) { var it = document.createElement('li'); it.textContent = x; ul.appendChild(it); });
+      if (p.unica) $('.plan__unica', li).textContent = p.unica;
       var b = $('.plan__boton', li);
       b.innerHTML = '<span class="sl"></span>';
       b.firstChild.textContent = p.boton;

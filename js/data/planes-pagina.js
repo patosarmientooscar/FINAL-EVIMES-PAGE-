@@ -6,7 +6,7 @@
    ========================================================================== */
 window.EVIMES_PLANES_PAGINA = {
   borrador: true,
-  hero: { etiqueta: 'Planes', titulo: 'Un plan para cada negocio.', texto: 'Sin letra pequeña.' },
+  hero: { etiqueta: 'Planes', titulo: 'Un plan para cada negocio.', texto: '' },
   tabla: { titulo: 'Compara los planes', nota: 'Lo que lleva cada plan, punto por punto.' },
   despues: { titulo: 'Qué pasa después' },
   faq: { titulo: 'Preguntas frecuentes' },
