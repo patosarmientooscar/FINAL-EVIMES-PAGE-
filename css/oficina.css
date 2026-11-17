@@ -129,3 +129,6 @@
 /* con la visita automática no hay "Desliza": la oficina avanza sola */
 .track.is-auto .hud { display: none; }
 .track.is-fija :is(.of-saltar, .of-barra) { display: none; }
+
+/* En móvil los círculos miden ~80 px: la etiqueta sin espaciado y con más ancho para que "Rendimiento" quepa. */
+@media (max-width: 699px) { .psi .g span { letter-spacing: 0; max-width: 90%; } }

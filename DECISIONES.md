@@ -114,3 +114,23 @@ Lo que decidí sin poder preguntar, y por qué. Lo que Oscar tiene que revisar e
 - `js/config.js`: todos los datos de contacto y la clave vacíos; `urls` pasan a relativas.
 - `.nojekyll` en la raíz (GitHub Pages sirve los archivos tal cual).
 - **Historia:** las versiones antiguas llevan el email y el teléfono, y todos los commits el gmail como autor. Reescribir la historia (`git filter-branch`) lo bloqueó la protección de Claude Code por destructivo, y no lo forcé. Hacer público el repo privado `evimes-web` expondría esa historia: GitHub muestra los commits antiguos en la actividad. Decisión: `evimes-web` se queda PRIVADO con la historia completa (copia de seguridad) y la web va a un repo PÚBLICO nuevo, `evimes-web-2026` (el nombre de reserva del prompt, porque `evimes-web` ya existe), con una sola "foto" del estado actual y el email noreply de GitHub como autor. Se publica con `tools/publicar.sh`. Los tags `v-…` solo están en local y en el privado.
+
+---
+
+# Tercera tanda autónoma (oficina automática)
+
+## Bloque 1 · Oficina automática (`v-oficina-auto`)
+- **La referencia no trae el código.** `Downloads/evimes-oficina/index.html` (modificada el 17-11 a las 16:26) no tiene AUTOPLAY, startAuto ni finishAuto: su track es de 780vh y avanza por scroll. `index-v2-tunel.html` tampoco los tiene. He construido la visita automática a partir de la especificación del prompt, que la describe entera: estados, 11 s, ×4, Saltar, barra, cierre por scroll, Lenis, movimiento reducido y recarga.
+- **Fases y valores: los del proyecto, como pide el prompt.** La referencia ha vuelto a la cámara que se acerca (fov 46, monPitch+0,3), la que se quitó en la tanda anterior ("vista de lejos"). No la copio. Tampoco hay túnel ni flash: el proyecto no los tiene desde v-oficina-psi (se aprobó la versión sin túnel), así que la visita hace la apertura, EVIMES, el movimiento al monitor, la pantalla, la web de Disco que sale como card y los datos de PageSpeed.
+- Track de 240vh. idle = card cerrada (progreso 0). play = al llegar arriba el principio del track: el scroll se queda en ese punto (`lenis.stop()` + rueda, touchmove y teclas de scroll bloqueadas, y si algo lo mueve se vuelve a colocar) y el progreso va de 0 a 0,86 en 11 s.
+- Avance rápido: un intento de scroll pasado 1,2 s sube la velocidad suavemente hasta ×4. Se queda en ×4 mientras se sigue intentando y vuelve a ×1 a los 0,45 s sin intentos.
+- "Saltar" arriba a la derecha, bajo la cabecera (cristal oscuro, scramble). También **Esc**, por teclado. Fuera de la reproducción el botón está oculto y no se puede enfocar.
+- Barra de progreso de 3 px abajo (#2b4dff → #00e5ff, scaleX).
+- done: `lenis.start()` y el resto del track hace el cierre (0,86 → 1 según el scroll). Si se vuelve a subir no se repite la visita.
+- No arranca:
+  - si se cruza la oficina con un salto de ancla de la home (`EV.saltando`, que pone home.js en `ir()`);
+  - si se pasa de golpe más de media pantalla;
+  - si la página se carga por debajo de la oficina.
+- Movimiento reducido: la versión fija de siempre, sin reproducción ni bloqueo.
+- Con la visita automática no sale el "Desliza" del hud.
+- De paso, en móvil las etiquetas de los indicadores dentro de la oficina tenían poco ancho ("Rendimiento" se cortaba). Ahora van sin espaciado y con el 90 % de ancho.
