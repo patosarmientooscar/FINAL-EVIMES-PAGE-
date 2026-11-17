@@ -44,11 +44,11 @@ window.EVIMES_PROYECTOS.casos = {
   disco: {
     nombre: 'Disco Producción',
     url: 'https://discoproduccion.com',
-    video: null    // { mp4: 'assets/proyectos/disco-recorrido.mp4', webm: 'assets/proyectos/disco-recorrido.webm', poster: 'assets/proyectos/disco-recorrido.jpg' }
+    video: { mp4: 'assets/proyectos/disco-recorrido.mp4', webm: 'assets/proyectos/disco-recorrido.webm', poster: 'assets/proyectos/disco-recorrido-poster.jpg' }
   },
   leons: {
     nombre: "León's",
-    url: null,     // PENDIENTE: la URL de la web de León's
-    video: null    // { mp4: 'assets/proyectos/leons-recorrido.mp4', webm: 'assets/proyectos/leons-recorrido.webm', poster: 'assets/proyectos/leons-recorrido.jpg' }
+    url: 'https://patosarmientooscar.github.io/leon-s/',
+    video: { mp4: 'assets/proyectos/leons-recorrido.mp4', webm: 'assets/proyectos/leons-recorrido.webm', poster: 'assets/proyectos/leons-recorrido-poster.jpg' }
   }
 };
