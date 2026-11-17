@@ -5,8 +5,9 @@
      formulario valida igual y al enviar dice "Formulario en configuración".
    · Validación en línea (al salir del campo y al enviar), sin alertas;
      aria-invalid + aria-describedby; el foco va al primer error.
-   · Plan preseleccionado desde ?plan=…, #contacto?plan=… o un botón con
-     data-plan (EV.form.plan). "Soy…" desde los CTA de Con quién (EV.form.perfil).
+   · Campos: nombre*, empresa*, email*, teléfono y "de qué va tu empresa"
+     (opcionales), privacidad*. El plan (?plan=…, #contacto?plan=… o un botón
+     con data-plan) y el perfil (CTA de Con quién, data-perfil) van ocultos.
    · Éxito: el formulario se sustituye por "Recibido. Te escribimos muy pronto."
      Error: mensaje claro + WhatsApp / email de config.js si están rellenos.
    ========================================================================== */
@@ -26,9 +27,9 @@
   /* ---------- validación ---------- */
   var REGLAS = {
     nombre: function (v) { return v.trim().length >= 2 ? '' : 'Escribe tu nombre.'; },
+    empresa: function (v) { return v.trim().length >= 2 ? '' : 'Escribe el nombre de tu empresa.'; },
     email: function (v) { v = v.trim(); if (!v) return 'Escribe tu email.'; return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) ? '' : 'Ese email no parece completo (falta algo como nombre@dominio.com).'; },
     telefono: function (v) { v = v.trim(); return !v || /^[+\d][\d\s().-]{6,}$/.test(v) ? '' : 'Revisa el teléfono (solo números, espacios y +).'; },
-    mensaje: function (v) { return v.trim().length >= 10 ? '' : 'Cuéntanos un poco más (al menos una frase).'; },
     privacidad: function (v, el) { return el.checked ? '' : 'Necesitamos que aceptes la política de privacidad para poder responderte.'; }
   };
   function validar(nombre) {
@@ -48,9 +49,11 @@
 
   /* ---------- preselección ---------- */
   function marcar(nombre, valor) {
-    var r = form.querySelector('input[name="' + nombre + '"][value="' + valor + '"]');
-    if (r) r.checked = true;
-    return !!r;
+    var r = form.elements[nombre];
+    if (!r || !valor) return false;
+    if (nombre === 'plan' && !PLANES[valor]) return false;
+    r.value = valor;
+    return true;
   }
   EV.form = {
     plan: function (id) { if (id) marcar('plan', id); },
@@ -91,6 +94,7 @@
   function avisar(html, error) { estado.className = 'form__estado' + (error ? ' is-error' : ''); estado.innerHTML = html; }
   function ocupado(on) {
     boton.disabled = on; boton.setAttribute('aria-busy', on ? 'true' : 'false');
+    if (boton.__scrStop) boton.__scrStop();           // que el scramble no pise "Enviando…"
     sl.textContent = on ? 'Enviando…' : 'Enviar';
   }
   function exito() {
@@ -115,18 +119,19 @@
       avisar('<p>Formulario en configuración: todavía no puede enviar mensajes.</p>' + alternativas(), true);
       return;
     }
-    var perfil = form.querySelector('input[name="perfil"]:checked'), plan = form.querySelector('input[name="plan"]:checked');
+    var perfil = form.elements.perfil.value, plan = form.elements.plan.value;
     var datos = {
       access_key: cfg.WEB3FORMS_KEY,
       subject: 'Nueva propuesta desde evimesweb.com',
       from_name: 'evimesweb.com',
       botcheck: false,
       nombre: form.elements.nombre.value.trim(),
+      empresa: form.elements.empresa.value.trim(),
       email: form.elements.email.value.trim(),
       telefono: form.elements.telefono.value.trim() || '—',
-      soy: perfil ? perfil.value : '—',
-      plan: plan ? PLANES[plan.value] : '—',
-      mensaje: form.elements.mensaje.value.trim(),
+      soy: perfil || '—',
+      plan: plan ? PLANES[plan] : '—',
+      sobre_la_empresa: form.elements.mensaje.value.trim() || '—',
       privacidad: 'Aceptada'
     };
     ocupado(true);

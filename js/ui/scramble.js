@@ -43,6 +43,9 @@ export function initScramble(root = document) {
     };
     el.addEventListener('pointerenter', run);
     el.addEventListener('focus', run);
+    // Para quien cambie el texto del botón (el formulario: "Enviar" → "Enviando…"):
+    // corta el efecto sin restaurar el texto viejo.
+    el.__scrStop = () => { if (!vivo) return; cancelAnimationFrame(raf); L.style.width = ''; L.style.overflow = ''; vivo = false; };
   });
 }
 

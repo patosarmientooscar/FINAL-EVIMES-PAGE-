@@ -280,21 +280,9 @@
 .pag-hero--contacto { min-height: 0; padding-bottom: clamp(40px, 7vh, 88px); }
 .pag-hero--contacto .pag-hero__titulo { font-size: clamp(64px, 12.4vw, 228px); max-width: 11ch; }
 .contacto--pagina { padding-top: 0; }
-.contacto--pagina .contacto__form { grid-column: 1 / span 7; grid-row: 1; }
-.contacto--pagina .contacto__lado { grid-column: 9 / -1; grid-row: 1; position: sticky; top: clamp(96px, 14vh, 140px); }
-.contacto__lado-t { font-size: clamp(30px, 2.8vw, 46px); line-height: 1.06; letter-spacing: -.02em; }
-.contacto__lado .contacto__directo { margin-top: 32px; display: grid; gap: 0; font-size: 18px; }
-.contacto__lado .contacto__directo a { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 60px; border-top: 1px solid var(--nav-linea); color: var(--stone); text-decoration: none; }
-.contacto__lado .contacto__directo a:last-child { border-bottom: 1px solid var(--nav-linea); }
-.contacto__lado .contacto__directo a span:last-child { color: var(--texto-2); transition: transform .4s var(--ease); }
-.contacto__lado .contacto__directo a:hover span:last-child { transform: translateX(4px); color: var(--cyan); }
-.contacto__lugar { margin-top: 28px; font-size: 15px; letter-spacing: .16em; text-transform: uppercase; color: var(--texto-2); }
-
-.despues--gris { margin-top: clamp(80px, 12vh, 140px); background: var(--gris); color: var(--tinta-oscura); border-radius: 30px; box-shadow: 0 -40px 90px -40px rgb(0 0 0 / 0.5); }
-.despues--gris .despues__lista { grid-template-columns: repeat(3, 1fr); }
-.despues--gris .despues__lista li { border-top-color: var(--gris-linea); }
-.despues--gris .despues__n, .despues--gris .despues__lista p { color: var(--tinta-2); }
-.despues--gris :focus-visible { outline: 2px solid var(--tinta-oscura); outline-offset: 3px; }
+.contacto--pagina .contacto__form { grid-column: 1 / span 8; grid-row: 1; }
+.contacto--pagina .contacto__directo--linea { grid-column: 1 / span 8; grid-row: 2; margin-top: 0; font-size: 17px; }
+.contacto--pagina .contacto__directo--linea a { color: var(--stone); }
 
 @media (max-width: 899px) {
   .caso__vista > .vitrina, .caso__vista > .captura, .caso__ficha, .caso__reto, .caso__hicimos { grid-column: 1 / -1; }
@@ -304,8 +292,6 @@
   .psi-caso__lista { display: grid; grid-template-columns: repeat(2, max-content); justify-content: start; gap: 18px 22px; }
   .psi-g { --s: clamp(120px, 36vw, 150px); }
   .horno__lista { grid-template-columns: 1fr; }
-  .contacto--pagina .contacto__form, .contacto--pagina .contacto__lado { grid-column: 1 / -1; position: static; }
-  .contacto--pagina .contacto__lado { grid-row: 2; }
-  .despues--gris .despues__lista { grid-template-columns: 1fr; }
+  .contacto--pagina .contacto__form, .contacto--pagina .contacto__directo--linea { grid-column: 1 / -1; }
 }
 @media (prefers-reduced-motion: reduce) { .vitrina__tira, .horno__t i { animation: none !important; } }

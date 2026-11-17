@@ -106,54 +106,39 @@
       <p class="pag-hero__texto" data-ct="hero.texto">Cuéntanos qué necesitas. Te respondemos con una propuesta clara.</p>
     </section>
 
-    <!-- 2 · Formulario (el de la home: Web3Forms, clave en js/config.js) + contacto directo -->
+    <!-- 2 · Formulario: el mismo de la home (Web3Forms, clave en js/config.js), en su card de cristal -->
     <section class="contacto contacto--pagina" id="formulario" aria-label="Formulario de contacto">
-      <div class="contacto__form" data-form-caja>
+      <div class="contacto__form form-card" data-form-caja>
         <form class="form" data-form data-form-ir="formulario" novalidate aria-describedby="form-nota">
           <!-- trampa para bots (Web3Forms): oculta para personas y lectores de pantalla -->
           <input class="form__hp" type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <!-- plan (?plan=… o los botones de los planes) y perfil (los CTA de Con quién): ocultos -->
+          <input type="hidden" name="plan" value="">
+          <input type="hidden" name="perfil" value="">
 
           <div class="campo">
-            <input class="campo__input" id="f-nombre" name="nombre" type="text" autocomplete="name" required placeholder=" " aria-describedby="f-nombre-err">
             <label class="campo__label" for="f-nombre">Nombre <span aria-hidden="true">*</span></label>
-            <span class="campo__linea" aria-hidden="true"></span>
+            <input class="campo__input" id="f-nombre" name="nombre" type="text" autocomplete="name" required aria-describedby="f-nombre-err">
             <p class="campo__error" id="f-nombre-err"></p>
           </div>
           <div class="campo">
-            <input class="campo__input" id="f-email" name="email" type="email" autocomplete="email" inputmode="email" required placeholder=" " aria-describedby="f-email-err">
+            <label class="campo__label" for="f-empresa">Nombre de la empresa <span aria-hidden="true">*</span></label>
+            <input class="campo__input" id="f-empresa" name="empresa" type="text" autocomplete="organization" required aria-describedby="f-empresa-err">
+            <p class="campo__error" id="f-empresa-err"></p>
+          </div>
+          <div class="campo">
             <label class="campo__label" for="f-email">Email <span aria-hidden="true">*</span></label>
-            <span class="campo__linea" aria-hidden="true"></span>
+            <input class="campo__input" id="f-email" name="email" type="email" autocomplete="email" inputmode="email" required aria-describedby="f-email-err">
             <p class="campo__error" id="f-email-err"></p>
           </div>
           <div class="campo">
-            <input class="campo__input" id="f-telefono" name="telefono" type="tel" autocomplete="tel" inputmode="tel" placeholder=" " aria-describedby="f-telefono-err">
             <label class="campo__label" for="f-telefono">Teléfono <span class="campo__opc">(opcional)</span></label>
-            <span class="campo__linea" aria-hidden="true"></span>
+            <input class="campo__input" id="f-telefono" name="telefono" type="tel" autocomplete="tel" inputmode="tel" aria-describedby="f-telefono-err">
             <p class="campo__error" id="f-telefono-err"></p>
           </div>
-
-          <fieldset class="grupo">
-            <legend class="grupo__legend">Soy…</legend>
-            <div class="grupo__chips">
-              <label class="chip"><input type="radio" name="perfil" value="Agencia creativa"><span>Agencia creativa</span></label>
-              <label class="chip"><input type="radio" name="perfil" value="Negocio local"><span>Negocio local</span></label>
-              <label class="chip"><input type="radio" name="perfil" value="Otro"><span>Otro</span></label>
-            </div>
-          </fieldset>
-          <fieldset class="grupo">
-            <legend class="grupo__legend">Plan que te interesa</legend>
-            <div class="grupo__chips">
-              <label class="chip"><input type="radio" name="plan" value="fundamento"><span>Fundamento</span></label>
-              <label class="chip"><input type="radio" name="plan" value="inmersion"><span>Inmersión</span></label>
-              <label class="chip"><input type="radio" name="plan" value="impacto"><span>Impacto</span></label>
-              <label class="chip"><input type="radio" name="plan" value="aun-no"><span>Aún no lo sé</span></label>
-            </div>
-          </fieldset>
-
           <div class="campo campo--area">
-            <textarea class="campo__input" id="f-mensaje" name="mensaje" rows="4" required placeholder=" " aria-describedby="f-mensaje-err"></textarea>
-            <label class="campo__label" for="f-mensaje">Mensaje <span aria-hidden="true">*</span></label>
-            <span class="campo__linea" aria-hidden="true"></span>
+            <label class="campo__label" for="f-mensaje">Cuéntanos de qué va tu empresa <span class="campo__opc">(opcional)</span></label>
+            <textarea class="campo__input" id="f-mensaje" name="mensaje" rows="3" aria-describedby="f-mensaje-err"></textarea>
             <p class="campo__error" id="f-mensaje-err"></p>
           </div>
 
@@ -170,26 +155,11 @@
           <div class="form__estado" data-form-estado role="status" aria-live="polite"></div>
         </form>
       </div>
-
-      <aside class="contacto__lado" aria-labelledby="h-lado">
-        <h2 class="display contacto__lado-t" id="h-lado" data-ct="lado.titulo">Te respondemos personalmente, sin bots.</h2>
-        <!-- WhatsApp y email salen de js/config.js; vacíos, no se muestran -->
-        <div class="contacto__directo" data-directo hidden>
-          <a data-whatsapp href="#" target="_blank" rel="noopener" hidden><span>WhatsApp</span><span aria-hidden="true">→</span></a>
-          <a data-email href="#" hidden><span data-valor>Email</span><span aria-hidden="true">→</span></a>
-        </div>
-        <p class="contacto__lugar" data-ct="lado.lugar">Madrid</p>
-      </aside>
-    </section>
-
-    <!-- 3 · Qué pasa después (gris). "Llamada de 20 minutos": BORRADOR -->
-    <section class="despues despues--gris" id="despues" aria-labelledby="h-despues" data-cubre>
-      <h2 class="display despues__titulo" id="h-despues" data-ct="despues.titulo" data-lineas>Qué pasa después</h2>
-      <ol class="despues__lista" data-escalona>
-        <li><span class="despues__n">01</span><h3 class="display" data-ct="despues.pasos.0.titulo">Te escribimos</h3><p data-ct="despues.pasos.0.texto">Leemos tu mensaje y te contestamos nosotros, por email o por WhatsApp.</p></li>
-        <li><span class="despues__n">02</span><h3 class="display" data-ct="despues.pasos.1.titulo">Llamada de 20 minutos</h3><p data-ct="despues.pasos.1.texto">Hablamos de tu negocio, de lo que necesitas y de cómo lo haríamos.</p></li>
-        <li><span class="despues__n">03</span><h3 class="display" data-ct="despues.pasos.2.titulo">Propuesta clara</h3><p data-ct="despues.pasos.2.texto">Te enviamos qué haremos, en qué plazos y cuánto cuesta. Por escrito y sin letra pequeña.</p></li>
-      </ol>
+      <!-- WhatsApp y email salen de js/config.js; vacíos, no se muestran -->
+      <p class="contacto__directo contacto__directo--linea" data-directo hidden>
+        <a data-whatsapp href="#" target="_blank" rel="noopener" hidden>WhatsApp</a>
+        <a data-email href="#" hidden></a>
+      </p>
     </section>
   </main>
 
