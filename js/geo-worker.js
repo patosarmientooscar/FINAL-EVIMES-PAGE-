@@ -6,7 +6,6 @@
    Recetas:
      tube    { pts:[[x,y,z]…], curva:'centripetal', cerrada, seg, r, radial, tubeCerrado }
      extrude { shapes: shape.toJSON(), opts }
-     icosa   { r, detalle }
    Operaciones después (en orden): ['translate',x,y,z] · ['scale',x,y,z] ·
      ['aS'] (atributo aS = uv.x, la de los tubos de la onda) ·
      ['capUV', S, espejoAtras] (planarCapUV de js/bento/shared.js, igual).
@@ -22,7 +21,6 @@ function crear(r) {
     const shapes = [].concat(r.shapes).map(j => new THREE.Shape().fromJSON(j));
     return new THREE.ExtrudeGeometry(shapes.length === 1 ? shapes[0] : shapes, r.opts);
   }
-  if (r.tipo === 'icosa') return new THREE.IcosahedronGeometry(r.r, r.detalle);
   throw new Error('receta desconocida: ' + r.tipo);
 }
 

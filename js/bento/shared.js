@@ -6,8 +6,8 @@
      4 contextos WebGL, 4 PMREM y cada shader compilado 4 veces). Pinta en un
      canvas fuera de pantalla con viewport/scissor del tamaño de la card y copia
      el resultado al canvas 2D de la card (drawImage): mismo píxel que antes.
-   · Un solo PMREM del estudio, compartido por las escenas (el metal líquido de
-     ia.js tiene el suyo, distinto a propósito).
+   · Un solo PMREM del estudio, compartido por las escenas (las bodegones de
+     bodegones.js usan el suyo, de RoomEnvironment, también compartido).
    · makeCard es asíncrona: crea la escena, espera a sus texturas, compila los
      shaders en paralelo (compileAsync) y sube las texturas, cediendo el hilo
      entre paso y paso (js/escenas.js → EV.gpu).
@@ -25,7 +25,7 @@ export const ehPath = fetch(new URL('../../assets/logo/evimes-eh.svg', import.me
   .then(txt => new DOMParser().parseFromString(txt, 'image/svg+xml').querySelector('path').getAttribute('d'));
 
 // Arranque escalonado (js/escenas.js); respaldo si la página no lo carga.
-export const G=(window.EV&&window.EV.gpu)||{cede:()=>new Promise(r=>setTimeout(r,0)),turno:fn=>Promise.resolve().then(fn),pmrem:null};
+export const G=(window.EV&&window.EV.gpu)||{cede:()=>new Promise(r=>setTimeout(r,0)),turno:fn=>Promise.resolve().then(fn),listo:()=>Promise.resolve(),pmrem:null};
 
 // El renderer compartido (se crea con la primera card).
 let R=null;
@@ -39,7 +39,10 @@ export function compartido(){
   renderer.setClearColor(NAVY,1);renderer.autoClear=false;renderer.setSize(1,1,false);
   R={renderer,canvas,w:1,h:1};return R;
 }
-const asegura=(pw,ph)=>{if(pw<=R.w&&ph<=R.h)return;R.w=Math.max(R.w,pw);R.h=Math.max(R.h,ph);R.renderer.setSize(R.w,R.h,false);};
+export const asegura=(pw,ph)=>{if(pw<=R.w&&ph<=R.h)return;R.w=Math.max(R.w,pw);R.h=Math.max(R.h,ph);R.renderer.setSize(R.w,R.h,false);};
+// Pinta en el renderer compartido (viewport/scissor de pw × ph) y copia el resultado al canvas 2D g2.
+export function pintaEn(g2,pw,ph,fn){const {renderer}=compartido();asegura(pw,ph);renderer.setViewport(0,0,pw,ph);renderer.setScissor(0,0,pw,ph);renderer.setScissorTest(true);
+  fn(renderer);g2.drawImage(R.canvas,0,R.h-ph,pw,ph,0,0,pw,ph);}   // el viewport está abajo a la izquierda (GL)
 // PMREM (con sus shaders compilados en paralelo, EV.gpu.pmrem) o el de siempre.
 export const pmremDe=(renderer,t)=>G.pmrem?G.pmrem(THREE,renderer,t).then(e=>{t.dispose();return e;})
   :Promise.resolve().then(()=>{const pm=new THREE.PMREMGenerator(renderer);const e=pm.fromEquirectangular(t).texture;t.dispose();pm.dispose();return e;});
@@ -96,9 +99,7 @@ export async function makeCard(el,setup,opts={}){
   new IntersectionObserver(es=>{ctx.visible=es[0].isIntersecting;if(ctx.visible)el.classList.add('in');},{threshold:.08}).observe(el);
   ctx.step=(dt)=>{ctx.t+=dt;const k=1-Math.pow(.04,dt);ctx.mx+=(ctx.tmx-ctx.mx)*k;ctx.my+=(ctx.tmy-ctx.my)*k;ctx.hover+=(ctx.thover-ctx.hover)*(1-Math.pow(.02,dt));
     if(ctx.bg)ctx.bg.u.uT.value=ctx.t;ctx.update(dt);};
-  ctx.render=()=>{asegura(ctx.pw,ctx.ph);renderer.setViewport(0,0,ctx.pw,ctx.ph);renderer.setScissor(0,0,ctx.pw,ctx.ph);renderer.setScissorTest(true);
-    renderer.clear();if(ctx.bg){renderer.render(ctx.bg.scene,ctx.bg.cam);renderer.clearDepth();}renderer.render(scene,camera);
-    g2.drawImage(R.canvas,0,R.h-ctx.ph,ctx.pw,ctx.ph,0,0,ctx.pw,ctx.ph);};   // el viewport está abajo a la izquierda (GL)
+  ctx.render=()=>pintaEn(g2,ctx.pw,ctx.ph,r=>{r.clear();if(ctx.bg){r.render(ctx.bg.scene,ctx.bg.cam);r.clearDepth();}r.render(scene,camera);});
   cards.push(ctx);return ctx;
 }
 export const roundedRect=(w,h,r)=>{const s=new THREE.Shape(),x=-w/2,y=-h/2;s.moveTo(x+r,y);s.lineTo(x+w-r,y);s.quadraticCurveTo(x+w,y,x+w,y+r);s.lineTo(x+w,y+h-r);
@@ -109,8 +110,7 @@ export function geoDe(receta,ops=[]){
   if(G.geometria)return G.geometria(THREE,receta,ops);
   return G.cede().then(()=>{let g;
     if(receta.tipo==='tube')g=new THREE.TubeGeometry(new THREE.CatmullRomCurve3(receta.pts.map(p=>new THREE.Vector3(...p)),!!receta.cerrada,receta.curva||'centripetal'),receta.seg,receta.r,receta.radial,!!receta.tubeCerrado);
-    else if(receta.tipo==='extrude')g=new THREE.ExtrudeGeometry(new THREE.Shape().fromJSON(receta.shapes),receta.opts);
-    else g=new THREE.IcosahedronGeometry(receta.r,receta.detalle);
+    else g=new THREE.ExtrudeGeometry(new THREE.Shape().fromJSON(receta.shapes),receta.opts);
     ops.forEach(o=>{if(o[0]==='translate')g.translate(o[1],o[2],o[3]);else if(o[0]==='capUV')planarCapUV(g,o[1],o[2]!==false);});return g;});
 }
 export const planarCapUV=(geo,S,mirrorBack=true)=>{const pos=geo.attributes.position,uv=geo.attributes.uv,g0=geo.groups[0];

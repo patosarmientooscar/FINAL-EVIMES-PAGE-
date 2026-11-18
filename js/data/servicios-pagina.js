@@ -34,7 +34,7 @@ window.EVIMES_SERVICIOS_PAGINA = {
       ctas: [{ texto: 'Pide tu propuesta', href: 'contacto.html' }, { texto: 'Ver un proyecto', href: 'proyectos.html#disco' }]
     },
     {
-      id: 'seo', kind: 'pin', num: '03', nombre: 'Posicionamiento',
+      id: 'seo', kind: 'seo', num: '03', nombre: 'Posicionamiento',
       frase: 'Que te encuentren cuando te buscan.',
       parrafos: [
         'Una web que nadie encuentra no existe. Trabajamos el SEO desde el código, el contenido y tu ficha de Google para que aparezcas en Google, en Maps y en las respuestas de la IA.',

@@ -69,10 +69,30 @@
     });
   }
 
+  /* pmremEscena(T, renderer, escena, sigma): PMREMGenerator.fromScene de siempre
+     (el RoomEnvironment de las bodegones del bento) con sus shaders compilados antes:
+     con un objetivo del PMREM puesto y sin tone mapping, como en _sceneToCubeUV. */
+  function pmremEscena(T, renderer, escena, sigma) {
+    var pm = new T.PMREMGenerator(renderer);
+    pm._setSize(256);                           // lo mismo que hace fromScene
+    var rt = pm._allocateTargets();
+    var antes = renderer.getRenderTarget(), tm = renderer.toneMapping;
+    renderer.setRenderTarget(rt); renderer.toneMapping = T.NoToneMapping;
+    pm._compileMaterial(pm._blurMaterial);
+    var mats = Array.from(renderer.compile(escena, new T.PerspectiveCamera(90, 1, 0.1, 100)));
+    renderer.toneMapping = tm; renderer.setRenderTarget(antes);
+    rt.dispose();
+    return listo(renderer, [pm._blurMaterial].concat(mats)).then(cede).then(function () {
+      var env = pm.fromScene(escena, sigma).texture;
+      pm.dispose();
+      return env;
+    });
+  }
+
   function sinEsperas(renderer) { renderer.debug.checkShaderErrors = false; return renderer; }
 
-  /* geometria(T, receta, ops): la geometría pesada (tubos, extrusiones, la esfera
-     del metal líquido) se genera en js/geo-worker.js con el mismo Three.js y los
+  /* geometria(T, receta, ops): la geometría pesada (tubos y extrusiones)
+     se genera en js/geo-worker.js con el mismo Three.js y los
      mismos parámetros; aquí solo se monta el BufferGeometry con sus arrays.
      Si el worker no arranca, se genera igual en el hilo principal (mismo código). */
   var base = (document.currentScript && document.currentScript.src) || location.href;
@@ -97,7 +117,6 @@
     var geo;
     if (r.tipo === 'tube') geo = new T.TubeGeometry(new T.CatmullRomCurve3(r.pts.map(function (p) { return new T.Vector3(p[0], p[1], p[2]); }), !!r.cerrada, r.curva || 'centripetal'), r.seg, r.r, r.radial, !!r.tubeCerrado);
     else if (r.tipo === 'extrude') { var sh = [].concat(r.shapes).map(function (j) { return new T.Shape().fromJSON(j); }); geo = new T.ExtrudeGeometry(sh.length === 1 ? sh[0] : sh, r.opts); }
-    else geo = new T.IcosahedronGeometry(r.r, r.detalle);
     (ops || []).forEach(function (op) {
       if (op[0] === 'translate') geo.translate(op[1], op[2], op[3]);
       else if (op[0] === 'scale') geo.scale(op[1], op[2], op[3]);
@@ -120,5 +139,5 @@
     });
   }
 
-  EV.gpu = { cede: cede, turno: turno, listo: listo, pmrem: pmrem, sinEsperas: sinEsperas, geometria: geometria };
+  EV.gpu = { cede: cede, turno: turno, listo: listo, pmrem: pmrem, pmremEscena: pmremEscena, sinEsperas: sinEsperas, geometria: geometria };
 })();

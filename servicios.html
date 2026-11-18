@@ -159,6 +159,8 @@
   <link rel="preload" as="image" type="image/webp" href="assets/onda/onda-escritorio.webp" media="(min-width: 720px)">
   <link rel="preload" href="assets/fonts/fraunces-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/schibsted-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <!-- Import map: "three" = la MISMA URL que la onda y el bento; lo necesitan los addons que importan "three" a secas (bodegones del bento). -->
+  <script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js" } }</script>
   <link rel="stylesheet" href="css/fonts.css">
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/base.css">
@@ -276,7 +278,7 @@
     <!-- 03 · Posicionamiento -->
     <section class="sp-serv sp-serv--gris sp-serv--izq" id="seo" aria-labelledby="h-seo" data-cubre>
       <div class="sp-serv__obj bento" data-bento>
-        <article class="card" data-kind="pin" data-servicio="seo" aria-hidden="true"><canvas></canvas></article>
+        <article class="card bodegon" data-kind="seo" data-servicio="seo" aria-hidden="true"><canvas></canvas></article>
       </div>
       <div class="sp-serv__texto">
         <p class="sp-serv__num display" aria-hidden="true">03</p>
@@ -307,7 +309,7 @@
     <!-- 04 · Software IA -->
     <section class="sp-serv sp-serv--der" id="ia" aria-labelledby="h-ia">
       <div class="sp-serv__obj bento" data-bento>
-        <article class="card" data-kind="ia" data-servicio="ia" aria-hidden="true"><canvas></canvas></article>
+        <article class="card bodegon" data-kind="ia" data-servicio="ia" aria-hidden="true"><canvas></canvas></article>
       </div>
       <div class="sp-serv__texto">
         <p class="sp-serv__num display" aria-hidden="true">04</p>

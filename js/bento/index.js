@@ -10,14 +10,20 @@
      viewport). Un solo renderer para las cuatro (shared.js) y cada card se
      crea en su turno (EV.gpu.turno), con los shaders compilados en paralelo.
      Cada card solo renderiza si está visible (makeCard).
-   · Solo se mueve el destello (Animaciones 3D). Las otras tres se pintan UNA
-     vez en su pose (POSE: segundos de su propia animación) y no se animan ni
-     reaccionan; al cambiar de tamaño se vuelven a pintar una vez.
+   · Solo se mueve el destello (Animaciones 3D). Desarrollo web se pinta UNA
+     vez en su pose (POSE) y al cambiar de tamaño. Posicionamiento y Software
+     con IA son bodegones quietos (bodegones.js, desde backup-pre-bodegones):
+     se pintan una vez al entrar en pantalla y otra solo si cambia el tamaño.
    · Versión fija (movimiento reducido, ahorro de datos, ?modo=fijo) o sin
      WebGL: póster estático de cada card, sacado del propio render
-     (assets/bento/, ver ?bento=captura).
+     (assets/bento/ y assets/img/bodegon-*, ver ?bento=captura).
    ========================================================================== */
 const EV = window.EV || {};
+// Bodegones sin WebGL: captura de cada escena (AVIF/WebP) con su descripción.
+const BODEGON_ALT = {
+  seo: 'Un móvil negro sobre un bloque de hormigón oscuro; en la pantalla, la búsqueda «barbería cerca de mí» con «Tu negocio» como primer resultado.',
+  ia: 'Una pantalla de cristal ahumado con marco de aluminio negro y un teclado negro sobre un bloque de hormigón oscuro; en la pantalla, el código de una reserva automática por WhatsApp.'
+};
 // Uno o varios contenedores [data-bento] (la home tiene uno; servicios.html, uno por oficio):
 // todas sus cards comparten el mismo bucle.
 const roots = Array.from(document.querySelectorAll('[data-bento]'));
@@ -65,25 +71,33 @@ function posters(els) {
     const k = el.dataset.kind;
     const pic = document.createElement('picture');
     pic.className = 'poster';
-    pic.innerHTML = `<source media="(max-width: 900px)" srcset="assets/bento/${k}-movil.png"><img src="assets/bento/${k}-escritorio.png" alt="" loading="lazy" decoding="async">`;
+    if (k in BODEGON_ALT) {
+      // ancha (16:9, objeto al tercio derecho): la card de la home en escritorio · movil (16:10, centrada): la home en ≤ 860 px · cuadrada (1:1): servicios.html
+      const b = 'assets/img/bodegon-' + k, ancha = !!el.closest('.que-hacemos');
+      pic.innerHTML = (ancha ? `<source media="(max-width: 860px)" type="image/avif" srcset="${b}-movil.avif"><source media="(max-width: 860px)" type="image/webp" srcset="${b}-movil.webp"><source type="image/avif" srcset="${b}-ancha.avif">`
+        : `<source type="image/avif" srcset="${b}-cuadrada.avif">`) + `<img src="${b}-${ancha ? 'ancha' : 'cuadrada'}.webp" alt="" loading="lazy" decoding="async">`;
+      pic.querySelector('img').alt = BODEGON_ALT[k];
+    } else pic.innerHTML = `<source media="(max-width: 900px)" srcset="assets/bento/${k}-movil.png"><img src="assets/bento/${k}-escritorio.png" alt="" loading="lazy" decoding="async">`;
     el.querySelector('canvas').after(pic);
   });
 }
 
 async function arrancar(els, captura) {
-  const [S, { webCard }, { starCard }, { pinCard }, { iaCard }] = await Promise.all([
-    import('./shared.js'), import('./web.js'), import('./star.js'), import('./pin.js'), import('./ia.js')
+  const [S, { webCard }, { starCard }, B] = await Promise.all([
+    import('./shared.js'), import('./web.js'), import('./star.js'), import('./bodegones.js')
   ]);
   /* ---------- boot + one shared loop ---------- */
-  const kinds = { web: webCard, star: starCard, pin: pinCard, ia: iaCard };
+  const kinds = { web: webCard, star: starCard };
   const { cards, reduce } = S;
-  // web: capas juntas y algo abiertas · pin: quieto sobre el mapa, anillos parados · ia: metal líquido en una forma suave
-  const POSE = { web: 6.88, pin: 0.4, ia: 2.2 };
+  // web: capas juntas y algo abiertas (Posicionamiento y Software con IA son bodegones: sin pose ni bucle)
+  const POSE = { web: 6.88 };
   const pintar = c => { c.render(); c.step(0); c.render(); };
   // Cada card en su turno (js/escenas.js): nunca dos cards en la misma tarea, y la onda del hero va antes.
   const crear = el => S.G.turno(async () => {
     if (el.__card) return; el.__card = true;
-    const k = el.dataset.kind, c = await S.makeCard(el, kinds[k], { captura });
+    const k = el.dataset.kind;
+    if (!(k in kinds)) { await B.bodegon(el, k, { captura }); return; }
+    const c = await S.makeCard(el, kinds[k], { captura });
     if (k in POSE) { c.quieta = true; c.step(POSE[k]); pintar(c); c.trasResize = () => { c.step(0); pintar(c); }; return; }
     c.step(reduce || captura ? 1.5 : 0); if (reduce || captura) { c.render(); c.step(0); }
   }, 1);
@@ -111,5 +125,7 @@ async function arrancar(els, captura) {
   if (captura) {
     await S.ehListo;
     window.__bentoPosters = () => { const o = {}; cards.forEach(c => { c.render(); o[c.el.dataset.kind] = c.cv.toDataURL('image/png'); }); return o; };
+    // bodegones → assets/img/bodegon-<k>-ancha (16:9, home escritorio) · -movil (16:10, home ≤ 860 px) · -cuadrada (1:1, servicios.html), en AVIF y WebP
+    window.__bodegones = () => { const o = {}; B.bodegones.forEach(b => { o[b.k] = { ancha: b.capturar(1600, 900, 'ancha'), movil: b.capturar(1600, 1000, 'centrada'), cuadrada: b.capturar(1100, 1100, 'centrada') }; }); return o; };
   }
 }

@@ -7,7 +7,7 @@
    prototipo que no coinciden con los tokens globales (navy #070a13,
    stone #ece7dd, tinta #0b1020) viven aquí, en el ámbito de la sección,
    para no mover el resto de la web.
-   Escenas 3D: js/bento/ · textos: js/data/servicios.js
+   Escenas 3D: js/bento/ (Posicionamiento y Software con IA: bodegones.js) · textos: js/data/servicios.js
    ========================================================================== */
 .que-hacemos {
   --b-ink: #0b1020;
@@ -89,4 +89,35 @@
   .que-hacemos .bento .meta p { margin-top: 8px; font-size: 14px; line-height: 1.45; }
   .que-hacemos .bento .more { padding: 10px 16px; font-size: 14px; }
 }
-@media (prefers-reduced-motion: reduce) { :is(.is-cine, .is-still) .bento .card { opacity: 1; transform: none; transition: none; } }
+/* ---------- Bodegones: Posicionamiento y Software con IA (desde backup-pre-bodegones) ----------
+   Prototipo aprobado Downloads/evimes-cards/bodegones.html (js/bento/bodegones.js). La misma caja
+   que las otras dos cards; la escena ocupa toda la card (su fondo es el color liso de la card), el
+   objeto queda a la derecha (setViewOffset) y el texto abajo a la izquierda, protegido por un
+   degradado suave. Quietas: el hover solo sube la card 2 px y aclara el borde (sin 3D). En móvil
+   (≤ 860 px) el texto va debajo de la escena y la cámara se centra. */
+.bento .bodegon { transition: opacity 1s cubic-bezier(.2,.7,.2,1), transform 1.2s cubic-bezier(.2,.7,.2,1), translate .5s cubic-bezier(.2,.75,.15,1); }
+.bento .bodegon:hover { translate: 0 -2px; }
+.bento .bodegon::after { transition: box-shadow .5s cubic-bezier(.2,.75,.15,1); }
+.bento .bodegon:hover::after { box-shadow: inset 0 0 0 1px rgba(255,255,255,.13), inset 0 1px 0 rgba(255,255,255,.16); }
+/* la escena aparece cuando está pintada (una sola vez) */
+.bento .bodegon canvas { opacity: 0; transition: opacity .5s cubic-bezier(.2,.7,.2,1); }
+.bento .bodegon canvas.is-lista { opacity: 1; }
+.bento.is-fija .bodegon canvas { display: none; }
+.que-hacemos .bento .bodegon canvas,
+.que-hacemos .bento .bodegon .poster { inset: 0; width: 100%; -webkit-mask-image: none; mask-image: none; }
+.que-hacemos .bento .bodegon::before { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(90deg, rgb(7 10 19 / .7) 0%, rgb(7 10 19 / 0) 40%); }
+.que-hacemos .bento .bodegon .meta { z-index: 2; top: auto; bottom: clamp(22px,3vw,40px); width: 52%; justify-content: flex-end; }
+@media (max-width: 860px) {
+  .que-hacemos .bento .bodegon { aspect-ratio: auto; display: flex; flex-direction: column; }
+  .que-hacemos .bento .bodegon canvas,
+  .que-hacemos .bento .bodegon .poster { position: relative; inset: auto; width: 100%; height: auto; aspect-ratio: 16 / 10; }
+  .que-hacemos .bento .bodegon .poster img { position: absolute; inset: 0; }   /* la captura 1:1 no estira la caja 16:10 */
+  .que-hacemos .bento .bodegon::before { display: none; }
+  .que-hacemos .bento .bodegon .meta { position: relative; inset: auto; width: auto; padding: 4px clamp(22px,3vw,44px) clamp(22px,3vw,40px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  :is(.is-cine, .is-still) .bento .card { opacity: 1; transform: none; transition: none; }
+  .bento .bodegon, .bento .bodegon::after, .bento .bodegon canvas { transition: none; }
+  .bento .bodegon:hover { translate: none; }
+}
