@@ -1,9 +1,25 @@
 /* ==========================================================================
-   Fondo global: negro (#0b0c0f) con líneas finas en mosaico (la línea de
-   onda del monograma EH, var(--lineas)) + onda de cromo (WebGL) + grano.
+   Fondo global, de abajo arriba: negro (#0b0c0f, el de html) → cuadrícula de
+   líneas finas (.bg-grid, CSS puro) → onda de cromo (WebGL, .fondo) → grano.
    Capas fijas detrás de todo. Alto = 100lvh: la barra del navegador móvil
    no obliga a redimensionar los canvas.
+   (Desde backup-pre-grid el negro ya no lleva el patrón de líneas de onda,
+   var(--lineas); las secciones grises conservan el suyo, var(--lineas-tinta).)
    ========================================================================== */
+
+/* Cuadrícula (líneas a .18: a .25 se veían azuladas y fuertes sobre #0b0c0f; nunca más de .25): un único <div class="bg-grid" aria-hidden="true"> al abrir <body>
+   (home, servicios, proyectos, planes y contacto; la oficina no la lleva). Sin
+   color de fondo; la máscara la funde hacia los bordes. */
+.bg-grid {
+  position: fixed; inset: 0; z-index: -2; pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(71, 85, 105, .18) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(71, 85, 105, .18) 1px, transparent 1px);
+  background-size: 24px 24px;
+  -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 40%, #000 70%, transparent 100%);
+          mask-image: radial-gradient(ellipse 90% 70% at 50% 40%, #000 70%, transparent 100%);
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+}
 .fondo {
   position: fixed;
   inset: 0 0 auto 0;
@@ -11,7 +27,7 @@
   height: 100lvh;
   z-index: 0;
   pointer-events: none;
-  background: var(--navy) var(--lineas) 0 0 / var(--lineas-tam) repeat;
+  /* sin fondo: debajo se ven la cuadrícula y el negro de html */
   contain: strict;
 }
 .fondo > * {
