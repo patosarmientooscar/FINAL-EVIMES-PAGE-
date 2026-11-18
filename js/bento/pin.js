@@ -2,7 +2,7 @@
    bento/pin.js — 03 · Posicionamiento: el pin de cromo cae sobre un mapa de cristal con anillos de radar.
    Copiado tal cual del prototipo aprobado (evimes-cards/bento.html).
    ========================================================================== */
-import { THREE, chromeMat } from './shared.js';
+import { THREE, chromeMat, geoDe } from './shared.js';
 
 export function pinCard(ctx){
   const {scene,camera}=ctx;
@@ -40,8 +40,11 @@ export function pinCard(ctx){
   sh.moveTo(0,tipY+.06);sh.quadraticCurveTo(.035,tipY+.03,.06,tipY+.1);
   sh.lineTo(p1[0]*.999,p1[1]);sh.absarc(0,cy,r,-ang,Math.PI+ang,false);sh.lineTo(-.06,tipY+.1);sh.quadraticCurveTo(-.035,tipY+.03,0,tipY+.06);
   const hole=new THREE.Path();hole.absarc(0,cy,.30,0,Math.PI*2,true);sh.holes.push(hole);
-  const DEPTH=.34;const geo=new THREE.ExtrudeGeometry(sh,{depth:DEPTH,curveSegments:64,bevelEnabled:true,bevelThickness:.11,bevelSize:.07,bevelSegments:16});geo.translate(0,0,-DEPTH/2);
-  const pin=new THREE.Mesh(geo,chromeMat());
+  // la extrusión (la parte pesada) se genera en el worker con los mismos parámetros
+  const DEPTH=.34;
+  const pin=new THREE.Mesh(new THREE.BufferGeometry(),chromeMat());
+  ctx.espera.push(geoDe({tipo:'extrude',shapes:sh.toJSON(),opts:{depth:DEPTH,curveSegments:64,bevelEnabled:true,bevelThickness:.11,bevelSize:.07,bevelSegments:16}},
+    [['translate',0,0,-DEPTH/2]]).then(g=>{pin.geometry=g;}));
   // cyan light trapped in the hole
   const core=new THREE.Mesh(new THREE.CircleGeometry(.31,48),new THREE.MeshBasicMaterial({color:0x00e5ff,toneMapped:false}));core.position.set(0,cy,0);
   const coreGlow=new THREE.Mesh(new THREE.PlaneGeometry(1.6,1.6),new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,

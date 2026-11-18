@@ -24,7 +24,10 @@
   var vw = 0, vh = 0;
   var lay = {};                           // posiciones cacheadas (se recalculan al cambiar el tamaño)
   var mouse = { x: 0, y: 0 };
-  var ondaOpacity = -1, fijaOpacity = -1, posterFuera = false;
+  var ondaOpacity = -1, fijaOpacity = -1, posterFuera = false, cruce = 0;
+  var CRUCE = 0.4;                        // póster → onda en vivo: fundido de 400 ms
+  var st = { hero: 0, op: 0, cubierta: false };                         // estado por scroll (reutilizado: sin objetos por fotograma)
+  var inp = { mx: 0, my: 0, hero: 0, luz: true, cuerdas: true };       // entrada de la onda (reutilizada)
   var cabClara = null;
   var sinOnda = false;                    // Three.js no cargó: imagen fija en su lugar
 
@@ -197,7 +200,8 @@
     var scrolled = y > 40;
     if (el.cab._s !== scrolled) { el.cab._s = scrolled; el.cab.classList.toggle('is-scroll', scrolled); }
 
-    return { hero: hero, op: op, cubierta: cubierta };
+    st.hero = hero; st.op = op; st.cubierta = cubierta;
+    return st;
   }
 
   function setOpacity(node, v, last) {
@@ -207,9 +211,10 @@
   }
 
   /* ---------- bucle ----------
-     Hasta el primer gesto se ve el póster (las bandas sin luces, con
-     transparencia, sacadas del propio render, assets/onda/). Con el gesto carga Three.js y,
-     en su primer fotograma, la onda en vivo sustituye al póster de golpe. */
+     Hasta que arranca la onda se ve el póster (las bandas sin luces, con
+     transparencia, sacadas del propio render, assets/onda/). La onda carga en
+     un momento libre (requestIdleCallback) o con el primer gesto y, desde su
+     primer fotograma en vivo, el póster se funde encima en 400 ms. */
   function tick(time, dtMs) {
     var dt = Math.min((dtMs || 16.7) / 1000, 0.1);
     var st = estado(scrollY());
@@ -218,15 +223,25 @@
     // pose, así que en el primer fotograma en vivo se cambia de golpe (antes se
     // fundían 1,4 s con el póster a opacidad 1 mientras los tubos vivos ya se
     // movían con el scroll y el ratón: se veían dos conjuntos desplazados).
+    // El póster es el mismo render en la misma pose: el fundido es corto (400 ms) y
+    // el póster BAJA desde el primer fotograma (nunca se queda a opacidad 1 encima
+    // de los tubos en vivo; así se veían dos conjuntos desplazados).
     if (!posterFuera && !sinOnda) {
-      if (vivo) { posterFuera = true; root.classList.add('onda-viva'); }
-      else fijaOpacity = setOpacity(el.fija, st.op, fijaOpacity);
+      if (vivo) {
+        cruce = Math.min(1, cruce + dt / CRUCE);
+        var k = cruce * cruce * (3 - 2 * cruce);
+        fijaOpacity = setOpacity(el.fija, st.op * (1 - k), fijaOpacity);
+        if (cruce >= 1) { posterFuera = true; root.classList.add('onda-viva'); }
+      } else fijaOpacity = setOpacity(el.fija, st.op, fijaOpacity);
     }
 
     if (vivo) {
       var op = st.op;
       ondaOpacity = setOpacity(el.onda, op, ondaOpacity);
-      if (op > 0.001) EV.onda.render(dt, { mx: mouse.x, my: mouse.y, hero: st.hero, luz: true, cuerdas: !EV.reducedMotion });
+      if (op > 0.001) {
+        inp.mx = mouse.x; inp.my = mouse.y; inp.hero = st.hero; inp.cuerdas = !EV.reducedMotion;
+        EV.onda.render(dt, inp);
+      }
     }
   }
 
@@ -286,14 +301,22 @@
       window.addEventListener('touchcancel', fuera, { passive: true });
       window.addEventListener('blur', fuera);
       gsap.ticker.add(tick);
-      // Three.js al primer gesto (como la oficina): el hero no lo espera y quien
-      // no interactúa no paga los ~600 KB ni la compilación de shaders.
+      // Three.js en el primer momento libre tras la carga (requestIdleCallback;
+      // sin él, a los 1,5 s) o antes si llega un gesto. El montaje va troceado
+      // (js/escenas.js + onda.js): no bloquea el hilo; hasta entonces, el póster.
       var gestos = ['pointermove', 'pointerdown', 'wheel', 'touchstart', 'keydown', 'scroll'];
+      var lanzada = false;
       var go = function () {
+        if (lanzada) return; lanzada = true;
         gestos.forEach(function (n) { window.removeEventListener(n, go, { passive: true }); });
         cargarOnda();
       };
       gestos.forEach(function (n) { window.addEventListener(n, go, { passive: true }); });
+      var enReposo = function () {
+        if ('requestIdleCallback' in window) requestIdleCallback(go, { timeout: 4000 });
+        else setTimeout(go, 1500);
+      };
+      if (document.readyState === 'complete') enReposo(); else window.addEventListener('load', enReposo, { once: true });
     } else if (!captura) fijo();
 
     // ?onda=captura: fotograma fijo para assets/onda/ (ver assets/onda/LEEME.md).

@@ -73,8 +73,8 @@
       if (window.matchMedia) matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', function () { if (!q) location.reload(); });
     })();
   </script>
-  <link rel="preload" as="image" type="image/webp" href="assets/onda/onda-movil.webp" media="(max-width: 719px)">
-  <link rel="preload" as="image" type="image/webp" href="assets/onda/onda-escritorio.webp" media="(min-width: 720px)">
+  <link rel="preload" as="image" type="image/avif" href="assets/onda/onda-movil.avif" media="(max-width: 719px)">
+  <link rel="preload" as="image" type="image/avif" href="assets/onda/onda-escritorio.avif" media="(min-width: 720px)">
   <link rel="preload" href="assets/fonts/fraunces-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/schibsted-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
   <!-- Import map: "three" = la MISMA URL que usan js/fondo/onda.js y js/bento/ (un solo Three.js 0.160.0);
@@ -96,9 +96,11 @@
 
   <!-- ===== Fondo global: negro con líneas finas + la onda de cromo (Three.js) + grano ===== -->
   <div class="fondo" aria-hidden="true">
-    <!-- Póster (hasta el primer gesto) y versión fija: fotograma del propio render. -->
+    <!-- Póster (hasta que arranca la onda, que se funde encima en 400 ms) y versión fija: fotograma del propio render (AVIF; WebP de respaldo). -->
     <picture class="fondo__fija">
+      <source media="(max-width: 719px)" type="image/avif" srcset="assets/onda/onda-movil.avif">
       <source media="(max-width: 719px)" type="image/webp" srcset="assets/onda/onda-movil.webp">
+      <source type="image/avif" srcset="assets/onda/onda-escritorio.avif">
       <img src="assets/onda/onda-escritorio.webp" alt="" width="1920" height="1080" decoding="async" fetchpriority="high">
     </picture>
     <canvas class="fondo__onda"></canvas>
@@ -381,6 +383,7 @@
   <script defer src="js/data/clientes.js"></script>
   <script defer src="js/brand.js"></script>
   <script defer src="js/engine/util.js"></script>
+  <script defer src="js/escenas.js"></script>
   <script defer src="js/fondo/onda.js"></script>
   <script defer src="js/home.js"></script>
   <script defer src="js/gris/clientes.js"></script>

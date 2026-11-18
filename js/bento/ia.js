@@ -2,7 +2,7 @@
    bento/ia.js — 04 · Software IA: metal líquido que "piensa" dentro de una red de nodos.
    Copiado tal cual del prototipo aprobado (evimes-cards/bento.html).
    ========================================================================== */
-import { THREE, chromeMat } from './shared.js';
+import { THREE, chromeMat, pmremDe, geoDe } from './shared.js';
 
 export const NOISE=`vec3 m289(vec3 x){return x-floor(x*(1./289.))*289.;}vec4 m289(vec4 x){return x-floor(x*(1./289.))*289.;}
 vec4 perm(vec4 x){return m289(((x*34.)+1.)*x);}vec4 tis(vec4 r){return 1.79284291400159-.85373472095314*r;}
@@ -30,7 +30,7 @@ function envLiquido(renderer){
   // suelo oscuro con dos brillos
   mancha(210,395,150,14,'0,229,255',.45);mancha(760,345,190,22,'235,242,255',.55);
   const t=new THREE.CanvasTexture(c);t.mapping=THREE.EquirectangularReflectionMapping;t.colorSpace=THREE.SRGBColorSpace;
-  const pm=new THREE.PMREMGenerator(renderer);const env=pm.fromEquirectangular(t).texture;t.dispose();pm.dispose();return env;
+  return pmremDe(renderer,t);
 }
 export function iaCard(ctx){
   const {scene,camera}=ctx;
@@ -42,7 +42,7 @@ export function iaCard(ctx){
   // Mercurio, no roca: con roughness .04 el estudio común (rectángulos con bordes
   // duros) se reflejaba como costuras rectas. El metal líquido usa el mismo estudio
   // pero suavizado (bandas difuminadas, sin bordes): reflejos continuos, como un líquido.
-  mat.envMap=envLiquido(ctx.renderer);
+  ctx.espera.push(envLiquido(ctx.renderer).then(e=>{mat.envMap=e;}));
   mat.onBeforeCompile=sh=>{Object.assign(sh.uniforms,U);
     const DISP=`uniform float uT,uPull,uAmp;uniform vec3 uM;\n${NOISE}
       vec3 dispP(vec3 p){vec3 n=normalize(p);float d=.13*snoise(n*.75+vec3(0.,0.,uT*.30))+.05*snoise(n*1.3+vec3(uT*.36,4.,0.))+.02*sin(uT*.9);
@@ -56,7 +56,8 @@ export function iaCard(ctx){
       float fr=pow(1.-clamp(abs(dot(normal,normalize(vViewPosition))),0.,1.),2.6);totalEmissiveRadiance+=vec3(0.,.75,1.)*fr*.55;`);
   };
   mat.customProgramCacheKey=()=>'ev-liquid';
-  const blob=new THREE.Mesh(new THREE.IcosahedronGeometry(1,64),mat);
+  const blob=new THREE.Mesh(new THREE.BufferGeometry(),mat);   // IcosahedronGeometry(1,64), generada en el worker
+  ctx.espera.push(geoDe({tipo:'icosa',r:1,detalle:64}).then(g=>{blob.geometry=g;}));
   const rig=new THREE.Group();rig.add(blob);scene.add(rig);
   // neural constellation around it: nodes on a shell + links that light up like thoughts
   const N=180,nodes=[];for(let i=0;i<N;i++){const u=Math.random()*2-1,a=Math.random()*Math.PI*2,rr=2.0+Math.random()*1.1;const s=Math.sqrt(1-u*u);nodes.push(new THREE.Vector3(s*Math.cos(a)*rr,u*rr*.8,s*Math.sin(a)*rr));}

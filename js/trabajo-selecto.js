@@ -7,6 +7,10 @@
      pantalla no se pinta. pixelRatio ≤ 2.
    · Pinta solo cuando hace falta (bajo demanda): el único movimiento es un
      parallax de ±3° con el ratón; quieto, no se repinta.
+   · Arranque escalonado (js/escenas.js → EV.gpu): se crea a menos de un
+     viewport, en su turno, troceado (cediendo el hilo entre pasos), con la
+     imagen decodificada antes de subirla y los shaders compilados en paralelo
+     (compileAsync); la escena se funde sobre la captura cuando está lista.
    · Movimiento reducido, ahorro de datos o sin WebGL: la captura fija
      assets/img/trabajo-portatil.jpg (se rehace con ?ts=captura →
      window.__tsCaptura()).
@@ -17,6 +21,7 @@ const THREE_URL = 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module
 const RB_URL = 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/geometries/RoundedBoxGeometry.js';
 const HERO = 'assets/img/disco-hero.jpg';
 const GRADO = Math.PI / 180;
+const G = (window.EV && window.EV.gpu) || { cede: () => new Promise(r => setTimeout(r, 0)), turno: fn => Promise.resolve().then(fn), pmrem: null };
 
 const raiz = document.querySelector('[data-ts-escena]');
 const captura = new URLSearchParams(location.search).get('ts') === 'captura';
@@ -36,13 +41,9 @@ function datosPSI() {
   });
 }
 
-function hayWebGL() {
-  try { const c = document.createElement('canvas'); return !!(window.WebGLRenderingContext && (c.getContext('webgl2') || c.getContext('webgl'))); }
-  catch (e) { return false; }
-}
-
 function iniciar() {
-  if (!captura && (EV.mode === 'still' || !hayWebGL())) return;   // se queda la captura fija (con alt)
+  // Sin sonda de WebGL (un contexto de prueba costaba): si el renderer no se puede crear, se queda la captura fija (con alt).
+  if (!captura && EV.mode === 'still') return;
   let creada = false, visible = false, api = null;
   new IntersectionObserver(es => {
     visible = es[0].isIntersecting;
@@ -51,13 +52,20 @@ function iniciar() {
       creada = true;
       crear().then(a => { api = a; api.visible(visible); }).catch(err => { console.warn('[trabajo selecto] sin 3D, captura fija', err); });
     }
-  }, { rootMargin: '200px 0px' }).observe(raiz);
+  }, { rootMargin: '100% 0px' }).observe(raiz);   // a menos de un viewport
 }
 
 async function crear() {
-  const [THREE, { RoundedBoxGeometry }] = await Promise.all([import(THREE_URL), import(RB_URL)]);
+  // Red y decodificación fuera del turno: Three.js, RoundedBoxGeometry y el hero de Disco (img.decode, fuera del hilo).
+  const heroImg = new Image(); heroImg.src = HERO;
+  const [THREE, { RoundedBoxGeometry }] = await Promise.all([import(THREE_URL), import(RB_URL), heroImg.decode()]);
+  return G.turno(() => montar(THREE, RoundedBoxGeometry, heroImg), 0);
+}
+
+async function montar(THREE, RoundedBoxGeometry, heroImg) {
   const cv = raiz.querySelector('canvas'), img = raiz.querySelector('img');
   const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, powerPreference: 'high-performance', preserveDrawingBuffer: captura });
+  renderer.debug.checkShaderErrors = false;      // producción: sin esperas síncronas en el primer uso de cada programa
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.setClearColor(0x141518, 1);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -66,8 +74,10 @@ async function crear() {
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
+  await G.cede();
   const scene = new THREE.Scene();
-  scene.environment = entornoOscuro(THREE, renderer);
+  scene.environment = await entornoOscuro(THREE, renderer);
+  await G.cede();
   const camera = new THREE.PerspectiveCamera(28, 16 / 11, 0.1, 60);
   // cámara baja, en tres cuartos: mira el portátil desde la izquierda hacia la derecha
   camera.position.set(-4.3, 0.95, 4.6);
@@ -78,6 +88,7 @@ async function crear() {
 
   /* ---------- bloque de hormigón oscuro, poroso ---------- */
   const tex = ruidoHormigon(THREE, renderer);
+  await G.cede();
   const hormigon = new THREE.MeshStandardMaterial({ color: 0x2a2a2b, roughness: 0.94, roughnessMap: tex, bumpMap: tex, bumpScale: 2.2, envMapIntensity: 0.35 });
   const bloque = new THREE.Mesh(new RoundedBoxGeometry(3.4, 1.1, 2.5, 4, 0.035), hormigon);
   bloque.position.y = -0.55; bloque.receiveShadow = true; bloque.castShadow = true;
@@ -150,14 +161,19 @@ async function crear() {
   new ResizeObserver(() => { medir(); if (visible) pintar(); }).observe(raiz);
   medir();
 
-  new THREE.TextureLoader().load(HERO, t => {
-    t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-    pantallaMat.map = t; pantallaMat.needsUpdate = true;
-    pintar();
-    raiz.classList.add('is-viva');
-    if (img) { img.alt = ''; img.setAttribute('aria-hidden', 'true'); }   // la descripción de la escena va en texto (#ts-escena)
-    if (captura) window.__tsCaptura = () => { pintar(); return cv.toDataURL('image/jpeg', 0.9); };
-  });
+  // la pantalla: el hero ya decodificado; se sube a la GPU en su tarea y los shaders se compilan en paralelo
+  const t = new THREE.Texture(heroImg);
+  t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy()); t.needsUpdate = true;
+  pantallaMat.map = t;
+  await G.cede();
+  renderer.initTexture(t); renderer.initTexture(tex);
+  await G.cede();
+  await renderer.compileAsync(scene, camera);
+  await G.cede();
+  pintar();                                      // primer fotograma (sombras incluidas) y fundido corto sobre la captura (css)
+  raiz.classList.add('is-viva');
+  if (img) { img.alt = ''; img.setAttribute('aria-hidden', 'true'); }   // la descripción de la escena va en texto (#ts-escena)
+  if (captura) window.__tsCaptura = () => { pintar(); return cv.toDataURL('image/jpeg', 0.9); };
 
   const quieto = EV.reducedMotion || EV.mode !== 'cine';
   if (!quieto) {
@@ -193,8 +209,9 @@ function entornoOscuro(THREE, renderer) {
   mancha(760, 190, 140, 22, 'rgba(170,195,255,.16)');     // franja fría (rim)
   mancha(520, 300, 380, 18, 'rgba(255,255,255,.08)');     // horizonte apenas
   const t = new THREE.CanvasTexture(c); t.mapping = THREE.EquirectangularReflectionMapping; t.colorSpace = THREE.SRGBColorSpace;
+  if (G.pmrem) return G.pmrem(THREE, renderer, t).then(env => { t.dispose(); return env; });
   const pm = new THREE.PMREMGenerator(renderer); const env = pm.fromEquirectangular(t).texture; t.dispose(); pm.dispose();
-  return env;
+  return Promise.resolve(env);
 }
 
 /* Ruido de hormigón pintado una vez en canvas (bump + roughness): grano fino,

@@ -2,7 +2,7 @@
    bento/web.js — 01 · Desarrollo web: una web desmontada en láminas de cristal con filo de cromo.
    Copiado tal cual del prototipo aprobado (evimes-cards/bento.html).
    ========================================================================== */
-import { THREE, chromeMat, roundedRect } from './shared.js';
+import { THREE, chromeMat, roundedRect, geoDe } from './shared.js';
 
 export function webCard(ctx){
   const {scene,camera}=ctx;
@@ -41,13 +41,18 @@ export function webCard(ctx){
   const PW=3.3,PH=PW*TH/TW;
   const glassShape=roundedRect(PW,PH,.16);
   const rig=new THREE.Group();scene.add(rig);
+  // Las 4 láminas son iguales: una sola geometría de cristal y una de filo para todas (mismo resultado,
+  // ¼ del trabajo), generadas en el worker con los mismos parámetros.
+  const geo=new THREE.BufferGeometry(),edgeGeo=new THREE.BufferGeometry(),vidrios=[],filos=[];
+  ctx.espera.push(geoDe({tipo:'extrude',shapes:glassShape.toJSON(),opts:{depth:.025,bevelEnabled:true,bevelThickness:.012,bevelSize:.012,bevelSegments:4,curveSegments:16}},[['translate',0,0,-.0125]])
+    .then(g=>vidrios.forEach(m=>{m.geometry=g;})));
+  ctx.espera.push(geoDe({tipo:'tube',pts:glassShape.getPoints(24).map(p=>[p.x,p.y,0]),cerrada:true,curva:'centripetal',seg:240,r:.011,radial:8,tubeCerrado:true})
+    .then(g=>filos.forEach(m=>{m.geometry=g;})));
   const panes=layers.map((tx,i)=>{
     const grp=new THREE.Group();
-    const geo=new THREE.ExtrudeGeometry(glassShape,{depth:.025,bevelEnabled:true,bevelThickness:.012,bevelSize:.012,bevelSegments:4,curveSegments:16});geo.translate(0,0,-.0125);
     const glass=new THREE.Mesh(geo,new THREE.MeshPhysicalMaterial({color:0x101a38,metalness:.1,roughness:.06,clearcoat:1,clearcoatRoughness:.04,envMapIntensity:1.6,transparent:true,opacity:i===0?.55:.16,depthWrite:false}));
     // chrome edge
-    const pts=glassShape.getPoints(24).map(p=>new THREE.Vector3(p.x,p.y,0));
-    const edge=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts,true),240,.011,8,true),chromeMat({roughness:.08}));
+    const edge=new THREE.Mesh(edgeGeo,chromeMat({roughness:.08}));vidrios.push(glass);filos.push(edge);
     const ui=new THREE.Mesh(new THREE.PlaneGeometry(PW*.96,PH*.96),new THREE.MeshBasicMaterial({map:tx,transparent:true,depthWrite:false,toneMapped:false,opacity:.95}));ui.position.z=.02;
     grp.add(glass,edge,ui);grp.renderOrder=i;glass.renderOrder=i*3;ui.renderOrder=i*3+1;rig.add(grp);return grp;
   });

@@ -2,7 +2,7 @@
    bento/star.js — 02 · Animaciones 3D: el destello de cromo con el EH grabado y la ráfaga azul y cian.
    Copiado tal cual del prototipo aprobado (evimes-cards/bento.html).
    ========================================================================== */
-import { THREE, chromeMat, planarCapUV, engraveEH } from './shared.js';
+import { THREE, chromeMat, engraveEH, geoDe } from './shared.js';
 
 export function starCard(ctx){
   const {scene,camera,el}=ctx;
@@ -28,10 +28,12 @@ export function starCard(ctx){
   const s0=q2(edges[0].A,edges[0].C,edges[0].B,E);sh.moveTo(s0[0],s0[1]);
   edges.forEach((e,i)=>{const pb=q2(e.A,e.C,e.B,1-E),c=sub(e.A,e.C,e.B,E,1-E);sh.quadraticCurveTo(c[0],c[1],pb[0],pb[1]);
     const n=edges[(i+1)%4],pa=q2(n.A,n.C,n.B,E);sh.quadraticCurveTo(e.B[0],e.B[1],pa[0],pa[1]);});
-  const DEPTH=.30;const geo=new THREE.ExtrudeGeometry(sh,{depth:DEPTH,curveSegments:64,bevelEnabled:true,bevelThickness:.1,bevelSize:.06,bevelSegments:18});
-  geo.translate(0,0,-DEPTH/2);planarCapUV(geo,R+.08);
-  const side=chromeMat(),face=chromeMat();const star=new THREE.Mesh(geo,[face,side]);const rig=new THREE.Group();rig.add(star);scene.add(rig);
-  engraveEH(face,.30);
+  // la extrusión (la parte pesada) se genera en el worker con los mismos parámetros
+  const DEPTH=.30;
+  const side=chromeMat(),face=chromeMat();const star=new THREE.Mesh(new THREE.BufferGeometry(),[face,side]);
+  ctx.espera.push(geoDe({tipo:'extrude',shapes:sh.toJSON(),opts:{depth:DEPTH,curveSegments:64,bevelEnabled:true,bevelThickness:.1,bevelSize:.06,bevelSegments:18}},
+    [['translate',0,0,-DEPTH/2],['capUV',R+.08]]).then(g=>{star.geometry=g;}));const rig=new THREE.Group();rig.add(star);scene.add(rig);
+  ctx.espera.push(new Promise(r=>engraveEH(face,.30,r)));   // compila ya con los mapas del grabado
   let spin=new THREE.Vector3(),drag=false,lx=0,ly=0;
   el.addEventListener('pointermove',e=>{if(drag){spin.y+=(e.clientX-lx)*.012;spin.x+=(e.clientY-ly)*.012;lx=e.clientX;ly=e.clientY;}});
   el.addEventListener('pointerdown',e=>{if(e.target.closest('a'))return;drag=true;lx=e.clientX;ly=e.clientY;el.setPointerCapture(e.pointerId)});

@@ -7,8 +7,11 @@
      (shader aditivo sobre la UV del tubo), cada una con su desfase.
    · Tubos individuales: cada tubo es un muelle propio (rigidez, retraso y
      respiración distintos, sin acoplamiento) que se aparta del cursor con
-     caída gaussiana. Campo de 96 puntos × 7 tubos en CPU, paso fijo 1/120 s,
-     que los vertex shaders leen de una DataTexture.
+     caída gaussiana. Campo de 96 puntos × 7 tubos en CPU, paso fijo 1/120 s
+     (máx. 4 sub-pasos por fotograma), que los vertex shaders leen de una DataTexture.
+   · Arranque escalonado (fix TBT, js/escenas.js): la escena se monta en su
+     turno, troceada (geometrías en js/geo-worker.js, PMREM y shaders
+     compilados en paralelo con compileAsync) y sin tareas largas.
    · Los dos extremos de cada banda se funden (alpha sobre la UV): nunca se
      ve el corte del tubo y la banda se apaga antes de llegar al texto.
    Un solo renderer. No tiene bucle propio: js/home.js llama a render() desde
@@ -30,7 +33,7 @@
   //   objetivo = tanh(lado/30) · push · exp(−d²/radius²) · presence + respiración
   // con su propio retraso; la tensión (26) solo une puntos del MISMO tubo.
   // Se sube cada fotograma a una DataTexture que leen los vertex shaders.
-  var TUBE = { W: 96, step: 1 / 120, maxSteps: 14, push: 0.52, radius: 210, max: 0.62, tension: 26, zeta: 0.82, breath: 0.032, breathSp: 0.07 };
+  var TUBE = { W: 96, step: 1 / 120, maxSteps: 4, push: 0.52, radius: 210, max: 0.62, tension: 26, zeta: 0.82, breath: 0.032, breathSp: 0.07 };
   // Carácter de cada tubo: valores fijos por índice (no cambian entre cargas).
   var tubeK = [22, 31, 16, 27, 14, 34, 19];                           // rigidez 14–34
   var tubeC = tubeK.map(function (k) { return 2 * TUBE.zeta * Math.sqrt(k); });   // casi crítica: sin rebotes
@@ -59,7 +62,9 @@
   var base = { x: 7.4, y: 0.2 };
   var s = { mx: 0, my: 0, hero: 0 };           // estado suavizado
   var dpr = 1, maxDpr = 1, slow = 0, mobile = false, w = 0, h = 0;
-  var cargando = null;                         // init protegido: un solo renderer y una sola escena
+  var primero = false;
+  var cargando = null;                       // init protegido: un solo renderer y una sola escena
+  var G = EV.gpu || { cede: function () { return new Promise(function (r) { setTimeout(r, 0); }); }, turno: function (fn) { return Promise.resolve().then(fn); } };
 
   function env() {
     var c = document.createElement('canvas'); c.width = 1024; c.height = 512;
@@ -81,9 +86,11 @@
     box(60, 380, 260, 24, '0,229,255', 0.35);
     var t = new T.CanvasTexture(c);
     t.mapping = T.EquirectangularReflectionMapping; t.colorSpace = T.SRGBColorSpace;
+    if (G.pmrem) return G.pmrem(T, renderer, t).then(function (e) { scene.environment = e; t.dispose(); });
     var pm = new T.PMREMGenerator(renderer);
     scene.environment = pm.fromEquirectangular(t).texture;
     t.dispose(); pm.dispose();
+    return Promise.resolve();
   }
 
   function bandCurve(L, amp) {
@@ -129,11 +136,12 @@
     });
   }
 
-  function build() {
+  async function build() {
     scene = new T.Scene();
     camera = new T.PerspectiveCamera(32, 1, 0.1, 100);
     camera.position.set(0, 0, 14);
-    env();
+    await env();
+    await G.cede();
     fadeU.value = new T.Vector4(0.06, 0.3, 0.97, 1.0);
 
     var chrome = new T.MeshPhysicalMaterial({
@@ -147,14 +155,23 @@
     var tub = mobile ? 260 : 420, rad = mobile ? 18 : 28, radL = mobile ? 12 : 20;
 
     group = new T.Group(); scene.add(group);
+    // Las 14 geometrías (cromo + luz de cada banda) se generan en js/geo-worker.js
+    // (EV.gpu.geometria: mismo TubeGeometry, mismos parámetros); se piden todas a la vez.
+    var r = 0.12, curvas = [], geos = [];
+    var tubo = function (curve, radio, radial) {
+      if (!G.geometria) { var g0 = new T.TubeGeometry(curve, tub, radio, radial, false); g0.scale(1, 1.55, 0.38); addS(g0); return Promise.resolve(g0); }
+      return G.geometria(T, { tipo: 'tube', pts: curve.points.map(function (v) { return [v.x, v.y, v.z]; }), curva: 'centripetal', seg: tub, r: radio, radial: radial }, [['scale', 1, 1.55, 0.38], ['aS']]);
+    };
+    for (var j = 0; j < N; j++) {
+      curvas.push(bandCurve(20 + j * 0.9, 0.95));
+      geos.push(Promise.all([tubo(curvas[j], r, rad), tubo(curvas[j], r * 1.04, radL)]));
+    }
     for (var i = 0; i < N; i++) {
-      var L = 20 + i * 0.9, r = 0.12;
-      var curve = bandCurve(L, 0.95);
-      var geo = new T.TubeGeometry(curve, tub, r, rad, false); geo.scale(1, 1.55, 0.38); addS(geo);
+      var curve = curvas[i];
+      var par = await geos[i], geo = par[0], lgeo = par[1];
       var u = { uField: { value: fieldTex }, uBand: { value: i }, uW: { value: TUBE.W }, uN: { value: N } };
       var mesh = new T.Mesh(geo, makeChrome(chrome, u));
       mesh.renderOrder = N - i;                     // de atrás hacia delante
-      var lgeo = new T.TubeGeometry(curve, tub, r * 1.04, radL, false); lgeo.scale(1, 1.55, 0.38); addS(lgeo);
       var lm = lightMat(i % 3 === 1 ? 0x9ef6ff : 0x00e5ff, u);
       var light = new T.Mesh(lgeo, lm);
       light.renderOrder = 100 + i;
@@ -168,6 +185,7 @@
         pts[k * 3] = q.x; pts[k * 3 + 1] = q.y * 1.55; pts[k * 3 + 2] = q.z * 0.38;
       }
       bands.push({ g: g, lm: lm, pts: pts, head: i * 0.37 - 0.3, speed: (0.11 + (i % 3) * 0.025) * 0.5 });   // luz: a la mitad
+      await G.cede();                               // una banda por tarea: ninguna pasa de ~50 ms
     }
     group.rotation.set(0.18, -0.32, 0.46);
   }
@@ -234,7 +252,8 @@
     }
   }
 
-  /* Paso fijo (acumulador, máx. 14 pasos por fotograma): igual a cualquier fps.
+  /* Paso fijo (acumulador, máx. 4 pasos por fotograma; si el fotograma es más largo,
+     el tiempo sobrante se descarta): igual a cualquier fps por encima de 30.
      Sin movimiento (reduced motion): todo a cero, tubos quietos. */
   var parado = false;
   function simular(dt, activo) {
@@ -251,8 +270,14 @@
     fieldTex.needsUpdate = true;
   }
 
+  // El tamaño del canvas se lee solo cuando cambia (ResizeObserver): leer clientWidth en
+  // cada fotograma forzaba un recálculo de estilos tras los cambios de opacidad del bucle.
+  var medir = true, ro = null;
   function resize() {
     if (!renderer) return;
+    if (!ro && window.ResizeObserver) { ro = new ResizeObserver(function () { medir = true; }); ro.observe(canvas); }
+    if (!medir && ro) return;
+    medir = false;
     var cw = canvas.clientWidth, ch = canvas.clientHeight;
     if (cw === w && ch === h) return;
     w = cw; h = ch;
@@ -277,6 +302,31 @@
     group.rotation.z = 0.46 + s.hero * 0.096;
   }
 
+  /* Montaje troceado (dentro de EV.gpu.turno): renderer → entorno → una banda
+     por tarea → shaders compilados en paralelo → primer fotograma. Entre paso y
+     paso se cede el hilo: ninguna tarea larga en la carga. */
+  async function montar() {
+    renderer = new T.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true, powerPreference: 'high-performance', preserveDrawingBuffer: false });
+    maxDpr = Math.min(window.devicePixelRatio || 1, 2);
+    dpr = maxDpr;
+    renderer.debug.checkShaderErrors = false;      // producción: sin esperas síncronas en el primer uso de cada programa
+    renderer.setPixelRatio(dpr);
+    renderer.setClearColor(0x000000, 0);
+    renderer.outputColorSpace = T.SRGBColorSpace;
+    renderer.toneMapping = T.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.3;
+    await G.cede();
+    await build();
+    resize();
+    place();
+    await renderer.compileAsync(scene, camera);   // shaders en paralelo (KHR_parallel_shader_compile): no bloquea
+    await G.cede();
+    renderer.render(scene, camera);               // primer fotograma: sube las geometrías (aún con el póster delante)
+    await G.cede();
+    EV.onda.ok = true;
+    return true;
+  }
+
   EV.onda = {
     ok: false,
 
@@ -288,25 +338,11 @@
       mobile = Math.min(screen.width, screen.height) < 720 || matchMedia('(pointer: coarse)').matches;
       cargando = import(THREE_URL).then(function (mod) {
         T = mod;
-        renderer = new T.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true, powerPreference: 'high-performance', preserveDrawingBuffer: false });
-        maxDpr = Math.min(window.devicePixelRatio || 1, 2);
-        dpr = maxDpr;
-        renderer.setPixelRatio(dpr);
-        renderer.setClearColor(0x000000, 0);
-        renderer.outputColorSpace = T.SRGBColorSpace;
-        renderer.toneMapping = T.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.3;
-        build();
-        resize();
-        place();
-        renderer.compile(scene, camera);
-        EV.onda.ok = true;
-        return true;
+        return G.turno(montar, 10);                 // la onda del hero va antes que cualquier otra escena
       });
       cargando.catch(function () { cargando = null; });
       return cargando;
     },
-
     resize: resize,
 
     /* Un "pulso" en los tubos (sin uso ahora): un golpe de velocidad gaussiano
@@ -327,8 +363,10 @@
     /* dt: segundos · inp: { mx, my (−0.5..0.5), hero (0..1), luz, cuerdas (bool) } */
     render: function (dt, inp) {
       if (!renderer) return;
+      // Primer fotograma en vivo: delta limitado (el de la carga puede ser enorme).
+      if (!primero) { primero = true; dt = Math.min(dt, 1 / 60); }
       resize();
-      var k = 1 - Math.pow(1 - 0.018, dt * 60);    // inclinación por el ratón: lerp 0.018 a 60 fps (antes 0.05)
+      var k =1 - Math.pow(1 - 0.018, dt * 60);    // inclinación por el ratón: lerp 0.018 a 60 fps (antes 0.05)
       var kh = 1 - Math.pow(1 - 0.035, dt * 60);   // scroll del hero: 0.035 (antes 0.08)
       s.mx += (inp.mx - s.mx) * k;
       s.my += (inp.my - s.my) * k;
@@ -351,7 +389,7 @@
       if (dt > 0.022 && dt < 0.25) slow += dt; else slow = Math.max(0, slow - dt * 0.5);
       if (slow > 1.2 && dpr > 1) {
         dpr = Math.max(1, dpr - 0.5); slow = 0;
-        renderer.setPixelRatio(dpr); w = h = 0; resize();
+        renderer.setPixelRatio(dpr); w = h = 0; medir = true; resize();
       }
     },
 
