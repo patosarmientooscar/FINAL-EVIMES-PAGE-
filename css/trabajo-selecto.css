@@ -1,0 +1,91 @@
+/* ==========================================================================
+   trabajo-selecto.css — "Trabajo selecto" en la home, en NEGRO (el fondo
+   global: #0b0c0f con las líneas finas; la sección no pinta fondo propio).
+   Composición al revés que "Con quién trabajamos": la tarjeta visual a la
+   izquierda (7 columnas) y el texto a la derecha (5).
+   · .ts-card: tarjeta oscura con la escena 3D (js/trabajo-selecto.js) y, debajo,
+     el nombre y una línea. Toda la tarjeta es un enlace a oficina.html.
+   · .ts-psi: los 4 datos REALES de PageSpeed (js/data/pagespeed.js) con anillo
+     fino; el cian, solo en el trazo del anillo.
+   ========================================================================== */
+.ts {
+  --ts-card: #141518;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: clamp(16px, 2vw, 32px);
+  align-items: center;
+  padding: clamp(96px, 16vh, 180px) var(--g);
+  max-width: calc(1480px + 2 * var(--g));
+  margin-inline: auto;
+  color: var(--ink);
+}
+.ts :where(p, h2, ul) { margin: 0; }
+.ts__visual { grid-column: 1 / span 7; }
+.ts__texto { grid-column: 9 / span 4; }
+
+/* ---------- la tarjeta ---------- */
+.ts-card {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 18px;
+  background: var(--ts-card);
+  border: 1px solid rgb(255 255 255 / 0.06);
+  color: inherit;
+  text-decoration: none;
+  transition: transform 0.5s var(--ease), border-color 0.5s var(--ease);
+}
+.ts-card:hover { transform: translateY(-2px); border-color: rgb(255 255 255 / 0.12); }
+.ts-card:focus-visible { outline: 2px solid var(--stone); outline-offset: 4px; }
+.ts-card__escena { position: relative; aspect-ratio: 16 / 11; }
+.ts-card__escena > img, .ts-card__escena > canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.ts-card__escena > img { max-width: none; object-fit: cover; transition: opacity 0.6s var(--ease); }
+.ts-card__escena > canvas { opacity: 0; transition: opacity 0.6s var(--ease); }
+.ts-card__escena.is-viva > canvas { opacity: 1; }
+.ts-card__escena.is-viva > img { opacity: 0; }
+/* abajo, la escena se funde con el fondo de la tarjeta */
+.ts-card__escena::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 34%;
+  background: linear-gradient(to bottom, rgb(20 21 24 / 0), var(--ts-card));
+  pointer-events: none;
+}
+.ts-card__pie { position: relative; padding: 0 clamp(22px, 2.6vw, 36px) clamp(24px, 2.8vw, 36px); margin-top: -8px; }
+.ts-card__nombre {
+  font-size: clamp(26px, 2.4vw, 38px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  /* degradado sutil de blanco a gris (el texto es grande: AA con 3:1 en todo el recorrido) */
+  background: linear-gradient(180deg, #f4f1ea 0%, #f4f1ea 35%, #9a9ca3 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.ts-card__linea { margin-top: 10px; font-size: clamp(14px, 1.05vw, 16px); line-height: 1.5; color: var(--ink-muted); }
+
+/* ---------- el texto ---------- */
+.ts .label { font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-faint); }
+.ts__titulo { margin-top: 18px; font-size: clamp(32px, 3.2vw, 52px); line-height: 1.02; letter-spacing: -0.02em; text-wrap: balance; }
+/* subrayado cian muy fino, solo en la segunda frase */
+.ts__sub { display: block; text-decoration: underline; text-decoration-color: var(--cyan); text-decoration-thickness: 1px; text-underline-offset: 0.14em; }
+.ts__parrafo { margin-top: 24px; max-width: 44ch; font-size: clamp(15px, 1.15vw, 17px); line-height: 1.6; color: var(--ink-muted); text-wrap: pretty; }
+
+.ts-psi { list-style: none; padding: 0; margin-top: 28px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(10px, 1.2vw, 18px); }
+.ts-psi__g { position: relative; display: grid; align-content: start; justify-items: center; text-align: center; gap: 10px; }
+.ts-psi__g svg { width: 100%; max-width: 76px; aspect-ratio: 1; transform: rotate(-90deg); grid-area: 1 / 1; }
+.ts-psi__g b { grid-area: 1 / 1; align-self: center; font: 600 clamp(17px, 1.45vw, 21px) / 1 var(--font-text); color: var(--stone); letter-spacing: -0.02em; }
+.ts-psi__g span { font-size: 12px; line-height: 1.25; color: var(--ink-faint); }
+.ts-psi__base { fill: none; stroke: rgb(233 227 216 / 0.1); stroke-width: 1.2; }
+.ts-psi__arco { fill: none; stroke: var(--cyan); stroke-width: 1.2; stroke-linecap: round; stroke-dasharray: 182.2; stroke-dashoffset: calc(182.2 * (1 - var(--v) / 100)); }
+.ts__fuente { margin-top: 18px; font-size: 13px; color: var(--ink-faint); }
+.ts__botones { margin-top: 32px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 28px; }
+
+@media (max-width: 900px) {
+  .ts { row-gap: 44px; padding-block: clamp(72px, 12vh, 120px); }
+  .ts__visual, .ts__texto { grid-column: 1 / -1; }
+  .ts-psi { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 320px; row-gap: 22px; }
+}
+@media (prefers-reduced-motion: reduce) { .ts-card, .ts-card__escena > * { transition: none; } .ts-card:hover { transform: none; } }

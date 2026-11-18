@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Servicios — bento "Cuatro oficios. Un mismo nivel." (index.html, panel gris).
+   Servicios — bento "Qué hacemos. Un mismo nivel." (index.html, panel gris).
    EDITABLE. BORRADOR: Oscar debe confirmar títulos, frases y pistas. Sin cifras.
    ancla: sección de servicios.html a la que lleva "Ver más →".
    pista: la indicación de la esquina (vacía = sin pista).

@@ -25,7 +25,7 @@
 .que-hacemos p { text-wrap: pretty; }
 
 .que-hacemos .label { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: rgba(11,16,32,.62); } /* prototipo .55 = 3,9:1; .62 = 4,9:1 (AA) */
-.que-hacemos h2 { font-size: clamp(38px,5.6vw,84px); line-height: 1; margin-top: 18px; max-width: 15ch; }
+.que-hacemos h2 { font-size: clamp(38px,5.6vw,84px); line-height: 1; margin-top: 0; max-width: 15ch; }
 
 .bento { margin-top: clamp(36px,6vh,64px); display: grid; grid-template-columns: repeat(12,1fr); grid-auto-rows: clamp(380px,36vw,600px); gap: clamp(12px,1.4vw,20px); max-width: 1400px; }
 .c-web { grid-column: span 5 } .c-3d { grid-column: span 7 } .c-seo { grid-column: span 7 } .c-ia { grid-column: span 5 }
@@ -76,14 +76,15 @@
 .que-hacemos .bento .card canvas,
 .que-hacemos .bento .card .poster { inset: 0 0 0 auto; width: 56%;
   -webkit-mask-image: linear-gradient(to right, transparent, #000 24%); mask-image: linear-gradient(to right, transparent, #000 24%); }
-.que-hacemos .bento .meta { right: auto; width: 46%; flex-direction: column; align-items: flex-start; gap: 20px; }
+/* Sin numeración (desde backup-pre-trabajo-selecto): el texto va centrado en vertical en su columna, sin hueco arriba. */
+.que-hacemos .bento .meta { top: 0; bottom: 0; right: auto; width: 46%; flex-direction: column; justify-content: center; align-items: flex-start; gap: 20px; }
 .que-hacemos .bento .meta h3 { font-size: clamp(26px, 2.3vw, 40px); }
 .que-hacemos .bento .meta p { max-width: 28ch; }
 @media (max-width: 900px) {
   .que-hacemos .bento { grid-template-columns: 1fr; }
   .que-hacemos .bento .card { aspect-ratio: 4 / 3; }
   .que-hacemos .bento .card canvas, .que-hacemos .bento .card .poster { width: 56%; }
-  .que-hacemos .bento .meta { width: 46%; gap: 14px; bottom: clamp(18px, 5vw, 26px); }
+  .que-hacemos .bento .meta { width: 46%; gap: 14px; }
   .que-hacemos .bento .meta h3 { font-size: clamp(22px, 6.4vw, 28px); }
   .que-hacemos .bento .meta p { margin-top: 8px; font-size: 14px; line-height: 1.45; }
   .que-hacemos .bento .more { padding: 10px 16px; font-size: 14px; }

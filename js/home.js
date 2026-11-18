@@ -24,7 +24,7 @@
   var vw = 0, vh = 0;
   var lay = {};                           // posiciones cacheadas (se recalculan al cambiar el tamaño)
   var mouse = { x: 0, y: 0 };
-  var ondaIntro = 0, ondaOpacity = -1, fijaOpacity = -1, posterFuera = false;
+  var ondaOpacity = -1, fijaOpacity = -1, posterFuera = false;
   var cabClara = null;
   var sinOnda = false;                    // Three.js no cargó: imagen fija en su lugar
 
@@ -41,8 +41,8 @@
   function measure() {
     vw = window.innerWidth; vh = window.innerHeight;
     var y = scrollY();
-    var r = el.panel.getBoundingClientRect();
-    lay.panelTop = r.top + y; lay.panelBottom = r.bottom + y;
+    // Las secciones grises (el gris va partido: Qué hacemos | Trabajo selecto en negro | Con quién).
+    lay.grises = $$('.panel').map(function (n) { var r = n.getBoundingClientRect(); return { top: r.top + y, bottom: r.bottom + y }; });
     var c = el.cab.getBoundingClientRect();
     lay.cabTop = c.top; lay.cabBottom = c.bottom;
   }
@@ -180,14 +180,18 @@
   /* ---------- estado por scroll (sin lecturas de layout por fotograma) ---------- */
   function estado(y) {
     var hero = U.clamp01(y / vh);
-    // Opacidad de las bandas: 1 en el hero → 0.3 fuera; 0 si el panel gris cubre la pantalla.
-    var cubierta = (lay.panelTop - y) <= 0 && (lay.panelBottom - y) >= vh;
+    // Opacidad de las bandas: 1 en el hero → 0.3 fuera; 0 si una sección gris cubre la pantalla.
+    var mid = (lay.cabTop + lay.cabBottom) / 2, cubierta = false, dentro = false;
+    for (var i = 0; i < lay.grises.length; i++) {
+      var t = lay.grises[i].top - y, b = lay.grises[i].bottom - y;
+      if (t <= 0 && b >= vh) cubierta = true;
+      if (t < mid && b > mid) dentro = true;
+    }
     var op = cubierta ? 0 : U.lerp(1, 0.3, U.smooth(0.3, 1.05, hero));
 
-    // Cabecera clara cuando el panel gris pasa por su línea central.
-    var pt = lay.panelTop - y, pb = lay.panelBottom - y, mid = (lay.cabTop + lay.cabBottom) / 2;
+    // Cabecera clara cuando una sección gris pasa por su línea central.
     // Sobre la oficina (js/oficina/), cristal oscuro: la oficina pone EV.cabeceraOscura.
-    var clara = pt < mid && pb > mid && !EV.cabeceraOscura;
+    var clara = dentro && !EV.cabeceraOscura;
     if (clara !== cabClara) { cabClara = clara; el.cab.classList.toggle('is-clara', clara); }
 
     var scrolled = y > 40;
@@ -204,24 +208,23 @@
 
   /* ---------- bucle ----------
      Hasta el primer gesto se ve el póster (las bandas sin luces, con
-     transparencia, sacadas del propio render, assets/onda/). Con el gesto carga Three.js y la
-     onda en vivo entra por debajo mientras el póster se funde. */
+     transparencia, sacadas del propio render, assets/onda/). Con el gesto carga Three.js y,
+     en su primer fotograma, la onda en vivo sustituye al póster de golpe. */
   function tick(time, dtMs) {
     var dt = Math.min((dtMs || 16.7) / 1000, 0.1);
     var st = estado(scrollY());
     var vivo = EV.onda.ok && !sinOnda;
-    if (vivo && ondaIntro < 1) ondaIntro = Math.min(1, ondaIntro + dt / 1.4);
-    var intro = U.cubicOut(ondaIntro);
-
+    // Un solo conjunto de tubos, siempre: el póster es el mismo render en la misma
+    // pose, así que en el primer fotograma en vivo se cambia de golpe (antes se
+    // fundían 1,4 s con el póster a opacidad 1 mientras los tubos vivos ya se
+    // movían con el scroll y el ratón: se veían dos conjuntos desplazados).
     if (!posterFuera && !sinOnda) {
-      // Alfa del póster para que las bandas valgan exactamente st.op en cada momento.
-      var a = intro >= 1 ? 0 : st.op * (1 - intro) / Math.max(1e-3, 1 - st.op * intro);
-      fijaOpacity = setOpacity(el.fija, a, fijaOpacity);
-      if (intro >= 1) { posterFuera = true; root.classList.add('onda-viva'); }
+      if (vivo) { posterFuera = true; root.classList.add('onda-viva'); }
+      else fijaOpacity = setOpacity(el.fija, st.op, fijaOpacity);
     }
 
     if (vivo) {
-      var op = st.op * intro;
+      var op = st.op;
       ondaOpacity = setOpacity(el.onda, op, ondaOpacity);
       if (op > 0.001) EV.onda.render(dt, { mx: mouse.x, my: mouse.y, hero: st.hero, luz: true, cuerdas: !EV.reducedMotion });
     }

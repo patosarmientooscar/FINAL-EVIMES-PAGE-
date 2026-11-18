@@ -59,6 +59,7 @@
   var base = { x: 7.4, y: 0.2 };
   var s = { mx: 0, my: 0, hero: 0 };           // estado suavizado
   var dpr = 1, maxDpr = 1, slow = 0, mobile = false, w = 0, h = 0;
+  var cargando = null;                         // init protegido: un solo renderer y una sola escena
 
   function env() {
     var c = document.createElement('canvas'); c.width = 1024; c.height = 512;
@@ -281,9 +282,11 @@
 
     /* Carga Three.js y monta la escena. Resuelve true si hay WebGL. */
     load: function (cv) {
+      // Nunca dos veces (gesto repetido, otra llamada, vuelta desde bfcache): la misma promesa.
+      if (cargando) return cargando;
       canvas = cv;
       mobile = Math.min(screen.width, screen.height) < 720 || matchMedia('(pointer: coarse)').matches;
-      return import(THREE_URL).then(function (mod) {
+      cargando = import(THREE_URL).then(function (mod) {
         T = mod;
         renderer = new T.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true, powerPreference: 'high-performance', preserveDrawingBuffer: false });
         maxDpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -300,6 +303,8 @@
         EV.onda.ok = true;
         return true;
       });
+      cargando.catch(function () { cargando = null; });
+      return cargando;
     },
 
     resize: resize,

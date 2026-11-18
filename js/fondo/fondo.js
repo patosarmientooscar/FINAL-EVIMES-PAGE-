@@ -20,7 +20,7 @@
   var el = { onda: $('.fondo__onda'), fija: $('.fondo__fija'), cab: $('.cabecera') };
   var OP0 = parseFloat(document.body.dataset.fondoOp || '0.5');
   var lenis = null, vw = 0, vh = 0, grises = [], cabMid = 0, mouse = { x: 0, y: 0 };
-  var ondaIntro = 0, ondaOpacity = -1, fijaOpacity = -1, posterFuera = false, sinOnda = false, cabClara = null;
+  var ondaOpacity = -1, fijaOpacity = -1, posterFuera = false, sinOnda = false, cabClara = null;
 
   function scrollY() { return lenis ? lenis.scroll : window.scrollY; }
   function measure() {
@@ -37,6 +37,8 @@
       if (t <= 0 && b >= vh) cubierta = true;
       if (t < cabMid && b > cabMid) clara = true;
     }
+    // Sobre la ventana abierta de la oficina (oficina.html), cristal oscuro: la pone js/oficina/ (EV.cabeceraOscura).
+    if (EV.cabeceraOscura) clara = false;
     if (clara !== cabClara) { cabClara = clara; el.cab.classList.toggle('is-clara', clara); }
     var s = y > 40; if (el.cab._s !== s) { el.cab._s = s; el.cab.classList.toggle('is-scroll', s); }
     return { hero: hero, cubierta: cubierta, op: cubierta ? 0 : U.lerp(OP0, 0.3, U.smooth(0.3, 1.05, hero)) };
@@ -47,15 +49,13 @@
     var dt = Math.min((dtMs || 16.7) / 1000, 0.1);
     var st = estado(scrollY());
     var vivo = EV.onda.ok && !sinOnda;
-    if (vivo && ondaIntro < 1) ondaIntro = Math.min(1, ondaIntro + dt / 1.4);
-    var intro = U.cubicOut(ondaIntro);
+    // Un solo conjunto de tubos: cambio de golpe póster → vivo (ver js/home.js).
     if (!posterFuera && !sinOnda) {
-      var a = intro >= 1 ? 0 : st.op * (1 - intro) / Math.max(1e-3, 1 - st.op * intro);
-      fijaOpacity = setOpacity(el.fija, a, fijaOpacity);
-      if (intro >= 1) { posterFuera = true; root.classList.add('onda-viva'); }
+      if (vivo) { posterFuera = true; root.classList.add('onda-viva'); }
+      else fijaOpacity = setOpacity(el.fija, st.op, fijaOpacity);
     }
     if (vivo) {
-      var op = st.op * intro;
+      var op = st.op;
       ondaOpacity = setOpacity(el.onda, op, ondaOpacity);
       if (op > 0.001) EV.onda.render(dt, { mx: mouse.x, my: mouse.y, hero: st.hero, luz: true, cuerdas: !EV.reducedMotion });
     }

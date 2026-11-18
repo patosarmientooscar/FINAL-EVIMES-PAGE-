@@ -77,6 +77,9 @@
   <link rel="preload" as="image" type="image/webp" href="assets/onda/onda-escritorio.webp" media="(min-width: 720px)">
   <link rel="preload" href="assets/fonts/fraunces-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/schibsted-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <!-- Import map: "three" = la MISMA URL que usan js/fondo/onda.js y js/bento/ (un solo Three.js 0.160.0);
+       lo necesitan los addons que importan "three" a secas (RoundedBoxGeometry en js/trabajo-selecto.js). -->
+  <script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js" } }</script>
   <link rel="stylesheet" href="css/fonts.css">
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/base.css">
@@ -84,7 +87,7 @@
   <link rel="stylesheet" href="css/home.css">
   <link rel="stylesheet" href="css/bento.css">
   <link rel="stylesheet" href="css/gris.css">
-  <link rel="stylesheet" href="css/oficina.css">
+  <link rel="stylesheet" href="css/trabajo-selecto.css">
   <link rel="stylesheet" href="css/con-quien.css">
   <link rel="stylesheet" href="css/contacto.css">
 </head>
@@ -132,7 +135,7 @@
         <p class="portada__sub aparece"><span data-c="inicio.hero.sub">Diseño web a medida en Madrid. Webs rápidas, únicas y pensadas para convertir visitas en clientes.</span> <strong data-c="inicio.hero.desde">Desde 150&nbsp;€.</strong></p>
         <div class="portada__botones aparece">
           <a class="pastilla pastilla--grande" href="#contacto" data-scramble><span class="sl" data-c="inicio.hero.cta">Pide tu propuesta</span></a>
-          <a class="enlace" href="#oficina" data-scramble><span class="sl" data-c="inicio.hero.secundario">Ver proyectos</span></a>
+          <a class="enlace" href="#trabajo" data-scramble><span class="sl" data-c="inicio.hero.secundario">Ver proyectos</span></a>
         </div>
       </div>
       <p class="portada__desliza" aria-hidden="true"><i></i><span data-c="inicio.hero.desliza">Desliza</span></p>
@@ -174,71 +177,76 @@
       </div>
     </section>
 
-    <!-- ===== Panel gris: qué hacemos (bento) → trabajo selecto → la oficina (#oficina-slot) → con quién trabajamos ===== -->
-    <section class="panel" id="oficina" aria-label="Qué hacemos, trabajo selecto y con quién trabajamos">
+    <!-- ===== Panel gris (1): Qué hacemos. El gris va partido: Qué hacemos | Trabajo selecto (negro) | Con quién trabajamos ===== -->
+    <section class="panel panel--que" aria-labelledby="qh">
 
       <!-- 1. Qué hacemos: bento de 4 cards 3D (prototipo aprobado: evimes-cards/bento.html).
            Textos: js/data/servicios.js (BORRADOR). Escenas: js/bento/. Estilos: css/bento.css. -->
       <div class="que-hacemos" id="que-hacemos" role="group" aria-labelledby="qh">
-        <p class="label">Qué hacemos</p>
-        <h2 class="display" id="qh">Cuatro oficios. Un mismo nivel.</h2>
+        <h2 class="display" id="qh">Qué hacemos. Un mismo nivel.</h2>
 
         <div class="bento" data-bento>
           <article class="card c-web" data-kind="web" data-servicio="web">
             <canvas aria-hidden="true"></canvas>
-            <div class="num"><b>01</b> / 04</div>
             <div class="meta"><div><h3 class="display">Desarrollo web</h3><p>Webs a medida, rápidas y hechas a mano. Sin plantillas.</p></div><a class="more" href="servicios.html#web" data-scramble aria-label="Ver más sobre Desarrollo web"><span class="sl">Ver más</span> →</a></div>
           </article>
           <article class="card c-3d" data-kind="star" data-servicio="3d">
             <canvas aria-hidden="true"></canvas>
-            <div class="num"><b>02</b> / 04</div><div class="hint" aria-hidden="true">ARRÁSTRALO</div>
+            <div class="hint" aria-hidden="true">ARRÁSTRALO</div>
             <div class="meta"><div><h3 class="display">Animaciones 3D</h3><p>Experiencias 3D y WebGL que la gente recuerda.</p></div><a class="more" href="servicios.html#3d" data-scramble aria-label="Ver más sobre Animaciones 3D"><span class="sl">Ver más</span> →</a></div>
           </article>
           <article class="card c-seo" data-kind="pin" data-servicio="seo">
             <canvas aria-hidden="true"></canvas>
-            <div class="num"><b>03</b> / 04</div>
             <div class="meta"><div><h3 class="display">Posicionamiento</h3><p>Que te encuentren en Google, en Maps y en las respuestas de la IA.</p></div><a class="more" href="servicios.html#seo" data-scramble aria-label="Ver más sobre Posicionamiento"><span class="sl">Ver más</span> →</a></div>
           </article>
           <article class="card c-ia" data-kind="ia" data-servicio="ia">
             <canvas aria-hidden="true"></canvas>
-            <div class="num"><b>04</b> / 04</div>
             <div class="meta"><div><h3 class="display">Software IA</h3><p>Agentes, bots y herramientas con IA que trabajan por ti.</p></div><a class="more" href="servicios.html#ia" data-scramble aria-label="Ver más sobre Software IA"><span class="sl">Ver más</span> →</a></div>
           </article>
         </div>
       </div>
 
-      <!-- 2. Trabajo selecto + la oficina (#oficina-slot, track de 470vh): la ventana se abre desde una card,
-           EVIMES se enciende, la cámara va al monitor, la web de Disco sube como una card (con su PageSpeed)
-           y se vuelve a cerrar en card. Prototipo aprobado: Downloads/evimes-oficina/index.html.
-           Textos: js/data/oficina.js (BORRADOR) · proyecto y rutas: js/oficina/config.js
-           Escena: js/oficina/ · estilos: css/oficina.css -->
-      <div class="intro" id="trabajo" role="group" aria-labelledby="ts">
-        <p class="label" data-of="intro.label">Trabajo selecto</p>
-        <h2 class="display" id="ts" data-of="intro.titulo">Webs que dan que hablar.</h2>
-        <p data-of="intro.texto">Pasa. Siéntate en nuestra mesa y mira lo que sale de la pantalla.</p>
-        <p class="intro__mas"><a class="enlace" href="proyectos.html" data-scramble><span class="sl">Ver todos los proyectos</span> →</a></p>
-      </div>
+    </section>
 
-      <div class="track" id="oficina-slot" data-oficina>
-        <div class="stage">
-          <!-- Visita automática: barra de progreso (js/oficina/index.js) -->
-          <div class="of-barra" aria-hidden="true"><i data-of-barra></i></div>
-          <div class="window" id="win">
-            <picture class="espera" aria-hidden="true">
-              <source media="(max-aspect-ratio: 9/10)" srcset="assets/oficina/oficina-espera-movil.webp">
-              <img src="assets/oficina/oficina-espera.webp" alt="" width="480" height="270" decoding="async">
-            </picture>
+    <!-- ===== Trabajo selecto (NEGRO, el fondo global): a la izquierda la web de Disco en un portátil 3D
+         (js/trabajo-selecto.js, Three.js 0.160.0 con RoundedBoxGeometry; sin WebGL, assets/img/trabajo-portatil.jpg),
+         a la derecha el texto y los datos REALES de PageSpeed (js/data/pagespeed.js). La card lleva a la oficina
+         (oficina.html). Composición al revés que "Con quién trabajamos". Estilos: css/trabajo-selecto.css ===== -->
+    <section class="ts" id="trabajo" aria-labelledby="ts-h">
+      <div class="ts__visual">
+        <a class="ts-card" href="oficina.html" aria-label="Entrar en la oficina: Disco Producción" aria-describedby="ts-escena">
+          <div class="ts-card__escena" data-ts-escena>
+            <img class="ts-card__fija" src="assets/img/trabajo-portatil.jpg" alt="Un portátil negro abierto sobre un bloque de hormigón oscuro, con la portada de la web de Disco Producción en la pantalla." width="1450" height="998" loading="lazy" decoding="async">
             <canvas aria-hidden="true"></canvas>
-            <div class="scrim"></div>
-            <div class="cap" data-cap="1"><p class="k" data-of="cap1.k">El estudio</p><h3 class="display" data-of="cap1.titulo">Aquí se hacen.</h3><p data-of="cap1.texto">Una oficina pequeña en Madrid, gente que diseña y programa cada web a mano.</p></div>
-            <div class="cap" data-cap="2"><p class="k" data-of="cap2.k">Trabajo selecto · 01</p><h3 class="display" data-of="cap2.titulo">Disco <span class="accent">Producción</span></h3><p data-of="cap2.texto">Productora audiovisual en Madrid. Su web ya está dando que hablar.</p>
-              <a class="btn" href="https://discoproduccion.com" target="_blank" rel="noopener" data-scramble aria-label="Ver la web de Disco Producción (abre en una pestaña nueva)"><span class="sl" data-of="cap2.boton">Ver la web</span> <i aria-hidden="true">→</i></a></div>
-            <div class="hud" aria-hidden="true" data-of="hud">Desliza</div>
-            <!-- PageSpeed de la web de Disco (js/data/pagespeed.js): 4 indicadores + píldora, colocados junto a la card -->
-            <div class="psi" data-psi role="img" aria-label="PageSpeed Insights de discoproduccion.com"></div>
           </div>
+          <div class="ts-card__pie">
+            <p class="display ts-card__nombre">Disco Producción</p>
+            <p class="ts-card__linea">Productora audiovisual en Madrid. Su web ya da que hablar.</p>
+          </div>
+        </a>
+        <p class="sr-only" id="ts-escena">Un portátil negro de aluminio, abierto, apoyado sobre un bloque de hormigón oscuro, con la portada de la web de Disco Producción encendida en la pantalla.</p>
+      </div>
+      <div class="ts__texto">
+        <p class="label">Trabajo selecto</p>
+        <h2 class="display ts__titulo" id="ts-h">Disco Producción. <span class="ts__sub">Su web ya da que hablar.</span></h2>
+        <p class="ts__parrafo">Una web con el ritmo de lo que graban: flash de cámara al entrar, un hero que reacciona al ratón y su estudio en 3D. Rápida y accesible, medida con Google:</p>
+        <!-- Datos REALES (js/data/pagespeed.js). Anillo fino; el cian, solo en el trazo. -->
+        <ul class="ts-psi" data-ts-psi role="list" aria-label="PageSpeed Insights de discoproduccion.com">
+          <li class="ts-psi__g" data-k="rendimiento"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="ts-psi__base" cx="32" cy="32" r="29"/><circle class="ts-psi__arco" cx="32" cy="32" r="29" style="--v:99"/></svg><b>99</b><span>Rendimiento</span></li>
+          <li class="ts-psi__g" data-k="accesibilidad"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="ts-psi__base" cx="32" cy="32" r="29"/><circle class="ts-psi__arco" cx="32" cy="32" r="29" style="--v:100"/></svg><b>100</b><span>Accesibilidad</span></li>
+          <li class="ts-psi__g" data-k="buenasPracticas"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="ts-psi__base" cx="32" cy="32" r="29"/><circle class="ts-psi__arco" cx="32" cy="32" r="29" style="--v:100"/></svg><b>100</b><span>Buenas prácticas</span></li>
+          <li class="ts-psi__g" data-k="seo"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="ts-psi__base" cx="32" cy="32" r="29"/><circle class="ts-psi__arco" cx="32" cy="32" r="29" style="--v:100"/></svg><b>100</b><span>SEO</span></li>
+        </ul>
+        <p class="ts__fuente">PageSpeed Insights · discoproduccion.com · noviembre 2026</p>
+        <div class="ts__botones">
+          <a class="pastilla" href="oficina.html" data-scramble><span class="sl">Entrar en la oficina</span> <span aria-hidden="true">→</span></a>
+          <a class="enlace" href="https://discoproduccion.com" target="_blank" rel="noopener" data-scramble><span class="sl">Ver la web de Disco</span><span class="sr-only"> (se abre en otra pestaña)</span></a>
         </div>
       </div>
+    </section>
+
+    <!-- ===== Panel gris (2): Con quién trabajamos ===== -->
+    <section class="panel panel--cq" aria-label="Con quién trabajamos">
 
       <!-- 3. Con quién trabajamos (última sección del gris). Prototipo aprobado: evimes-cards/con-quien.html.
            Textos: js/data/clientes.js (BORRADOR; js/gris/clientes.js repinta los paneles desde ahí).
@@ -369,7 +377,6 @@
   <script defer src="js/content.js"></script>
   <script defer src="js/data/planes.js"></script>
   <script defer src="js/data/servicios.js"></script>
-  <script defer src="js/data/oficina.js"></script>
   <script defer src="js/data/pagespeed.js"></script>
   <script defer src="js/data/clientes.js"></script>
   <script defer src="js/brand.js"></script>
@@ -380,8 +387,8 @@
   <script defer src="js/contacto/form.js"></script>
   <!-- Bento: módulo ES; Three.js 0.160.0 (la misma URL que la onda) se importa al acercarse al bento. -->
   <script type="module" src="js/bento/index.js"></script>
-  <!-- La oficina: módulo ES; Three.js 0.160.0 y el panorama se cargan a una pantalla de distancia. -->
-  <script type="module" src="js/oficina/index.js"></script>
+  <!-- Trabajo selecto: el portátil 3D (Three.js 0.160.0, el mismo import map) se crea al entrar la sección en pantalla. -->
+  <script type="module" src="js/trabajo-selecto.js"></script>
   <script type="module" src="js/ui/scramble.js"></script>
 </body>
 </html>

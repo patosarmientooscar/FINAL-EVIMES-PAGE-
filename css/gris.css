@@ -15,3 +15,7 @@
 
 .enlace--oscuro { color: var(--tinta-oscura); text-decoration-color: rgb(11 15 26 / 0.35); }
 .enlace--oscuro:hover { text-decoration-color: var(--tinta-oscura); }
+
+/* El gris va partido en dos (Qué hacemos | Trabajo selecto en negro | Con quién):
+   el segundo empieza con el propio aire de "Con quién" (.cq ya trae su padding). */
+.panel--cq { padding-top: 0; }
