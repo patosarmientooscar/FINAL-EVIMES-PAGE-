@@ -38,13 +38,13 @@ export function starCard(ctx){
   el.addEventListener('pointerup',()=>{drag=false});el.addEventListener('pointerleave',()=>{drag=false});
   const q=new THREE.Quaternion().setFromEuler(new THREE.Euler(.25,-.35,.12)),dq=new THREE.Quaternion(),ax=new THREE.Vector3(),tip=new THREE.Vector3(),cen=new THREE.Vector3(),nz=new THREE.Vector3();
   let flash=0,prevFace=1;
-  ctx.onResize=()=>{camera.position.z=ctx.ar<1?13.5:9;camera.updateProjectionMatrix();};
+  ctx.onResize=()=>{camera.position.z=ctx.lado?(ctx.ar<.9?13:11.5):(ctx.ar<1?13.5:9);camera.updateProjectionMatrix();};
   return (dt)=>{const t=ctx.t;
     const w=new THREE.Vector3(.32*Math.sin(t*.41)+.18*Math.sin(t*1.13),.62+.32*Math.sin(t*.27),.22*Math.cos(t*.33)).multiplyScalar(1+ctx.hover*.6).add(spin);
     const ang=w.length()*dt;if(ang>1e-6){ax.copy(w).normalize();dq.setFromAxisAngle(ax,ang);q.premultiply(dq);}
     spin.multiplyScalar(Math.exp(-dt*1.4));star.quaternion.copy(q);
     rig.rotation.set(-ctx.my*.35,ctx.mx*.45,0);const ar=ctx.ar,sx=ar>1?1:.45;
-    rig.position.set((Math.sin(t*.23)*.45+Math.sin(t*.61)*.15)*sx+ctx.mx*.3+(ar>1.25?1.25:0),Math.sin(t*.37)*.24+Math.cos(t*.71)*.08+ctx.my*.2+(ar>1?.25:1.05),Math.sin(t*.19)*.5);
+    rig.position.set((Math.sin(t*.23)*.45+Math.sin(t*.61)*.15)*sx+ctx.mx*.3+(ctx.lado?0:ar>1.25?1.25:0),Math.sin(t*.37)*.24+Math.cos(t*.71)*.08+ctx.my*.2+(ctx.lado?0:ar>1?.25:1.05),Math.sin(t*.19)*.5);
     rig.scale.setScalar(1+.035*Math.sin(t*1.3));
     rig.updateMatrixWorld();cen.setFromMatrixPosition(star.matrixWorld).project(camera);RU.uC.value.set(cen.x*.5+.5,cen.y*.5+.5);
     tip.set(0,R,0).applyMatrix4(star.matrixWorld).project(camera);RU.uRot.value=Math.atan2(tip.y-cen.y,(tip.x-cen.x)*ar);

@@ -60,6 +60,7 @@ export function webCard(ctx){
       p.position.set(k*.10*ex+Math.sin(t*.7+i)*.02,k*.06*ex+Math.sin(t*.9+i*1.3)*.03,k*(.12+.75*ex));
       p.rotation.z=Math.sin(t*.4+i)*.01*ex;});
     rig.rotation.set(-.42-ctx.my*.22,.62+ctx.mx*.38+Math.sin(t*.25)*.08,.1);
-    rig.position.set(ctx.ar<1?.1:.3,(ctx.ar<1?1.1:.72)+Math.sin(t*.6)*.06,0);rig.scale.setScalar(ctx.ar<1?1:.9);
+    if(ctx.lado){rig.position.set(.05,.18+Math.sin(t*.6)*.06,0);rig.scale.setScalar(.92);}
+    else{rig.position.set(ctx.ar<1?.1:.3,(ctx.ar<1?1.1:.72)+Math.sin(t*.6)*.06,0);rig.scale.setScalar(ctx.ar<1?1:.9);}
   };
 }

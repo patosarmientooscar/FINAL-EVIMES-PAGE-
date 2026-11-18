@@ -8,7 +8,7 @@
    · Entrada con scroll (IntersectionObserver, solo transform/opacity):
      [data-lineas] sube línea a línea con máscara (se parte en líneas reales
      según el ancho), las listas aparecen escalonadas y las secciones grises
-     ([data-cubre]) suben a su sitio.
+     ([data-cubre]) están en su sitio desde el principio (no suben).
    · "Cómo trabajamos": la línea cian se dibuja con el scroll (scaleX; en
      móvil, scaleY), dentro de gsap.ticker (el bucle único) con posiciones
      cacheadas.

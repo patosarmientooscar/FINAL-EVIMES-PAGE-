@@ -7,10 +7,8 @@
   --tinta-2: rgb(11 15 26 / 0.7);               /* secundario sobre el gris ≥ 6:1 */
   padding-top: clamp(64px, 11vh, 120px);
   padding-bottom: clamp(64px, 10vh, 120px);
-  /* El gris termina después de "Con quién" con el borde inferior redondeado:
-     debajo vuelve el fondo global (tubos + rayos) para Planes y Contacto. */
-  border-bottom-left-radius: 30px;
-  border-bottom-right-radius: 30px;
+  /* El gris termina después de "Con quién", recto: debajo vuelve el fondo
+     global (negro con líneas + tubos) para Planes y Contacto. */
 }
 /* Foco visible sobre el gris: el cian no tiene contraste aquí. */
 .panel :focus-visible { outline: 2px solid var(--tinta-oscura); outline-offset: 3px; }

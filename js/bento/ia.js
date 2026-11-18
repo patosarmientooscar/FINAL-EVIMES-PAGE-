@@ -79,7 +79,8 @@ export function iaCard(ctx){
     U.uAmp.value=1+ctx.hover*.35;LU.uE.value=1+ctx.hover*.8;
     blob.rotation.y=t*.12;blob.rotation.x=Math.sin(t*.2)*.15;
     net.rotation.y=-t*.05+ctx.mx*.2;net.rotation.x=ctx.my*.15;
-    rig.position.y=(ctx.ar<1?1.25:.95)+Math.sin(t*.8)*.06;net.position.y=rig.position.y;rig.scale.setScalar(ctx.ar<1?1:.92);
-    BU.uC.value.set(.5,ctx.ar<1?.64:.62);
+    if(ctx.lado){rig.position.y=.05+Math.sin(t*.8)*.06;rig.scale.setScalar(.95);BU.uC.value.set(.5,.52);}
+    else{rig.position.y=(ctx.ar<1?1.25:.95)+Math.sin(t*.8)*.06;rig.scale.setScalar(ctx.ar<1?1:.92);BU.uC.value.set(.5,ctx.ar<1?.64:.62);}
+    net.position.y=rig.position.y;
   };
 }

@@ -8,6 +8,9 @@
      la subida de 40 px y el escalonado de 0,08 s).
    · Three.js y las escenas se importan al acercarse el bento (nada en la
      carga inicial). Cada card solo renderiza si está visible (makeCard).
+   · Solo se mueve el destello (Animaciones 3D). Las otras tres se pintan UNA
+     vez en su pose (POSE: segundos de su propia animación) y no se animan ni
+     reaccionan; al cambiar de tamaño se vuelven a pintar una vez.
    · Versión fija (movimiento reducido, ahorro de datos, ?modo=fijo) o sin
      WebGL: póster estático de cada card, sacado del propio render
      (assets/bento/, ver ?bento=captura).
@@ -76,7 +79,15 @@ async function arrancar(els, captura) {
   /* ---------- boot + one shared loop ---------- */
   const kinds = { web: webCard, star: starCard, pin: pinCard, ia: iaCard };
   const { cards, reduce } = S;
-  const crear = el => { if (el.__card) return; el.__card = true; const c = S.makeCard(el, kinds[el.dataset.kind], { captura }); c.step(reduce || captura ? 1.5 : 0); if (reduce || captura) { c.render(); c.step(0); } };
+  // web: capas juntas y algo abiertas · pin: quieto sobre el mapa, anillos parados · ia: metal líquido en una forma suave
+  const POSE = { web: 6.88, pin: 0.4, ia: 2.2 };
+  const pintar = c => { c.render(); c.step(0); c.render(); };
+  const crear = el => {
+    if (el.__card) return; el.__card = true;
+    const k = el.dataset.kind, c = S.makeCard(el, kinds[k], { captura });
+    if (k in POSE) { c.quieta = true; c.step(POSE[k]); pintar(c); c.trasResize = () => { c.step(0); pintar(c); }; return; }
+    c.step(reduce || captura ? 1.5 : 0); if (reduce || captura) { c.render(); c.step(0); }
+  };
   // Con todas las cards juntas (la home) se crean a la vez; repartidas por la página
   // (servicios.html, un contenedor por oficio) cada una se crea a una pantalla de
   // distancia: crear los 4 renderers de golpe costaba ~1,8 s de CPU en móvil.
@@ -98,7 +109,8 @@ async function arrancar(els, captura) {
     return;
   }
 
-  const frame = dt => { for (const c of cards) { if (!c.visible) continue; if (!reduce) c.step(dt); c.render(); } };
+  // Un solo bucle de WebGL en las cards: el del destello (las quietas no entran).
+  const frame = dt => { for (const c of cards) { if (!c.visible || c.quieta) continue; if (!reduce) c.step(dt); c.render(); } };
   if (window.gsap) gsap.ticker.add((time, dms) => frame(Math.min(.05, (dms || 16.7) / 1000)));
   else { let last = performance.now(); const f = now => { requestAnimationFrame(f); const dt = Math.min(.05, (now - last) / 1000); last = now; frame(dt); }; requestAnimationFrame(f); }
 }

@@ -43,13 +43,14 @@ export function makeCard(el,setup,opts={}){
   renderer.setClearColor(NAVY,1);renderer.autoClear=false;
   const scene=new THREE.Scene();studioEnv(renderer,scene);
   const camera=new THREE.PerspectiveCamera(30,1,.1,100);camera.position.set(0,0,9);
-  const ctx={el,renderer,scene,camera,W:1,H:1,ar:1,t:0,mx:0,my:0,tmx:0,tmy:0,hover:0,thover:0,visible:false,bg:null};
+  // lado: card horizontal de la home (el texto va fuera del canvas, a la izquierda): el objeto va centrado en su zona.
+  const ctx={el,renderer,scene,camera,W:1,H:1,ar:1,t:0,mx:0,my:0,tmx:0,tmy:0,hover:0,thover:0,visible:false,bg:null,lado:!!el.closest('.que-hacemos')};
   ctx.setBg=(frag,uniforms)=>{const u=Object.assign({uT:{value:0},uA:{value:1}},uniforms);const s=new THREE.Scene();
     s.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2),new THREE.ShaderMaterial({uniforms:u,depthWrite:false,depthTest:false,
       vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}`,fragmentShader:`varying vec2 vUv;uniform float uT,uA;\n`+COMMON_GLSL+frag})));
     ctx.bg={scene:s,cam:new THREE.OrthographicCamera(-1,1,1,-1,0,1),u};return u;};
-  const resize=()=>{const r=el.getBoundingClientRect();ctx.W=Math.max(1,r.width);ctx.H=Math.max(1,r.height);ctx.ar=ctx.W/ctx.H;
-    renderer.setSize(ctx.W,ctx.H,false);camera.aspect=ctx.ar;camera.updateProjectionMatrix();if(ctx.bg)ctx.bg.u.uA.value=ctx.ar;ctx.onResize&&ctx.onResize();};
+  const resize=()=>{const r=cv.getBoundingClientRect();ctx.W=Math.max(1,r.width);ctx.H=Math.max(1,r.height);ctx.ar=ctx.W/ctx.H;
+    renderer.setSize(ctx.W,ctx.H,false);camera.aspect=ctx.ar;camera.updateProjectionMatrix();if(ctx.bg)ctx.bg.u.uA.value=ctx.ar;ctx.onResize&&ctx.onResize();ctx.trasResize&&ctx.trasResize();};
   el.addEventListener('pointerenter',()=>{ctx.thover=1});
   el.addEventListener('pointerleave',()=>{ctx.thover=0;ctx.tmx=ctx.tmy=0});
   el.addEventListener('pointermove',e=>{const r=el.getBoundingClientRect();ctx.tmx=(e.clientX-r.left)/r.width*2-1;ctx.tmy=-((e.clientY-r.top)/r.height*2-1);ctx.px=e.clientX;ctx.py=e.clientY;});

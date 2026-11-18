@@ -1,9 +1,9 @@
 /* ==========================================================================
-   fondo/fondo.js — el fondo global (rayos + la onda de cromo + grano) en las
+   fondo/fondo.js — el fondo global (negro con líneas finas + la onda de cromo + grano) en las
    páginas que no son la home (servicios.html, planes.html). Mismos módulos
-   que la home (js/fondo/rayos.js, js/fondo/onda.js, css/fondo.css) y la
+   que la home (js/fondo/onda.js, css/fondo.css) y la
    misma lógica de home.js, sin lo que es solo de la home:
-     · Un único bucle: gsap.ticker → Lenis → estado por scroll → rayos → onda.
+     · Un único bucle: gsap.ticker → Lenis → estado por scroll → onda.
      · Hasta el primer gesto, el póster (fotograma del propio render); con el
        gesto carga Three.js y la onda en vivo se funde por encima.
      · Opacidad de las bandas: <body data-fondo-op="0.5"> en la cabecera de la
@@ -17,10 +17,10 @@
   var cine = EV.mode === 'cine', root = document.documentElement;
   var $ = function (s, c) { return (c || document).querySelector(s); };
   var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
-  var el = { rayos: $('.fondo__rayos'), onda: $('.fondo__onda'), fija: $('.fondo__fija'), cab: $('.cabecera') };
+  var el = { onda: $('.fondo__onda'), fija: $('.fondo__fija'), cab: $('.cabecera') };
   var OP0 = parseFloat(document.body.dataset.fondoOp || '0.5');
   var lenis = null, vw = 0, vh = 0, grises = [], cabMid = 0, mouse = { x: 0, y: 0 };
-  var ondaIntro = 0, ondaOpacity = -1, fijaOpacity = -1, posterFuera = false, sinOnda = false, tRayos = 6, cabClara = null;
+  var ondaIntro = 0, ondaOpacity = -1, fijaOpacity = -1, posterFuera = false, sinOnda = false, cabClara = null;
 
   function scrollY() { return lenis ? lenis.scroll : window.scrollY; }
   function measure() {
@@ -29,7 +29,6 @@
     // posición de layout (sin el translateY de la entrada de [data-cubre]): si no, la cabecera cambiaba 72 px tarde
     grises = $$('[data-cubre]').map(function (n) { var t = 0, m = n; while (m) { t += m.offsetTop; m = m.offsetParent; } return { top: t, bottom: t + n.offsetHeight }; });
     var c = el.cab.getBoundingClientRect(); cabMid = (c.top + c.bottom) / 2;
-    if (EV.rayos) EV.rayos.resize();
   }
   function estado(y) {
     var hero = U.clamp01(y / vh), cubierta = false, clara = false;
@@ -56,8 +55,6 @@
       if (intro >= 1) { posterFuera = true; root.classList.add('onda-viva'); }
     }
     if (vivo) {
-      tRayos += dt;
-      if (!st.cubierta) EV.rayos.render(tRayos, st.hero);
       var op = st.op * intro;
       ondaOpacity = setOpacity(el.onda, op, ondaOpacity);
       if (op > 0.001) EV.onda.render(dt, { mx: mouse.x, my: mouse.y, hero: st.hero, luz: true, cuerdas: !EV.reducedMotion });
@@ -106,7 +103,6 @@
 
   function boot() {
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-    EV.rayos.init(el.rayos);
     if (cine && typeof Lenis !== 'undefined' && window.gsap) {
       lenis = new Lenis({ duration: 1.15, easing: function (t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); }, smoothWheel: true, autoRaf: false });
       gsap.ticker.add(function (time) { lenis.raf(time * 1000); }, false, true);
@@ -131,7 +127,6 @@
       addEventListener('touchcancel', fuera, { passive: true });
       addEventListener('blur', fuera);
       gsap.ticker.add(tick);
-      EV.rayos.render(tRayos, 0);
       var gestos = ['pointermove', 'pointerdown', 'wheel', 'touchstart', 'keydown', 'scroll'];
       var go = function () { gestos.forEach(function (n) { removeEventListener(n, go, { passive: true }); }); cargarOnda(); };
       gestos.forEach(function (n) { addEventListener(n, go, { passive: true }); });

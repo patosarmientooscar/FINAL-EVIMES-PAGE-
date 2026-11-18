@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Home (fase onda): cabecera, hero, herramientas, frase, panel gris,
+   Home (fase onda): cabecera, hero, herramientas, panel gris,
    planes, contacto y pie. Sobre el fondo global (css/fondo.css).
    ========================================================================== */
 .inicio {
@@ -94,13 +94,13 @@
   padding: 8px 8px 8px 22px;
   border-radius: 999px;
   color: var(--stone);
-  background: rgb(8 11 20 / 0.38);
+  background: rgb(11 12 15 / 0.38);
   border: 1px solid rgb(236 230 219 / 0.1);
   -webkit-backdrop-filter: blur(14px) saturate(140%);
   backdrop-filter: blur(14px) saturate(140%);
   transition: background-color 0.4s var(--ease), border-color 0.4s var(--ease), color 0.4s var(--ease);
 }
-.cabecera.is-scroll { background: rgb(8 11 20 / 0.5); }
+.cabecera.is-scroll { background: rgb(11 12 15 / 0.5); }
 .cabecera__marca {
   justify-self: start;
   display: inline-flex;
@@ -138,7 +138,7 @@
 .cabecera.is-clara .cabecera__nav a { color: rgb(11 15 26 / 0.78); }
 .cabecera.is-clara .cabecera__nav a:hover { color: var(--tinta-oscura); }
 .cabecera.is-clara .cabecera__cta { background: var(--tinta-oscura); color: var(--stone); }
-.cabecera.is-clara .cabecera__cta:hover { background: #1c2333; }
+.cabecera.is-clara .cabecera__cta:hover { background: #1f2126; }
 
 @media (max-width: 51.24rem) {
   .cabecera { grid-template-columns: 1fr auto auto; gap: 6px; padding: 6px 6px 6px 18px; }
@@ -173,7 +173,7 @@
     right: 0;
     padding: 10px;
     border-radius: 26px;
-    background: rgb(8 11 20 / 0.86);
+    background: rgb(11 12 15 / 0.86);
     border: 1px solid rgb(236 230 219 / 0.1);
     -webkit-backdrop-filter: blur(18px) saturate(140%);
     backdrop-filter: blur(18px) saturate(140%);
@@ -209,7 +209,7 @@
   inset: -22% -34% -26% -44%;
   z-index: -1;
   pointer-events: none;
-  background: radial-gradient(closest-side, rgb(8 11 20 / 0.86), rgb(8 11 20 / 0.6) 55%, rgb(8 11 20 / 0));
+  background: radial-gradient(closest-side, rgb(11 12 15 / 0.86), rgb(11 12 15 / 0.6) 55%, rgb(11 12 15 / 0));
 }
 .portada__h1 { font-size: clamp(42px, 6.4vw, 100px); }
 /* "altura" en cian (el punto final, no). Va dentro del span que sube: entra con su línea. */
@@ -267,7 +267,7 @@
   margin-top: 34px;
   padding: 22px 0;
   overflow: hidden;
-  background: rgb(8 11 20 / 0.5);
+  background: rgb(11 12 15 / 0.5);
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
 }
@@ -344,51 +344,22 @@ html:not(.cinta-viva) .cinta__pista { width: auto; }
 html:not(.cinta-viva) .cinta__lista { flex-wrap: wrap; gap: 8px 40px; padding: 0; }
 
 /* ==========================================================================
-   Frase
-   ========================================================================== */
-.frase { position: relative; padding: clamp(80px, 16vh, 180px) var(--g); }
-.frase__texto { font-size: clamp(44px, 7.4vw, 128px); max-width: 12ch; line-height: 0.98; }
-.frase__acento { color: var(--cyan); }
-.frase__texto { pointer-events: auto; }
-.frase__p { transition: opacity 0.5s var(--ease); }
-
-/* Cine: la frase queda fija mientras se enciende y el panel sube por encima. */
-/* margin-top negativo: la frase centrada aparece justo después de la cinta,
-   sin media pantalla vacía en medio (pointer-events: la cinta sigue viva). */
-.is-cine .frase { height: 260vh; height: 260svh; padding: 0; margin-top: -30vh; margin-top: -30svh; pointer-events: none; }
-.is-cine .frase__fija {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  height: 100svh;
-  display: flex;
-  align-items: center;
-  padding: 0 var(--g);
-}
-/* Apagada a .45 (no .16): con texto grande AA pide 3:1; con .45 lo dan el blanco y el cian sobre el fondo oscuro. */
-.is-cine .frase__p { opacity: 0.45; }
-.is-cine .frase__p.is-on { opacity: 1; }
-
-/* ==========================================================================
    Panel gris (proyectos · aquí entrará la oficina)
    ========================================================================== */
+/* Recto (sin esquinas curvas) y en su sitio: no sube sobre el fondo. */
 .panel {
   position: relative;
   z-index: 3;
-  margin-top: -6vh;
   padding: clamp(70px, 12vh, 140px) var(--g) clamp(90px, 16vh, 180px);
-  border-radius: clamp(24px, 3vw, 44px) clamp(24px, 3vw, 44px) 0 0;
-  background: var(--gris);
+  border-radius: 0;
+  background: var(--gris) var(--lineas-tinta) 0 0 / var(--lineas-tam) repeat;
   color: var(--tinta-oscura);
-  box-shadow: 0 -40px 90px -40px rgb(0 0 0 / 0.5);
 }
-.is-cine .panel { margin-top: -100vh; margin-top: -100svh; }
 
 
 /* Móvil: los titulares grandes, de verdad grandes. */
 @media (max-width: 47.99rem) {
   .portada__h1 { font-size: 11.4vw; }
-  .frase__texto { font-size: 13.4vw; }
   .contacto__titulo { font-size: 15vw; }
 }
 

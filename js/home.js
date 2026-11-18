@@ -1,11 +1,10 @@
 /* ==========================================================================
    home.js — la home (fase onda). Un único bucle: gsap.ticker.
      1. Lenis.raf                 (prioritario)
-     2. tick(): scroll → hero, frase, opacidad del fondo, cabecera clara
-     3. EV.rayos.render           (2D, media resolución)
-     4. EV.onda.render            (Three.js; se salta si nadie lo ve)
+     2. tick(): scroll → hero, opacidad del fondo, cabecera clara
+     3. EV.onda.render            (Three.js; se salta si nadie lo ve)
    Versión fija (EV.mode === 'still'): sin Lenis ni Three; imagen fija de las
-   bandas, rayos pintados una vez, frase encendida, cards visibles.
+   bandas, cards visibles.
    ========================================================================== */
 (function () {
   var EV = window.EV;
@@ -18,18 +17,14 @@
   var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
 
   var el = {
-    fondo: $('.fondo'), rayos: $('.fondo__rayos'), onda: $('.fondo__onda'), fija: $('.fondo__fija'),
-    cab: $('.cabecera'), panel: $('.panel'), frase: $('.frase'), portada: $('.portada')
+    fondo: $('.fondo'), onda: $('.fondo__onda'), fija: $('.fondo__fija'),
+    cab: $('.cabecera'), panel: $('.panel'), portada: $('.portada')
   };
   var lenis = null;
   var vw = 0, vh = 0;
   var lay = {};                           // posiciones cacheadas (se recalculan al cambiar el tamaño)
-  var palabras = [];
   var mouse = { x: 0, y: 0 };
   var ondaIntro = 0, ondaOpacity = -1, fijaOpacity = -1, posterFuera = false;
-  // Reloj de los rayos: parado en t = 6 s (el fotograma del póster) hasta que
-  // la onda en vivo entra; así el fundido póster → vivo cae en el mismo sitio.
-  var tRayos = 6;
   var cabClara = null;
   var sinOnda = false;                    // Three.js no cargó: imagen fija en su lugar
 
@@ -48,11 +43,8 @@
     var y = scrollY();
     var r = el.panel.getBoundingClientRect();
     lay.panelTop = r.top + y; lay.panelBottom = r.bottom + y;
-    var f = el.frase.getBoundingClientRect();
-    lay.fraseTop = f.top + y; lay.fraseH = f.height;
     var c = el.cab.getBoundingClientRect();
     lay.cabTop = c.top; lay.cabBottom = c.bottom;
-    EV.rayos.resize();
   }
 
   /* ---------- Lenis en gsap.ticker ---------- */
@@ -116,26 +108,6 @@
     copia.removeAttribute('data-herramientas');
     lista.parentNode.appendChild(copia);
     root.classList.add('cinta-viva');
-  }
-
-  /* ---------- frase: palabras ---------- */
-  function frase() {
-    var h = $('[data-frase]');
-    $$('span', h).forEach(function (sp) {
-      var frag = document.createDocumentFragment();
-      sp.textContent.split(/(\s+)/).forEach(function (t) {
-        if (!t) return;
-        if (/^\s+$/.test(t)) { frag.appendChild(document.createTextNode(t)); return; }
-        var w = document.createElement('span');
-        w.className = 'frase__p';
-        w.textContent = t;
-        frag.appendChild(w);
-      });
-      sp.textContent = '';
-      sp.appendChild(frag);
-    });
-    palabras = $$('.frase__p', h);
-    if (!cine) palabras.forEach(function (w) { w.classList.add('is-on'); });
   }
 
   /* ---------- planes (js/data/planes.js) ---------- */
@@ -212,18 +184,6 @@
     var cubierta = (lay.panelTop - y) <= 0 && (lay.panelBottom - y) >= vh;
     var op = cubierta ? 0 : U.lerp(1, 0.3, U.smooth(0.3, 1.05, hero));
 
-    // Frase: las palabras se encienden una a una mientras está fija.
-    if (palabras.length && cine) {
-      // De "la frase asoma" a "justo antes de que suba el panel".
-      var a = lay.fraseTop - vh * 0.4, b = lay.panelTop - vh * 1.05;
-      var p = U.clamp01((y - a) / Math.max(1, b - a));
-      var n = Math.floor(p * (palabras.length + 0.999));
-      for (var i = 0; i < palabras.length; i++) {
-        var on = i < n;
-        if (palabras[i]._on !== on) { palabras[i]._on = on; palabras[i].classList.toggle('is-on', on); }
-      }
-    }
-
     // Cabecera clara cuando el panel gris pasa por su línea central.
     var pt = lay.panelTop - y, pb = lay.panelBottom - y, mid = (lay.cabTop + lay.cabBottom) / 2;
     // Sobre la oficina (js/oficina/), cristal oscuro: la oficina pone EV.cabeceraOscura.
@@ -243,8 +203,8 @@
   }
 
   /* ---------- bucle ----------
-     Hasta el primer gesto se ve el póster (fotograma opaco de rayos + bandas
-     sacado del propio render, assets/onda/). Con el gesto carga Three.js y la
+     Hasta el primer gesto se ve el póster (las bandas sin luces, con
+     transparencia, sacadas del propio render, assets/onda/). Con el gesto carga Three.js y la
      onda en vivo entra por debajo mientras el póster se funde. */
   function tick(time, dtMs) {
     var dt = Math.min((dtMs || 16.7) / 1000, 0.1);
@@ -261,8 +221,6 @@
     }
 
     if (vivo) {
-      tRayos += dt;
-      if (!st.cubierta) EV.rayos.render(tRayos, st.hero);
       var op = st.op * intro;
       ondaOpacity = setOpacity(el.onda, op, ondaOpacity);
       if (op > 0.001) EV.onda.render(dt, { mx: mouse.x, my: mouse.y, hero: st.hero, luz: true, cuerdas: !EV.reducedMotion });
@@ -297,11 +255,9 @@
   function boot() {
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
     bindContent();
-    EV.rayos.init(el.rayos);
     scrollInit();
     cabecera();
     herramientas();
-    frase();
     planes();
     contacto();
     measure();
@@ -329,7 +285,6 @@
       gsap.ticker.add(tick);
       // Three.js al primer gesto (como la oficina): el hero no lo espera y quien
       // no interactúa no paga los ~600 KB ni la compilación de shaders.
-      EV.rayos.render(tRayos, 0);
       var gestos = ['pointermove', 'pointerdown', 'wheel', 'touchstart', 'keydown', 'scroll'];
       var go = function () {
         gestos.forEach(function (n) { window.removeEventListener(n, go, { passive: true }); });

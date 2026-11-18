@@ -37,7 +37,7 @@
 /* ---------- secciones de servicio ---------- */
 .sp-serv { position: relative; display: grid; grid-template-columns: repeat(12, 1fr); column-gap: clamp(16px, 2vw, 32px); align-items: center;
   min-height: 0; padding: clamp(56px, 8vh, 96px) var(--g); color: var(--stone); }
-.sp-serv--gris, .pasos { background: var(--gris); color: var(--tinta-oscura); border-radius: 30px; box-shadow: 0 -40px 90px -40px rgb(0 0 0 / 0.5); }
+.sp-serv--gris, .pasos { background: var(--gris) var(--lineas-tinta) 0 0 / var(--lineas-tam) repeat; color: var(--tinta-oscura); border-radius: 0; }
 .sp-serv--izq .sp-serv__obj { grid-column: 1 / span 5; grid-row: 1; }
 .sp-serv--izq .sp-serv__texto { grid-column: 7 / span 6; grid-row: 1; }
 .sp-serv--der .sp-serv__obj { grid-column: 8 / span 5; grid-row: 1; }
@@ -92,8 +92,6 @@
 .pag-viva [data-lineas].is-in .l > span { transform: none; }
 .pag-viva :is(.sp-serv__incluye, .pasos__lista, [data-escalona]) > * { opacity: 0; transform: translateY(16px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
 .pag-viva :is(.sp-serv__incluye, .pasos__lista, [data-escalona]).is-in > * { opacity: 1; transform: none; }
-.pag-viva [data-cubre] { transform: translateY(72px); transition: transform 1.3s var(--ease); }
-.pag-viva [data-cubre].is-in { transform: none; }
 
 /* ---------- móvil ---------- */
 @media (max-width: 899px) {
@@ -132,7 +130,7 @@
 .planes--pag .plan__boton { align-self: flex-start; min-height: 52px; padding-inline: 26px; font-size: 16px; }
 
 /* tabla comparativa (gris) */
-.comp, .faq { padding: clamp(96px, 14vh, 160px) var(--g); background: var(--gris); color: var(--tinta-oscura); border-radius: 30px; box-shadow: 0 -40px 90px -40px rgb(0 0 0 / 0.5); }
+.comp, .faq { padding: clamp(96px, 14vh, 160px) var(--g); background: var(--gris) var(--lineas-tinta) 0 0 / var(--lineas-tam) repeat; color: var(--tinta-oscura); border-radius: 0; }
 .comp__titulo, .despues__titulo, .faq__titulo { font-size: clamp(44px, 6vw, 104px); line-height: .98; }
 .comp__nota { margin-top: 18px; font-size: 18px; color: var(--tinta-2); }
 .comp__tabla { width: 100%; margin-top: clamp(40px, 6vh, 64px); border-collapse: collapse; font-size: 17px; }
@@ -247,7 +245,7 @@
 .psi-caso { margin-top: 32px; }
 .psi-caso__lista { display: flex; flex-wrap: wrap; gap: clamp(16px, 2.6vw, 44px); margin: 0; padding: 0; list-style: none; }
 .psi-g { --s: clamp(108px, 10vw, 156px); position: relative; width: var(--s); height: var(--s); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(var(--s) * .04);
-  background: radial-gradient(circle at 50% 30%, rgb(24 36 70 / 0.78), rgb(7 10 19 / 0.78));
+  background: radial-gradient(circle at 50% 30%, rgb(24 36 70 / 0.78), rgb(11 12 15 / 0.78));
   box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.10), inset 0 1px 0 rgb(255 255 255 / 0.14), 0 20px 44px -20px rgb(0 0 0 / 0.75), 0 0 46px -14px rgb(0 229 255 / 0.45); }
 .psi-g__anillo { position: absolute; inset: 7%; width: 86%; height: 86%; transform: rotate(-90deg); }
 .psi-g__base { fill: none; stroke: rgb(255 255 255 / 0.10); stroke-width: 5; }
@@ -255,7 +253,7 @@
 .psi-g b { position: relative; font: 600 calc(var(--s) * .27)/1 var(--font-text); color: #ece7dd; font-variant-numeric: tabular-nums; letter-spacing: -.03em; }
 .psi-g span { position: relative; font: 500 max(11px, calc(var(--s) * .078))/1.15 var(--font-text); letter-spacing: .04em; color: rgb(236 231 221 / 0.78); text-align: center; max-width: 74%; }
 .psi-caso__pill { display: inline-flex; align-items: center; gap: 10px; margin-top: 28px; padding: 11px 18px; border-radius: 999px; font-size: 14px; color: #ece7dd;
-  background: rgb(7 10 19 / 0.72); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.12); }
+  background: rgb(11 12 15 / 0.72); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.12); }
 .psi-caso__pill i { width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); }
 .psi-caso__pill b { font-weight: 600; }
 .psi-caso__nota { margin-top: 18px; font-size: 14px; color: var(--texto-2); }
@@ -263,7 +261,7 @@
 .res-caja .psi-caso + .res { margin-top: 48px; }
 
 /* el ejemplo sobre gris (León's) */
-.caso--gris { background: var(--gris); color: var(--tinta-oscura); border-radius: 30px; box-shadow: 0 -40px 90px -40px rgb(0 0 0 / 0.5); padding-top: clamp(96px, 14vh, 160px); }
+.caso--gris { background: var(--gris) var(--lineas-tinta) 0 0 / var(--lineas-tam) repeat; color: var(--tinta-oscura); border-radius: 0; padding-top: clamp(96px, 14vh, 160px); }
 .captura { margin: 0; padding: 8px; border-radius: 30px; background: rgb(11 15 26 / 0.06); box-shadow: inset 0 0 0 1px rgb(11 15 26 / 0.08); }
 .captura a { display: block; overflow: hidden; border-radius: 23px; box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3), 0 40px 80px -46px rgb(11 15 26 / 0.65); }
 .captura img { display: block; width: 100%; height: auto; transition: transform 1.2s var(--ease); }

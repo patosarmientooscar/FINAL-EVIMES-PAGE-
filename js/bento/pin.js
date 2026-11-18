@@ -49,7 +49,7 @@ export function pinCard(ctx){
     fragmentShader:`varying vec2 vUv;void main(){float r=length(vUv-.5);gl_FragColor=vec4(vec3(0.,.9,1.)*exp(-r*r*40.)*.9,1.);}`}));coreGlow.position.set(0,cy,0);
   const pinG=new THREE.Group();pinG.add(core,pin,coreGlow);
   const rig=new THREE.Group();rig.add(pinG);scene.add(rig);
-  ctx.onResize=()=>{const m=ctx.ar<1;camera.position.set(0,m?3.4:2.2,m?12.5:9);camera.lookAt(0,m?-.2:-.35,0);};
+  ctx.onResize=()=>{const m=ctx.ar<1&&!ctx.lado;camera.position.set(0,m?3.4:2.2,m?12.5:9);camera.lookAt(0,m?-.2:-.35,0);};
   // landing cycle: hover high, drop with gravity, squash & bounce, rings burst
   let phase=1.2,y=0,vy=0,landed=true,since=10;const CYCLE=6.5;
   return (dt)=>{const t=ctx.t;MU.uT.value=t;
@@ -61,9 +61,9 @@ export function pinCard(ctx){
     const squash=Math.exp(-since*6)*.12;
     pinG.position.y=y+bob;pinG.scale.set(1+squash,1-squash,1+squash);
     pinG.rotation.y=t*.9+ctx.mx*.6;   // spins slowly, mirrors the chrome around
-    rig.rotation.set(0,ctx.mx*.25,0);rig.position.x=ctx.ar<1?0:1.3;map.position.x=rig.position.x;
-    rig.position.y=ctx.ar<1?.85:0;map.position.y=-1.25+rig.position.y;
+    rig.rotation.set(0,ctx.mx*.25,0);rig.position.x=ctx.lado||ctx.ar<1?0:1.3;map.position.x=rig.position.x;
+    rig.position.y=!ctx.lado&&ctx.ar<1?.85:0;map.position.y=-1.25+rig.position.y;
     rig.rotation.x=-ctx.my*.08;
-    BU.uC.value.set(ctx.ar<1?.5:.62,ctx.ar<1?.55:.5);
+    BU.uC.value.set(ctx.lado||ctx.ar<1?.5:.62,!ctx.lado&&ctx.ar<1?.55:.5);
   };
 }

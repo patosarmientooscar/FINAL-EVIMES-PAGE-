@@ -129,7 +129,7 @@ input, textarea { caret-color: var(--cyan); }
   content: "";
   position: absolute;
   inset: 0 0 -60% 0;
-  background: linear-gradient(to bottom, rgb(8 11 20 / 0.72), rgb(8 11 20 / 0));
+  background: linear-gradient(to bottom, rgb(11 12 15 / 0.72), rgb(11 12 15 / 0));
   pointer-events: none;
   z-index: -1;
 }

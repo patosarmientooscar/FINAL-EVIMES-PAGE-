@@ -31,7 +31,7 @@
 .c-web { grid-column: span 5 } .c-3d { grid-column: span 7 } .c-seo { grid-column: span 7 } .c-ia { grid-column: span 5 }
 
 .bento .card { position: relative; border-radius: 30px; overflow: hidden; background: var(--b-navy); isolation: isolate; touch-action: pan-y;
-  box-shadow: 0 1px 0 rgba(255,255,255,.7), 0 40px 80px -40px rgba(7,10,19,.55), 0 18px 36px -24px rgba(7,10,19,.4); }
+  box-shadow: 0 1px 0 rgba(255,255,255,.7), 0 40px 80px -40px rgba(11,12,15,.55), 0 18px 36px -24px rgba(11,12,15,.4); }
 /* Entrada (solo con JS: la clase is-cine / is-still la pone el script del <head>):
    opacidad + subida de 40 px al entrar en pantalla, 0,08 s entre cards. */
 :is(.is-cine, .is-still) .bento .card { opacity: .6; transform: translateY(40px) scale(.98); transition: opacity 1s cubic-bezier(.2,.7,.2,1), transform 1.2s cubic-bezier(.2,.7,.2,1); }
@@ -51,7 +51,7 @@
 .bento .num b { color: var(--b-stone); font-weight: 500; }
 .bento .hint { position: absolute; top: clamp(20px,2.6vw,36px); right: clamp(22px,3vw,44px); font-size: 12px; letter-spacing: .14em; color: rgba(236,231,221,.56); pointer-events: none;
   /* AA: prototipo .4 = 3,3:1; .56 = 5,4:1. El halo navy la sostiene cuando un rayo del destello pasa por detrás. */
-  text-shadow: 0 0 2px rgba(7,10,19,.9), 0 0 12px rgba(7,10,19,.85); }
+  text-shadow: 0 0 2px rgba(11,12,15,.9), 0 0 12px rgba(11,12,15,.85); }
 .bento .meta { position: absolute; left: clamp(22px,3vw,44px); right: clamp(22px,3vw,44px); bottom: clamp(22px,3vw,40px); display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; color: var(--b-stone); pointer-events: none; }
 .bento .meta h3 { font-size: clamp(28px,3vw,48px); line-height: 1; }
 .bento .meta p { margin-top: 12px; font-size: clamp(14px,1.05vw,16px); line-height: 1.5; color: rgba(236,231,221,.68); max-width: 32ch; }
@@ -65,5 +65,27 @@
   .bento { grid-template-columns: 1fr; grid-auto-rows: auto; }
   .c-web, .c-3d, .c-seo, .c-ia { grid-column: auto; aspect-ratio: 4/5; }
   .bento .meta { flex-direction: column; align-items: flex-start; } .bento .hint { display: none; }
+}
+/* ---------- Desde v-pre-negro: cuatro cards iguales y horizontales ----------
+   Rejilla 2×2 en 16:9 (una columna en 4:3 en móvil). Texto (número, título,
+   frase y "Ver más") a la izquierda; el objeto 3D a la derecha: el canvas solo
+   ocupa esa zona y se funde por su borde izquierdo con el navy de la card
+   (máscara estática). Solo el destello se mueve (js/bento/index.js). */
+.que-hacemos .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: auto; }
+.que-hacemos .bento .card { grid-column: auto; aspect-ratio: 16 / 9; }
+.que-hacemos .bento .card canvas,
+.que-hacemos .bento .card .poster { inset: 0 0 0 auto; width: 56%;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 24%); mask-image: linear-gradient(to right, transparent, #000 24%); }
+.que-hacemos .bento .meta { right: auto; width: 46%; flex-direction: column; align-items: flex-start; gap: 20px; }
+.que-hacemos .bento .meta h3 { font-size: clamp(26px, 2.3vw, 40px); }
+.que-hacemos .bento .meta p { max-width: 28ch; }
+@media (max-width: 900px) {
+  .que-hacemos .bento { grid-template-columns: 1fr; }
+  .que-hacemos .bento .card { aspect-ratio: 4 / 3; }
+  .que-hacemos .bento .card canvas, .que-hacemos .bento .card .poster { width: 56%; }
+  .que-hacemos .bento .meta { width: 46%; gap: 14px; bottom: clamp(18px, 5vw, 26px); }
+  .que-hacemos .bento .meta h3 { font-size: clamp(22px, 6.4vw, 28px); }
+  .que-hacemos .bento .meta p { margin-top: 8px; font-size: 14px; line-height: 1.45; }
+  .que-hacemos .bento .more { padding: 10px 16px; font-size: 14px; }
 }
 @media (prefers-reduced-motion: reduce) { :is(.is-cine, .is-still) .bento .card { opacity: 1; transform: none; transition: none; } }

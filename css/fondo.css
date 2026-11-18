@@ -1,5 +1,6 @@
 /* ==========================================================================
-   Fondo global de la home: rayos (2D) + onda de cromo (WebGL) + grano.
+   Fondo global: negro (#0b0c0f) con líneas finas en mosaico (la línea de
+   onda del monograma EH, var(--lineas)) + onda de cromo (WebGL) + grano.
    Capas fijas detrás de todo. Alto = 100lvh: la barra del navegador móvil
    no obliga a redimensionar los canvas.
    ========================================================================== */
@@ -10,7 +11,7 @@
   height: 100lvh;
   z-index: 0;
   pointer-events: none;
-  background: var(--navy);
+  background: var(--navy) var(--lineas) 0 0 / var(--lineas-tam) repeat;
   contain: strict;
 }
 .fondo > * {
@@ -20,14 +21,12 @@
   height: 100%;
   display: block;
 }
-.fondo__rayos { opacity: 0.9; }
-
 /* Bandas en vivo: aparecen cuando Three.js está listo (opacidad desde JS). */
 .fondo__onda { opacity: 0; }
 
-/* Póster / versión fija: fotograma opaco del propio render (rayos + bandas,
-   sin luces). En cine tapa los canvas hasta el primer gesto y se funde cuando
-   entra la onda en vivo; en la versión fija se queda. Centrado: con la altura
+/* Póster / versión fija: las bandas sin luces, con transparencia (sacadas del
+   propio render): debajo se ven el negro y las líneas. En cine se ve hasta el
+   primer gesto y se funde cuando entra la onda en vivo; en la versión fija se queda. Centrado: con la altura
    como lado limitante, coincide con la cámara (fov vertical fijo). */
 .fondo__fija img {
   width: 100%;
@@ -37,8 +36,7 @@
   object-position: center;
 }
 .onda-viva .fondo__fija { display: none; }
-.fondo-fijo .fondo__onda,
-.fondo-fijo .fondo__rayos { display: none; }
+.fondo-fijo .fondo__onda { display: none; }
 
 /* Grano de película: fijo (sin animación), muy sutil y por debajo del texto.
    Tesela de ruido pintada una vez (assets/onda/grano.png, puntos blancos y

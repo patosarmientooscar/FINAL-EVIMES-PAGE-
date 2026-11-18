@@ -9,7 +9,7 @@
   <link rel="canonical" href="https://evimesweb.com/">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <meta name="theme-color" content="#080b14">
+  <meta name="theme-color" content="#0b0c0f">
   <meta name="robots" content="index, follow">
   <meta name="geo.region" content="ES-MD">
   <meta name="geo.placename" content="Madrid">
@@ -91,9 +91,8 @@
 <body class="inicio">
   <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
-  <!-- ===== Fondo global: rayos (2D) + la onda de cromo (Three.js) + grano ===== -->
+  <!-- ===== Fondo global: negro con líneas finas + la onda de cromo (Three.js) + grano ===== -->
   <div class="fondo" aria-hidden="true">
-    <canvas class="fondo__rayos"></canvas>
     <!-- Póster (hasta el primer gesto) y versión fija: fotograma del propio render. -->
     <picture class="fondo__fija">
       <source media="(max-width: 719px)" type="image/webp" srcset="assets/onda/onda-movil.webp">
@@ -175,13 +174,6 @@
       </div>
     </section>
 
-    <!-- ===== Frase (se enciende palabra a palabra con el scroll) ===== -->
-    <section class="frase" aria-labelledby="h-frase">
-      <div class="frase__fija">
-        <h2 class="display frase__texto" id="h-frase" data-frase><span data-c="inicio.frase.a">Si no eres visible,</span> <span class="frase__acento" data-c="inicio.frase.b">no existes.</span></h2>
-      </div>
-    </section>
-
     <!-- ===== Panel gris: qué hacemos (bento) → trabajo selecto → la oficina (#oficina-slot) → con quién trabajamos ===== -->
     <section class="panel" id="oficina" aria-label="Qué hacemos, trabajo selecto y con quién trabajamos">
 
@@ -194,7 +186,7 @@
         <div class="bento" data-bento>
           <article class="card c-web" data-kind="web" data-servicio="web">
             <canvas aria-hidden="true"></canvas>
-            <div class="num"><b>01</b> / 04</div><div class="hint" aria-hidden="true">PASA EL RATÓN</div>
+            <div class="num"><b>01</b> / 04</div>
             <div class="meta"><div><h3 class="display">Desarrollo web</h3><p>Webs a medida, rápidas y hechas a mano. Sin plantillas.</p></div><a class="more" href="servicios.html#web" data-scramble aria-label="Ver más sobre Desarrollo web"><span class="sl">Ver más</span> →</a></div>
           </article>
           <article class="card c-3d" data-kind="star" data-servicio="3d">
@@ -209,7 +201,7 @@
           </article>
           <article class="card c-ia" data-kind="ia" data-servicio="ia">
             <canvas aria-hidden="true"></canvas>
-            <div class="num"><b>04</b> / 04</div><div class="hint" aria-hidden="true">ACÉRCATE</div>
+            <div class="num"><b>04</b> / 04</div>
             <div class="meta"><div><h3 class="display">Software IA</h3><p>Agentes, bots y herramientas con IA que trabajan por ti.</p></div><a class="more" href="servicios.html#ia" data-scramble aria-label="Ver más sobre Software IA"><span class="sl">Ver más</span> →</a></div>
           </article>
         </div>
@@ -382,7 +374,6 @@
   <script defer src="js/data/clientes.js"></script>
   <script defer src="js/brand.js"></script>
   <script defer src="js/engine/util.js"></script>
-  <script defer src="js/fondo/rayos.js"></script>
   <script defer src="js/fondo/onda.js"></script>
   <script defer src="js/home.js"></script>
   <script defer src="js/gris/clientes.js"></script>
