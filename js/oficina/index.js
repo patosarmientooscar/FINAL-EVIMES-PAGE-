@@ -104,7 +104,7 @@ function fija() {
   const vista = (k, F) => { const r = F.card;
     return `<div class="fija fija--${k}" style="--ar:${F.ar}">
       <img class="fija__foto" src="${F.img}" alt="La oficina de Evimes: la mesa con el monitor encendido y la pared navy con EVIMES en cian." loading="lazy" decoding="async">
-      <a class="fweb" href="${PROJECT.url}" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true" style="left:${r.x}%;top:${r.y}%;width:${r.w}%;height:${r.h}%;background-image:url(${PROJECT.strip});background-size:100% ${PROJECT.frames * 100}%"></a>
+      <a class="fweb" href="${PROJECT.url}" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true" style="left:${r.x}%;top:${r.y}%;width:${r.w}%;height:${r.h}%;background-image:url(${PROJECT.hero});background-size:cover"></a>
       ${psiFija(k, F)}</div>`; };
   const div = document.createElement('div');
   div.className = 'fija-vistas';
@@ -220,10 +220,7 @@ async function arrancar(captura) {
   Object.defineProperty(EV.oficina, 'estado', { get: () => estado });
   Object.defineProperty(EV.oficina, 'auto', { get: () => auto });
 
-  // el vídeo de la card (si lo hay) solo corre con la oficina en pantalla
-  const video = () => K.video;
-  new IntersectionObserver(es => { running = es[0].isIntersecting; if (!running) EV.cabeceraOscura = false;
-    const v = video(); if (v) { if (running) v.play().catch(() => {}); else v.pause(); } }, { rootMargin: '300px' }).observe(track);
+  new IntersectionObserver(es => { running = es[0].isIntersecting; if (!running) EV.cabeceraOscura = false; }, { rootMargin: '300px' }).observe(track);
   const frame = dt => {
     if (!running && estado !== 'play') return;
     const y = scrollY();

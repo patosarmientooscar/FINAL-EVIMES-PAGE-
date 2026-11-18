@@ -5,12 +5,11 @@
    un único movimiento suave hacia el monitor 0.24–0.5 · pantalla 0.28–0.4 ·
    la web sube desde la pantalla como una card 0.38–0.56 · indicadores de
    PageSpeed 0.5–0.66 · texto de Disco desde 0.56 · cierre en card 0.9–1.
-   Dentro de la card la web hace scroll sola (baja por sus 4 secciones y vuelve
-   a subir, en bucle, con pausas). Los indicadores (HTML + SVG) se colocan cada
+   Dentro de la card, el hero de la web, fijo (solo lo cruza el brillo). Los indicadores (HTML + SVG) se colocan cada
    fotograma proyectando los bordes de la card y su tamaño sigue al de la card.
    El progreso (tP) lo pone index.js leyendo Lenis; aquí se suaviza igual.
    ========================================================================== */
-import { SPOT, PROJECT } from './config.js';
+import { SPOT } from './config.js';
 import { THREE, dir, D2R } from './scene.js';
 import { CWd, CHt } from './card.js';
 
@@ -22,7 +21,7 @@ export function crearTimeline(E, K, dom, opts = {}) {
   const { card, face, slab, edge, CU, BU } = K;
   const { win, caps, scrim, hud, psi } = dom;
   const reduce = !!opts.reduce;
-  let autoT = 0, P = 0, tP = 0, mx = 0, my = 0, tmx = 0, tmy = 0, W = 1, H = 1, mobile = false, t = 0, hov = 0, thov = 0, hx = 0, hy = 0, abierta = 0;
+  let P = 0, tP = 0, mx = 0, my = 0, tmx = 0, tmy = 0, W = 1, H = 1, mobile = false, t = 0, hov = 0, thov = 0, hx = 0, hy = 0, abierta = 0;
   const ptr = new THREE.Vector2(-9, -9), ray = new THREE.Raycaster();
   function puntero(e) { const r = win.getBoundingClientRect(); tmx = (e.clientX - r.left) / r.width * 2 - 1; tmy = -((e.clientY - r.top) / r.height * 2 - 1); ptr.set(tmx, tmy); }
   function resize(w, h) { W = w; H = h; renderer.setSize(W, H, false); camera.aspect = W / H; camera.updateProjectionMatrix(); mobile = W / H < .9; }
@@ -53,7 +52,7 @@ export function crearTimeline(E, K, dom, opts = {}) {
   }
 
   function update(dt) {
-    t += dt; SU.uT.value = t; steamU.uT.value = t; BU.uT.value = t; WU.uT.value = t; CU.uT.value = t;
+    t += dt; SU.uT.value = t; steamU.uT.value = t; BU.uT.value = t; WU.uT.value = t;
     P += (tP - P) * (1 - Math.pow(.0009, dt));
     const k5 = 1 - Math.pow(.05, dt); mx += (tmx - mx) * k5; my += (tmy - my) * k5;
     // phases
@@ -98,9 +97,6 @@ export function crearTimeline(E, K, dom, opts = {}) {
     CU.uA.value = 1; CU.uLight.value = seg(P, .37, .45);
     slab.material.opacity = Ec; edge.material.opacity = Ec; slab.visible = edge.visible = Ec > .02;
     BU.uA.value = (Ec * .45 + hov * .3) * (1 - X * .3);
-    // inside the card the site scrolls by itself, down and back up, pausing on each section
-    if (Ec > .9 && !reduce) autoT += dt;
-    if (CU.uFrames.value > 1) { const n = PROJECT.frames - 1, cyc = autoT * .3, st = Math.floor(cyc), ph = cyc - st, k = st % (2 * n), up = k < n, base = up ? k : 2 * n - k; CU.uFrame.value = base + (up ? 1 : -1) * eio(clamp((ph - .5) / .5)); }
     CU.uSheen.value = -.6 + ((t * .12) % 1) * 2.6 + hx * .4 * hov;
     // copy
     const c1 = seg(P, .17, .2) * (1 - seg(P, .25, .28)), c2 = seg(P, .56, .61);

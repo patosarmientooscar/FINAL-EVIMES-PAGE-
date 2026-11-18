@@ -15,17 +15,13 @@ export const LOGO = { eh: 'assets/logo/evimes-eh.svg', wordmark: 'assets/logo/ev
 // Valores del prototipo aprobado (Downloads/evimes-oficina/index.html), tal cual.
 export const SPOT = { monitor: { tl: [-15.6, 3.7], tr: [22.1, 3.7], br: [22.1, -15.9], bl: [-15.6, -15.9] }, mug: [46.2, -12], wall: [7.7, 24.5] };
 
-// El proyecto que sale del monitor. strip: 4 capturas reales de la web
-// apiladas en vertical (1024×640 cada una); la card las recorre.
+// El proyecto que sale del monitor. hero: UNA imagen fija del hero real de la
+// web (16:10, la misma proporción que la card). La card no hace scroll ni
+// cambia de imagen: solo la cruza el brillo de cristal.
 export const PROJECT = {
   title: 'Disco Producción',
   url: 'https://discoproduccion.com',
-  strip: 'assets/proyectos/disco-strip.webp',
-  frames: 4,
-  // Vídeo del recorrido por la web (16:10). Si se pone, la card lo usa en lugar de la tira.
-  // Se comprime con tools/video.sh (1280 px, H.264 CRF 26 + WebM + póster). null = la tira.
-  video: { mp4: 'assets/proyectos/disco-recorrido.mp4', webm: 'assets/proyectos/disco-recorrido.webm', poster: 'assets/proyectos/disco-recorrido-poster.jpg' },
-  frameAr: 1024 / 640
+  hero: 'assets/proyectos/disco-recorrido-poster.jpg'
 };
 
 // Versión fija (movimiento reducido, ahorro de datos, ?modo=fijo, sin WebGL):

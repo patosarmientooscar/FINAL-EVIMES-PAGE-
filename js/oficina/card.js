@@ -1,13 +1,10 @@
 /* ==========================================================================
    oficina/card.js — la card de Disco: la propia web, en cristal con filo de cromo.
    Portado tal cual del prototipo aprobado (Downloads/evimes-oficina/index.html):
-   cara con shader que enseña un fotograma de la tira (uFrame, con decimales =
-   scroll entre secciones), brillo de cristal que cruza y viñeta suave; filo de
-   cromo (refleja la oficina), losa navy con clearcoat y la ráfaga de detrás
-   (azul y cian de Evimes con un toque del rojo de Disco).
-   La tira: config.js → PROJECT.strip (4 capturas reales de 1024×640).
-   Si PROJECT.video existe, la cara enseña ese vídeo (VideoTexture, muted, loop,
-   playsinline) y la tira solo queda de respaldo si el vídeo falla.
+   cara con shader que enseña el hero fijo de la web (config.js → PROJECT.hero),
+   con el brillo de cristal que cruza y viñeta suave; filo de cromo (refleja la
+   oficina), losa navy con clearcoat y la ráfaga de detrás (azul y cian de
+   Evimes con un toque del rojo de Disco). La imagen no se mueve.
    ========================================================================== */
 import { THREE } from './scene.js';
 import { PROJECT } from './config.js';
@@ -20,30 +17,22 @@ export function crearCard(E) {
   const { scene } = E;
   const shape = roundedRect(CWd, CHt, .06);
   const faceGeo = new THREE.ShapeGeometry(shape, 24); { const uv = faceGeo.attributes.uv, pos = faceGeo.attributes.position; for (let k = 0; k < uv.count; k++) uv.setXY(k, pos.getX(k) / CWd + .5, pos.getY(k) / CHt + .5); }
-  const CU = { uTex: { value: null }, uFrame: { value: 0 }, uFrames: { value: PROJECT.frames }, uSheen: { value: -1 }, uA: { value: 1 }, uLight: { value: 1 }, uT: { value: 0 } };
+  const CU = { uTex: { value: null }, uSheen: { value: -1 }, uA: { value: 1 }, uLight: { value: 1 } };
   const face = new THREE.Mesh(faceGeo, new THREE.ShaderMaterial({ uniforms: CU, transparent: true, toneMapped: false,
     vertexShader: `varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
-    fragmentShader: `varying vec2 vUv;uniform sampler2D uTex;uniform float uFrame,uFrames,uSheen,uA,uLight,uT;
-    void main(){float v=1.-(uFrame+(1.-vUv.y))/uFrames;vec3 c=texture2D(uTex,vec2(vUv.x,v)).rgb;
+    fragmentShader: `varying vec2 vUv;uniform sampler2D uTex;uniform float uSheen,uA,uLight;
+    void main(){vec3 c=texture2D(uTex,vUv).rgb;
       // glass: a soft specular band that travels across, a faint inner vignette
       float s=exp(-pow((vUv.x*.8+vUv.y*.6)-uSheen,2.)*40.)*.16;c+=vec3(s);
       vec2 q=abs(vUv-.5)*2.;c*=1.-pow(max(q.x,q.y),8.)*.25;c*=uLight;
       gl_FragColor=vec4(c,uA);
       #include <colorspace_fragment>
     }` }));
-  let stripRes; const listo = new Promise(r => { stripRes = r; });
-  const tira = () => new THREE.TextureLoader().load(PROJECT.strip, t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; t.minFilter = THREE.LinearMipmapLinearFilter; CU.uTex.value = t; CU.uFrames.value = PROJECT.frames; stripRes(); }, undefined, () => stripRes());
-  let video = null;
-  if (PROJECT.video) {
-    video = document.createElement('video');
-    video.muted = true; video.loop = true; video.playsInline = true; video.setAttribute('playsinline', ''); video.preload = 'auto'; video.crossOrigin = 'anonymous';
-    if (PROJECT.video.poster) video.poster = PROJECT.video.poster;
-    [['webm', 'video/webm'], ['mp4', 'video/mp4']].forEach(([k, type]) => { if (PROJECT.video[k]) { const s = document.createElement('source'); s.src = PROJECT.video[k]; s.type = type; video.appendChild(s); } });
-    const vt = new THREE.VideoTexture(video); vt.colorSpace = THREE.SRGBColorSpace; vt.minFilter = THREE.LinearFilter;
-    video.addEventListener('loadeddata', () => { CU.uTex.value = vt; CU.uFrames.value = 1; CU.uFrame.value = 0; stripRes(); }, { once: true });
-    video.addEventListener('error', () => { video = null; tira(); }, { once: true, capture: true });
-    video.load();
-  } else tira();
+  // el hero fijo: una textura, con mipmaps y anisotropía para que se lea nítido inclinado
+  const listo = new Promise(r => new THREE.TextureLoader().load(PROJECT.hero, t => {
+    t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = E.renderer ? Math.min(8, E.renderer.capabilities.getMaxAnisotropy()) : 8; t.minFilter = THREE.LinearMipmapLinearFilter;
+    CU.uTex.value = t; r();
+  }, undefined, () => r()));
   const edge = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(shape.getPoints(28).map(p => new THREE.Vector3(p.x, p.y, 0)), true), 360, .006, 8, true),
     new THREE.MeshPhysicalMaterial({ color: 0xe4e9f0, metalness: 1, roughness: .08, clearcoat: .9, envMapIntensity: 1.8, transparent: true }));
   const slabG = new THREE.ExtrudeGeometry(roundedRect(CWd, CHt, .06), { depth: .035, bevelEnabled: true, bevelThickness: .01, bevelSize: .008, bevelSegments: 3, curveSegments: 20 }); slabG.translate(0, 0, -.05);
@@ -59,5 +48,5 @@ export function crearCard(E) {
       col*=1./(1.+r*r*14.)*smoothstep(.62,.25,r);col+=vec3(.17,.4,1.)*exp(-r*r*12.)*.35;
       gl_FragColor=vec4(col*uA,1.);}` })); burst.position.z = -.25;
   const card = new THREE.Group(); face.position.z = .003; card.add(burst, slab, face, edge); card.visible = false; scene.add(card);
-  return { card, face, slab, edge, burst, CU, BU, listo, get video() { return video; } };
+  return { card, face, slab, edge, burst, CU, BU, listo };
 }
