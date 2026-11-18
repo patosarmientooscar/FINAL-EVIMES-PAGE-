@@ -122,10 +122,13 @@
         mouse.x = e.clientX / vw - 0.5; mouse.y = e.clientY / vh - 0.5;
         if (EV.onda.pointer) EV.onda.pointer(e.clientX, e.clientY, true);
       }, { passive: true });
-      addEventListener('touchmove', function (e) { var t = e.touches[0]; if (t && EV.onda.pointer) EV.onda.pointer(t.clientX, t.clientY, true); }, { passive: true });
+      var dedo = function (e) { var t = e.touches[0]; if (t && EV.onda.pointer) EV.onda.pointer(t.clientX, t.clientY, true); };
+      addEventListener('touchstart', dedo, { passive: true });
+      addEventListener('touchmove', dedo, { passive: true });
       var fuera = function () { if (EV.onda.pointer) EV.onda.pointer(0, 0, false); };
       root.addEventListener('pointerleave', fuera);
       addEventListener('touchend', fuera, { passive: true });
+      addEventListener('touchcancel', fuera, { passive: true });
       addEventListener('blur', fuera);
       gsap.ticker.add(tick);
       EV.rayos.render(tRayos, 0);

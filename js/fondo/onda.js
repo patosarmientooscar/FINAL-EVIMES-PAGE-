@@ -5,9 +5,10 @@
      blancas y vetas cian/violeta: reflejan "los rayos".
    · Una línea de luz cian por banda que la recorre de punta a punta
      (shader aditivo sobre la UV del tubo), cada una con su desfase.
-   · Cuerdas acopladas: el puntero empuja un campo de desplazamiento (96
-     puntos × 7 tubos, CPU, paso fijo 1/90 s) que los vertex shaders leen de
-     una DataTexture; la onda recorre cada tubo y pasa a sus vecinos.
+   · Tubos individuales: cada tubo es un muelle propio (rigidez, retraso y
+     respiración distintos, sin acoplamiento) que se aparta del cursor con
+     caída gaussiana. Campo de 96 puntos × 7 tubos en CPU, paso fijo 1/120 s,
+     que los vertex shaders leen de una DataTexture.
    · Los dos extremos de cada banda se funden (alpha sobre la UV): nunca se
      ve el corte del tubo y la banda se apaga antes de llegar al texto.
    Un solo renderer. No tiene bucle propio: js/home.js llama a render() desde
@@ -22,14 +23,24 @@
   var P = [[0, .506], [.107, .536], [.203, .545], [.574, .485], [.67, .467], [.813, .455], [.909, .467], [1, .495]];
   var N = 7;
 
-  // Cuerdas acopladas: campo de desplazamiento (CPU) de W puntos × N tubos.
-  // u = desplazamiento en Y local del tubo, v = velocidad. Se sube cada
-  // fotograma a una DataTexture que leen los vertex shaders (cromo y luz).
-  // Calma (v-tubos-calma): tension 0.16 · coupling 0.09 · restore 0.010 · damping 0.10 · gain 0.0015 · max 0.28 · radio 160.
-  var SIM = { W: 96, step: 1 / 90, maxSteps: 6, lim: 0.28, radio: 160, fuerza: 0.0015, tension: 0.16, coupling: 0.09, restore: 0.010, damping: 0.10 };
-  var fieldU = new Float32Array(SIM.W * N), fieldV = new Float32Array(SIM.W * N);
-  var fieldTex = null, acc = 0, quieto = true;
-  var ptr = { x: 0, y: 0, px: 0, py: 0, dentro: false, prev: false, vx: 0, vy: 0 };
+  // Tubos: cada uno se mueve por su cuenta (v-tubos-individual). Campo de
+  // desplazamiento (CPU) de W puntos × N tubos: u = desplazamiento en Y local
+  // del tubo, v = velocidad. Cada tubo es un muelle independiente (sin
+  // acoplamiento entre tubos) que sigue a su objetivo:
+  //   objetivo = tanh(lado/30) · push · exp(−d²/radius²) · presence + respiración
+  // con su propio retraso; la tensión (26) solo une puntos del MISMO tubo.
+  // Se sube cada fotograma a una DataTexture que leen los vertex shaders.
+  var TUBE = { W: 96, step: 1 / 120, maxSteps: 14, push: 0.52, radius: 210, max: 0.62, tension: 26, zeta: 0.82, breath: 0.032, breathSp: 0.07 };
+  // Carácter de cada tubo: valores fijos por índice (no cambian entre cargas).
+  var tubeK = [22, 31, 16, 27, 14, 34, 19];                           // rigidez 14–34
+  var tubeC = tubeK.map(function (k) { return 2 * TUBE.zeta * Math.sqrt(k); });   // casi crítica: sin rebotes
+  var tubeLag = [0.10, 0.06, 0.15, 0.08, 0.18, 0.12, 0.07];          // retraso al seguir al cursor (s)
+  var tubePh = [0, 1.7, 3.1, 0.9, 4.4, 2.3, 5.6];                    // fase de la respiración
+  var tubeSp = [1, 1.27, 0.84, 1.13, 0.92, 1.38, 1.06];              // velocidad propia de la respiración
+  var fieldU = new Float32Array(TUBE.W * N), fieldV = new Float32Array(TUBE.W * N);
+  var target = new Float32Array(TUBE.W * N);                         // objetivo (con el retraso de cada tubo)
+  var fieldTex = null, acc = 0, tSim = 0, presence = 0;
+  var ptr = { x: 0, y: 0, dentro: false };
   var _v, _o;                                    // vectores de trabajo
 
   var EV_GLSL =
@@ -128,7 +139,7 @@
       color: 0xdfe6f0, metalness: 1, roughness: 0.13, clearcoat: 0.8, clearcoatRoughness: 0.08,
       envMapIntensity: 1.7, transparent: true
     });
-    fieldTex = new T.DataTexture(fieldU, SIM.W, N, T.RedFormat, T.FloatType);
+    fieldTex = new T.DataTexture(fieldU, TUBE.W, N, T.RedFormat, T.FloatType);
     fieldTex.minFilter = fieldTex.magFilter = T.NearestFilter;
     fieldTex.needsUpdate = true;
     _v = new T.Vector3(); _o = new T.Vector3();
@@ -139,7 +150,7 @@
       var L = 20 + i * 0.9, r = 0.12;
       var curve = bandCurve(L, 0.95);
       var geo = new T.TubeGeometry(curve, tub, r, rad, false); geo.scale(1, 1.55, 0.38); addS(geo);
-      var u = { uField: { value: fieldTex }, uBand: { value: i }, uW: { value: SIM.W }, uN: { value: N } };
+      var u = { uField: { value: fieldTex }, uBand: { value: i }, uW: { value: TUBE.W }, uN: { value: N } };
       var mesh = new T.Mesh(geo, makeChrome(chrome, u));
       mesh.renderOrder = N - i;                     // de atrás hacia delante
       var lgeo = new T.TubeGeometry(curve, tub, r * 1.04, radL, false); lgeo.scale(1, 1.55, 0.38); addS(lgeo);
@@ -150,9 +161,9 @@
       g.position.set(i * 0.12, i * 0.62, -i * 0.55);
       group.add(g);
       // Los 96 puntos de la cuerda en el espacio del tubo (misma escala que la geometría).
-      var pts = new Float32Array(SIM.W * 3);
-      for (var k = 0; k < SIM.W; k++) {
-        var q = curve.getPointAt(k / (SIM.W - 1));
+      var pts = new Float32Array(TUBE.W * 3);
+      for (var k = 0; k < TUBE.W; k++) {
+        var q = curve.getPointAt(k / (TUBE.W - 1));
         pts[k * 3] = q.x; pts[k * 3 + 1] = q.y * 1.55; pts[k * 3 + 2] = q.z * 0.38;
       }
       bands.push({ g: g, lm: lm, pts: pts, head: i * 0.37 - 0.3, speed: (0.11 + (i % 3) * 0.025) * 0.5 });   // luz: a la mitad
@@ -167,76 +178,75 @@
     geo.setAttribute('aS', new T.BufferAttribute(a, 1));
   }
 
-  /* Empuje del puntero: cada punto de cada cuerda recibe la velocidad del
-     puntero proyectada sobre su normal en pantalla, con caída gaussiana. */
-  function pulsar() {
-    var sp = ptr.vx * ptr.vx + ptr.vy * ptr.vy;
-    if (sp < 0.01) return;
-    var r2 = SIM.radio * SIM.radio, W = SIM.W;
-    group.updateMatrixWorld();
+  /* Objetivo de cada punto de cada tubo. Cerca del cursor, el tubo se aparta
+     hacia el lado contrario: "lado" es la distancia (px) del cursor al punto
+     medida sobre la normal del tubo en pantalla; tanh(lado/30) da el sentido
+     sin salto al cruzar la línea. Caída gaussiana con la distancia y
+     presence (0..1) para entrar y salir suave. Más una respiración lenta que
+     recorre cada tubo por separado (sin(π·s): los extremos no se mueven).
+     Cada tubo sigue su objetivo con su propio retraso (1er orden, por dt). */
+  function objetivos(dt) {
+    var W = TUBE.W, r2 = TUBE.radius * TUBE.radius, cerca = presence > 0.001;
+    if (cerca) group.updateMatrixWorld();
     for (var b = 0; b < N; b++) {
       var m = bands[b].g.matrixWorld, pts = bands[b].pts;
+      var kl = 1 - Math.exp(-dt / tubeLag[b]);
+      var fase = tSim * TUBE.breathSp * tubeSp[b] * 6.2832 - tubePh[b];
       for (var k = 0; k < W; k++) {
-        _v.set(pts[k * 3], pts[k * 3 + 1], pts[k * 3 + 2]);
-        _o.copy(_v); _o.y += 0.1;
-        _v.applyMatrix4(m).project(camera);
-        var sx = (_v.x * 0.5 + 0.5) * w, sy = (-_v.y * 0.5 + 0.5) * h;
-        var dx = sx - ptr.x, dy = sy - ptr.y, d2 = dx * dx + dy * dy;
-        if (d2 > r2 * 9) continue;                 // más allá de 3 radios: exp ≈ 0
-        _o.applyMatrix4(m).project(camera);
-        var nx = (_o.x * 0.5 + 0.5) * w - sx, ny = (-_o.y * 0.5 + 0.5) * h - sy;
-        var nl = Math.sqrt(nx * nx + ny * ny) || 1;
-        fieldV[b * W + k] += ((ptr.vx * nx + ptr.vy * ny) / nl) * Math.exp(-d2 / r2) * SIM.fuerza;
-        quieto = false;
+        var s0 = k / (W - 1), raw = TUBE.breath * Math.sin(Math.PI * s0) * Math.sin(s0 * 6.2832 - fase);
+        if (cerca) {
+          _v.set(pts[k * 3], pts[k * 3 + 1], pts[k * 3 + 2]);
+          _o.copy(_v); _o.y += 0.1;
+          _v.applyMatrix4(m).project(camera);
+          var sx = (_v.x * 0.5 + 0.5) * w, sy = (-_v.y * 0.5 + 0.5) * h;
+          var dx = sx - ptr.x, dy = sy - ptr.y, d2 = dx * dx + dy * dy;
+          if (d2 < r2 * 9) {                         // más allá de 3 radios: exp ≈ 0
+            _o.applyMatrix4(m).project(camera);
+            var nx = (_o.x * 0.5 + 0.5) * w - sx, ny = (-_o.y * 0.5 + 0.5) * h - sy;
+            var nl = Math.sqrt(nx * nx + ny * ny) || 1;
+            var lado = (dx * nx + dy * ny) / nl;      // + = el tubo está del lado +normal del cursor
+            raw += Math.tanh(lado / 30) * TUBE.push * Math.exp(-d2 / r2) * presence;
+          }
+        }
+        var i = b * W + k;
+        target[i] += (raw - target[i]) * kl;
       }
     }
   }
 
-  /* Un paso de 1/90 s. Donde falta un vecino (tubos de los bordes, extremos
-     de cada cuerda) se usa u·0.5. */
-  function paso() {
-    var W = SIM.W, lim = SIM.lim, e = 0;
+  /* Un paso semi-implícito de 1/120 s: cada tubo, su muelle; la tensión solo
+     entre puntos vecinos del mismo tubo (en los extremos, el propio punto). */
+  function paso(hs) {
+    var W = TUBE.W, lim = TUBE.max, ten = TUBE.tension;
     for (var b = 0; b < N; b++) {
+      var kk = tubeK[b], cc = tubeC[b];
       for (var k = 0; k < W; k++) {
         var i = b * W + k, u = fieldU[i];
-        var l = k > 0 ? fieldU[i - 1] : u * 0.5, r = k < W - 1 ? fieldU[i + 1] : u * 0.5;
-        var up = b > 0 ? fieldU[i - W] : u * 0.5, dn = b < N - 1 ? fieldU[i + W] : u * 0.5;
-        fieldV[i] += SIM.tension * (l + r - 2 * u) + SIM.coupling * (up + dn - 2 * u) - SIM.restore * u - SIM.damping * fieldV[i];
+        var l = k > 0 ? fieldU[i - 1] : u, r = k < W - 1 ? fieldU[i + 1] : u;
+        var a = kk * (target[i] - u) - cc * fieldV[i] + ten * (l + r - 2 * u);
+        fieldV[i] += a * hs;
       }
     }
     for (var j = 0; j < fieldU.length; j++) {
-      var nu = fieldU[j] + fieldV[j];
+      var nu = fieldU[j] + fieldV[j] * hs;
       fieldU[j] = nu > lim ? lim : nu < -lim ? -lim : nu;
-      e += Math.abs(fieldU[j]) + Math.abs(fieldV[j]);
     }
-    return e;
   }
 
-  /* Paso fijo (acumulador, máx. 6 pasos por fotograma): igual a cualquier fps. */
-  var ultimo = 0;
+  /* Paso fijo (acumulador, máx. 14 pasos por fotograma): igual a cualquier fps.
+     Sin movimiento (reduced motion): todo a cero, tubos quietos. */
+  var parado = false;
   function simular(dt, activo) {
-    // Si no se ha simulado en un rato (canvas a opacidad 0), la posición previa
-    // del puntero no vale: sin esto saldría un empujón falso al volver.
-    var ahora = performance.now();
-    if (ahora - ultimo > 120) ptr.prev = false;
-    ultimo = ahora;
-    if (activo && ptr.dentro) {
-      if (ptr.prev) {
-        // Velocidad del puntero por fotograma, normalizada a 60 fps y suavizada.
-        var f = 1 / Math.max(dt * 60, 0.25);
-        var ks = 1 - Math.pow(0.82, dt * 60);       // suavizado lento: sin sacudidas
-        ptr.vx += ((ptr.x - ptr.px) * f - ptr.vx) * ks;
-        ptr.vy += ((ptr.y - ptr.py) * f - ptr.vy) * ks;
-        pulsar();
-      }
-      ptr.px = ptr.x; ptr.py = ptr.y; ptr.prev = true;
-    } else { ptr.prev = false; ptr.vx = ptr.vy = 0; }
-
-    if (quieto) { acc = 0; return; }
-    acc = Math.min(acc + dt, SIM.step * SIM.maxSteps);
-    var e = -1;
-    while (acc >= SIM.step) { e = paso(); acc -= SIM.step; }
-    if (e >= 0 && e < 1e-4 * fieldU.length) { fieldU.fill(0); fieldV.fill(0); quieto = true; }
+    if (!activo) {
+      if (!parado) { fieldU.fill(0); fieldV.fill(0); target.fill(0); presence = 0; acc = 0; fieldTex.needsUpdate = true; parado = true; }
+      return;
+    }
+    parado = false;
+    tSim += dt;
+    presence += ((ptr.dentro ? 1 : 0) - presence) * (1 - Math.exp(-3 * dt));
+    objetivos(dt);
+    acc = Math.min(acc + dt, TUBE.step * TUBE.maxSteps);
+    while (acc >= TUBE.step) { paso(TUBE.step); acc -= TUBE.step; }
     fieldTex.needsUpdate = true;
   }
 
@@ -294,20 +304,20 @@
 
     resize: resize,
 
-    /* Un "pulso" en las cuerdas (p. ej. al cambiar el interruptor de clientes):
-       un golpe gaussiano en todos los tubos que luego viaja y se apaga solo. */
+    /* Un "pulso" en los tubos (sin uso ahora): un golpe de velocidad gaussiano
+       (unidades/s) que cada muelle devuelve solo a su sitio. */
     pulso: function (f) {
       if (!fieldTex || EV.reducedMotion) return;
-      f = f || 0.05;
-      var W = SIM.W, c = W * 0.62;
+      f = f || 6;
+      var W = TUBE.W, c = W * 0.62;
       for (var b = 0; b < N; b++) {
         for (var k = 0; k < W; k++) fieldV[b * W + k] += f * Math.exp(-Math.pow((k - c) / 6, 2)) * (1 - b * 0.06);
       }
-      quieto = false;
     },
 
-    /* Puntero en px de la ventana (ratón o dedo). dentro=false: sin empuje. */
-    pointer: function (x, y, dentro) { ptr.x = x; ptr.y = y; ptr.dentro = dentro; },
+    /* Puntero en px de la ventana (ratón o dedo). dentro=false: presence baja
+       sola y los tubos vuelven; se guarda la última posición para que no salten. */
+    pointer: function (x, y, dentro) { if (dentro) { ptr.x = x; ptr.y = y; } ptr.dentro = dentro; },
 
     /* dt: segundos · inp: { mx, my (−0.5..0.5), hero (0..1), luz, cuerdas (bool) } */
     render: function (dt, inp) {
@@ -344,7 +354,7 @@
     capture: function () {
       s.mx = s.my = s.hero = 0; place();
       bands.forEach(function (b, i) { b.lm.uniforms.uHead.value = -2; b.g.position.z = -i * 0.55; });
-      fieldU.fill(0); fieldV.fill(0); quieto = true; fieldTex.needsUpdate = true;
+      fieldU.fill(0); fieldV.fill(0); target.fill(0); presence = 0; fieldTex.needsUpdate = true;
       renderer.render(scene, camera);
       return canvas.toDataURL('image/png');
     },

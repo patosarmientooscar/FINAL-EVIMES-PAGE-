@@ -318,9 +318,9 @@
         if (EV.onda.pointer) EV.onda.pointer(e.clientX, e.clientY, true);
       }, { passive: true });
       // Cuerdas con el dedo: el scroll táctil cancela los pointer events, touchmove no.
-      window.addEventListener('touchmove', function (e) {
-        var t = e.touches[0]; if (t && EV.onda.pointer) EV.onda.pointer(t.clientX, t.clientY, true);
-      }, { passive: true });
+      var dedo = function (e) { var t = e.touches[0]; if (t && EV.onda.pointer) EV.onda.pointer(t.clientX, t.clientY, true); };
+      window.addEventListener('touchstart', dedo, { passive: true });
+      window.addEventListener('touchmove', dedo, { passive: true });
       var fuera = function () { if (EV.onda.pointer) EV.onda.pointer(0, 0, false); };
       document.documentElement.addEventListener('pointerleave', fuera);
       window.addEventListener('touchend', fuera, { passive: true });
