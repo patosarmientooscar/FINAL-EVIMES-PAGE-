@@ -103,7 +103,6 @@ window.EVIMES_CONFIG = {
   },
   urls: {
     home: './',
-    proyectos: 'proyectos.html',
     planes: 'planes.html',
     avisoLegal: 'aviso-legal.html',
     terminos: 'terminos.html',

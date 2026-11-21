@@ -113,9 +113,6 @@
 }
 
 /* Cabecera en páginas de lectura */
-.doc-back { color: var(--ink-muted); text-decoration: none; }
-.doc-back:hover { color: var(--stone); }
-@media (max-width: 47.99rem) { .doc-back { display: none; } }
 
 /* Pie */
 .doc-footer {

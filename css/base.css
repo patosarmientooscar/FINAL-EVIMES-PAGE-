@@ -112,102 +112,112 @@ input, textarea { caret-color: var(--cyan); }
 }
 
 /* ==========================================================================
-   Cabecera fija
+   Cabecera compacta: la misma en todas las páginas (desde backup-con-proyectos)
+   Barra fija de 56 px (52 en móvil). Servicios · Planes · Contacto a la
+   izquierda; EVIMES a la derecha, enlaza a la home. Transparente arriba; al
+   hacer scroll, velo oscuro (is-scroll); sobre las secciones grises, velo
+   claro y tinta (is-clara). Las clases las ponen js/home.js, js/fondo/fondo.js
+   y, en las páginas legales, js/ui/menu.js. En móvil: "Menú" a la izquierda y
+   la lista se despliega debajo de la barra.
    ========================================================================== */
-.site-header {
+.cabecera {
+  --cab-h: 56px;
+  box-sizing: border-box;                  /* el borde inferior va dentro de los 56 px (las páginas legales no tienen el reset de la home) */
+  --cab-g: clamp(16px, 4vw, 56px);
   position: fixed;
   inset: 0 0 auto 0;
   z-index: var(--z-header);
-  height: var(--header-h);
-  padding-inline: var(--gutter);
+  height: calc(var(--cab-h) + env(safe-area-inset-top, 0px));
+  padding: env(safe-area-inset-top, 0px) var(--cab-g) 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-4);
-  pointer-events: none;
+  gap: 24px;
+  color: var(--stone);
+  font-family: var(--font-text);
+  border-bottom: 1px solid transparent;
+  transition: background-color .4s cubic-bezier(.2,.75,.15,1), border-color .4s cubic-bezier(.2,.75,.15,1), color .4s cubic-bezier(.2,.75,.15,1);
 }
-/* velo para legibilidad sobre fotogramas claros */
-.site-header::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 -60% 0;
-  background: linear-gradient(to bottom, rgb(11 12 15 / 0.72), rgb(11 12 15 / 0));
-  pointer-events: none;
-  z-index: -1;
+.cabecera.is-scroll,
+.cabecera.is-abierta {
+  background: rgb(11 12 15 / .8);
+  border-bottom-color: rgb(236 230 219 / .07);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  backdrop-filter: blur(12px) saturate(140%);
 }
-.site-header > * { pointer-events: auto; }
-
-/* Marca: monograma EH vectorial (js/brand.js lo incrusta desde config).
-   Se reserva su caja para que no haya salto al cargar. */
-.brand {
-  --logo-h: clamp(1.25rem, 1.12rem + 0.35vw, 1.5rem);
+.cabecera.is-clara {
+  color: var(--tinta-oscura);
+  background: rgb(246 245 242 / .86);
+  border-bottom-color: rgb(11 15 26 / .08);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  backdrop-filter: blur(12px) saturate(140%);
+}
+.cabecera__nav ul { display: flex; gap: 26px; margin: 0; padding: 0; list-style: none; }
+.cabecera__nav a {
   display: inline-flex;
   align-items: center;
-  height: 2.75rem;                         /* objetivo táctil */
-  width: calc(var(--logo-h) * 2.008);      /* proporción 1566 × 780 */
-  color: var(--stone);
+  min-height: 40px;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: .01em;
+  color: rgb(233 227 216 / .62);
   text-decoration: none;
+  transition: color .3s cubic-bezier(.2,.75,.15,1);
 }
-.brand .logo-svg { display: block; height: var(--logo-h); width: auto; }
-
-/* Menú común (Servicios · Proyectos · Planes · Contacto) en las páginas de texto; en móvil, solo los dos botones. */
-.doc-nav { display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; font-size: var(--step--1, 15px); color: var(--ink-2, rgb(233 227 216 / 0.78)); text-decoration: none; }
-.doc-nav:hover { color: var(--ink, #e9e3d8); }
-@media (max-width: 899px) { .doc-nav { display: none; } }
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: clamp(0.25rem, 0.1rem + 0.8vw, 1rem);
-}
-
-/* Botones base de UI */
-.ui-btn {
-  appearance: none;
-  background: none;
-  border: 0;
-  color: var(--stone);
-  font: 500 var(--step--1) / 1 var(--font-text);
-  letter-spacing: 0.01em;
-  cursor: pointer;
+.cabecera__nav a:hover { color: var(--stone); }
+.cabecera.is-clara .cabecera__nav a { color: rgb(11 15 26 / .66); }
+.cabecera.is-clara .cabecera__nav a:hover { color: var(--tinta-oscura); }
+.cabecera__marca {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  min-height: 2.75rem;
-  padding: 0 var(--space-3);
-  transition: transform var(--dur-fast) var(--ease-out);
-  -webkit-tap-highlight-color: transparent;
-}
-.ui-btn:active { transform: scale(0.97); }
-.ui-btn svg { flex: none; }
-
-/* CTA único: placa rectangular, relleno de piedra que barre con clip-path */
-.btn-cta {
-  position: relative;
-  isolation: isolate;
-  padding-inline: var(--space-4);
-  margin-left: var(--space-2);
-  border: 1px solid var(--line-strong);
+  min-height: 40px;
+  margin-right: -.34em;                    /* el último espaciado no cuenta: la marca toca el margen */
+  font-family: "Libre Baskerville", Georgia, serif;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: .34em;
+  color: inherit;
   text-decoration: none;
-  white-space: nowrap;
-  overflow: hidden;
 }
-.btn-cta__fill {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--stone);
-  color: var(--navy);
-  clip-path: inset(0 100% 0 0);
-  transition: clip-path var(--dur-mid) var(--ease-out);
+.cabecera__abrir { display: none; }
+.cabecera a:focus-visible,
+.cabecera button:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; border-radius: 4px; }
+@media (max-width: 860px) {
+  .cabecera { --cab-h: 52px; }
+  .cabecera__abrir {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: 500 13.5px / 1 var(--font-text);
+    letter-spacing: .01em;
+    cursor: pointer;
+  }
+  .cabecera__nav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    padding: 4px var(--cab-g) 16px;
+    background: rgb(11 12 15 / .97);
+    border-bottom: 1px solid rgb(236 230 219 / .07);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition: opacity .3s cubic-bezier(.2,.75,.15,1), transform .4s cubic-bezier(.2,.75,.15,1), visibility 0s linear .4s;
+  }
+  .cabecera.is-abierta .cabecera__nav { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
+  .cabecera__nav ul { flex-direction: column; gap: 0; }
+  .cabecera__nav a { width: 100%; min-height: 48px; font-size: 16px; color: var(--stone); }
+  .cabecera.is-clara .cabecera__nav { background: rgb(246 245 242 / .97); border-bottom-color: rgb(11 15 26 / .08); }
+  .cabecera.is-clara .cabecera__nav a { color: var(--tinta-oscura); }
 }
-.btn-cta:hover .btn-cta__fill,
-.btn-cta:focus-visible .btn-cta__fill { clip-path: inset(0 0 0 0); }
-
-@media (max-width: 47.99rem) {
-  .btn-cta { padding-inline: var(--space-3); margin-left: var(--space-1); font-size: var(--step--2); }
-}
+@media (prefers-reduced-motion: reduce) { .cabecera, .cabecera__nav { transition: none; } }
 
 /* ==========================================================================
    Movimiento reducido
@@ -230,7 +240,7 @@ input, textarea { caret-color: var(--cyan); }
    @property --angle en 6 s lineal, y un halo difuminado que la sigue (la
    misma luz con blur, recortada para que solo se vea por fuera). El elemento
    necesita position y border-radius propios. .con-luz--sutil = más tenue.
-   Con movimiento reducido, quieta. La usan el formulario y "En el horno".
+   Con movimiento reducido, quieta. La usa el formulario de contacto.
    ========================================================================== */
 @property --angle { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
 .con-luz { --luz: conic-gradient(from var(--angle), transparent 0deg, #00e5ff 36deg, #2b4dff 84deg, transparent 132deg, transparent 360deg); --luz-r: 28px; isolation: isolate; }
@@ -248,6 +258,6 @@ input, textarea { caret-color: var(--cyan); }
 .con-luz--sutil::after { opacity: .2; }
 @media (prefers-reduced-motion: reduce) { .con-luz::before, .con-luz::after { animation: none; --angle: 210deg; } }
 
-/* Anclas: la cabecera flotante (≈ 80 px) + 16 px no tapan el título de la sección. */
-:where(main, footer) :where(section, article, div, header)[id] { scroll-margin-top: 96px; }
-@media (max-width: 51.24rem) { :where(main, footer) :where(section, article, div, header)[id] { scroll-margin-top: 88px; } }
+/* Anclas: la cabecera (56 px; 52 en móvil) + 16 px no tapan el título de la sección. */
+:where(main, footer) :where(section, article, div, header)[id] { scroll-margin-top: 72px; }
+@media (max-width: 860px) { :where(main, footer) :where(section, article, div, header)[id] { scroll-margin-top: 68px; } }

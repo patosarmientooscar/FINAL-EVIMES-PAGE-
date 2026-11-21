@@ -1,5 +1,5 @@
 /* ==========================================================================
-   paginas/paginas.js — lo común de servicios, proyectos, planes y contacto.
+   paginas/paginas.js — lo común de servicios, planes y contacto.
    · Textos: [data-sp] ← EVIMES_SERVICIOS_PAGINA · [data-pl] ← EVIMES_PLANES_PAGINA
      · [data-pr] ← EVIMES_PROYECTOS_PAGINA · [data-ct] ← EVIMES_CONTACTO_PAGINA
      (rutas con puntos; *-parrafos / *-lista repintan bloques enteros).
@@ -32,7 +32,6 @@
   }
   textos('data-sp', window.EVIMES_SERVICIOS_PAGINA);
   textos('data-pl', window.EVIMES_PLANES_PAGINA);
-  textos('data-pr', window.EVIMES_PROYECTOS_PAGINA);
   textos('data-ct', window.EVIMES_CONTACTO_PAGINA);
 
   /* ---------- contacto directo (desde config.js) ---------- */

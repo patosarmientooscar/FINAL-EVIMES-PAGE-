@@ -1,5 +1,5 @@
 /* ==========================================================================
-   paginas-evimes.css — servicios, proyectos, planes y contacto, sobre el fondo global.
+   paginas-evimes.css — servicios, planes y contacto, sobre el fondo global.
    Mismo lenguaje que la home: navy + cian + cromo, Fraunces (--display) y
    Schibsted Grotesk, secciones grises que suben con esquinas de 30 px.
    Entradas: solo transform y opacity (js/paginas/paginas.js añade .is-in).
@@ -190,133 +190,6 @@
 .acord__precio .plan__desde { margin-right: 4px; font-size: 13px; color: var(--tinta-2); }
 
 /* ==========================================================================
-   proyectos.html
-   ========================================================================== */
-.pag-hero--proyectos { min-height: 72vh; min-height: 72svh; }
-.caso { --g-col: clamp(16px, 2vw, 32px); position: relative; padding: clamp(48px, 8vh, 96px) var(--g) clamp(110px, 16vh, 180px); }
-.caso__cab { display: block; }
-.caso__nombre { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px clamp(20px, 3vw, 48px); }
-.pag .caso__num.display { font-family: var(--display); font-weight: 220; font-variation-settings: "opsz" 144; font-size: clamp(88px, 10vw, 176px); line-height: .8; letter-spacing: -.04em; }
-.caso__nombre { font-size: clamp(48px, 6.4vw, 112px); line-height: .94; letter-spacing: -.03em; }
-.caso__vista { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: var(--g-col); row-gap: 40px; align-items: end; margin-top: clamp(40px, 7vh, 72px); }
-.caso__vista > .vitrina, .caso__vista > .captura { grid-column: 1 / span 8; }
-.caso__ficha { grid-column: 10 / span 3; }
-
-/* la card de cristal con filo de cromo: la web de Disco hace scroll sola */
-.vitrina { position: relative; display: block; padding: 9px; border-radius: 30px; color: inherit; text-decoration: none;
-  background: linear-gradient(135deg, rgb(255 255 255 / 0.42), rgb(255 255 255 / 0.05) 26%, rgb(190 205 225 / 0.26) 52%, rgb(255 255 255 / 0.04) 74%, rgb(255 255 255 / 0.34));
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.5), 0 0 0 1px rgb(255 255 255 / 0.06), 0 50px 100px -50px rgb(0 0 0 / 0.9);
-  transition: transform .7s var(--ease); }
-.vitrina:hover { transform: translateY(-4px); }
-.vitrina:focus-visible { outline: 2px solid var(--cyan); outline-offset: 6px; }
-.vitrina__pantalla { display: block; position: relative; overflow: hidden; aspect-ratio: 1024 / 640; border-radius: 22px; background: #050608; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.6); }
-.vitrina__tira { display: block; width: 100%; height: auto; max-width: none; will-change: transform; }
-.is-cine .vitrina__tira { animation: tira 22s cubic-bezier(.65, 0, .35, 1) infinite; }
-.vitrina__pantalla::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
-  background: linear-gradient(115deg, rgb(255 255 255 / 0) 30%, rgb(255 255 255 / 0.1) 44%, rgb(255 255 255 / 0) 58%); }
-/* las 4 secciones de la web, abajo y vuelta arriba (como en la oficina) */
-@keyframes tira {
-  0%, 10% { transform: translateY(0); }
-  16%, 26% { transform: translateY(-25%); }
-  32%, 42% { transform: translateY(-50%); }
-  48%, 58% { transform: translateY(-75%); }
-  64%, 74% { transform: translateY(-50%); }
-  80%, 90% { transform: translateY(-25%); }
-  96%, 100% { transform: translateY(0); }
-}
-
-.caso__dl { margin: 0; display: grid; gap: 0; }
-.caso__dl > div { padding: 18px 0; border-top: 1px solid var(--nav-linea); }
-.caso__dl dt { font-size: 12px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--texto-2); }
-.caso__dl dd { margin: 8px 0 0; font-size: 17px; line-height: 1.5; }
-.caso__ficha .pastilla { margin-top: 28px; }
-
-.caso__cuerpo { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: var(--g-col); row-gap: 56px; margin-top: clamp(72px, 12vh, 140px); }
-.caso__reto { grid-column: 1 / span 5; }
-.caso__hicimos { grid-column: 7 / span 6; }
-.caso__resultado { grid-column: 1 / -1; padding-top: clamp(40px, 6vh, 64px); border-top: 1px solid var(--nav-linea); }
-.caso__t { font-family: var(--font-text); font-size: 13px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--texto-2); }
-.caso__reto p { margin-top: 20px; font-family: var(--display); font-weight: var(--display-w); font-size: clamp(30px, 3vw, 48px); line-height: 1.08; letter-spacing: -.02em; }
-.caso__lista { margin: 20px 0 0; padding: 0; list-style: none; }
-.caso__lista li { display: flex; gap: 16px; align-items: baseline; padding: 18px 0; border-top: 1px solid var(--nav-linea); font-size: clamp(17px, 1.3vw, 20px); line-height: 1.45; }
-.caso__lista li::before { content: ""; flex: 0 0 14px; height: 2px; background: var(--cyan); transform: translateY(-.3em); }
-
-/* los indicadores de PageSpeed: el diseño de la oficina, en fila */
-.psi-caso { margin-top: 32px; }
-.psi-caso__lista { display: flex; flex-wrap: wrap; gap: clamp(16px, 2.6vw, 44px); margin: 0; padding: 0; list-style: none; }
-.psi-g { --s: clamp(108px, 10vw, 156px); position: relative; width: var(--s); height: var(--s); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(var(--s) * .04);
-  background: radial-gradient(circle at 50% 30%, rgb(24 36 70 / 0.78), rgb(11 12 15 / 0.78));
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.10), inset 0 1px 0 rgb(255 255 255 / 0.14), 0 20px 44px -20px rgb(0 0 0 / 0.75), 0 0 46px -14px rgb(0 229 255 / 0.45); }
-.psi-g__anillo { position: absolute; inset: 7%; width: 86%; height: 86%; transform: rotate(-90deg); }
-.psi-g__base { fill: none; stroke: rgb(255 255 255 / 0.10); stroke-width: 5; }
-.psi-g__arco { fill: none; stroke-width: 5; stroke-linecap: round; stroke-dasharray: 263.9; filter: drop-shadow(0 0 3px rgb(0 229 255 / 0.75)); }
-.psi-g b { position: relative; font: 600 calc(var(--s) * .27)/1 var(--font-text); color: #ece7dd; font-variant-numeric: tabular-nums; letter-spacing: -.03em; }
-.psi-g span { position: relative; font: 500 max(11px, calc(var(--s) * .078))/1.15 var(--font-text); letter-spacing: .04em; color: rgb(236 231 221 / 0.78); text-align: center; max-width: 74%; }
-.psi-caso__pill { display: inline-flex; align-items: center; gap: 10px; margin-top: 28px; padding: 11px 18px; border-radius: 999px; font-size: 14px; color: #ece7dd;
-  background: rgb(11 12 15 / 0.72); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.12); }
-.psi-caso__pill i { width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); }
-.psi-caso__pill b { font-weight: 600; }
-.psi-caso__nota { margin-top: 18px; font-size: 14px; color: var(--texto-2); }
-.caso--gris .psi-caso__nota { color: var(--tinta-2); }
-.res-caja .psi-caso + .res { margin-top: 48px; }
-
-/* el ejemplo sobre gris (León's) */
-.caso--gris { background: var(--gris) var(--lineas-tinta) 0 0 / var(--lineas-tam) repeat; color: var(--tinta-oscura); border-radius: 0; padding-top: clamp(96px, 14vh, 160px); }
-.captura { margin: 0; padding: 8px; border-radius: 30px; background: rgb(11 15 26 / 0.06); box-shadow: inset 0 0 0 1px rgb(11 15 26 / 0.08); }
-.captura a { display: block; overflow: hidden; border-radius: 23px; box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3), 0 40px 80px -46px rgb(11 15 26 / 0.65); }
-.captura img { display: block; width: 100%; height: auto; transition: transform 1.2s var(--ease); }
-.captura a:hover img { transform: scale(1.025); }
-.captura a:focus-visible { outline: 2px solid var(--tinta-oscura); outline-offset: 4px; }
-.caso--gris .caso__dl > div { border-top-color: var(--gris-linea); }
-.caso--gris .caso__dl dt { color: var(--tinta-2); }
-.caso--gris .pastilla { background: var(--tinta-oscura); color: var(--stone); border-color: var(--tinta-oscura); }
-.caso--gris :focus-visible { outline-color: var(--tinta-oscura); }
-
-/* el tipo de cliente de cada ejemplo, encima del nombre */
-.caso__etiqueta { margin-bottom: 18px; font-size: 13px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--texto-2); }
-.caso--gris .caso__etiqueta { color: var(--tinta-2); }
-
-/* la vista de la web: vídeo, captura o card de espera */
-.vitrina__video { display: block; width: 100%; height: 100%; object-fit: cover; }
-a.vitrina { cursor: pointer; }
-.vitrina--espera .vitrina__pantalla { display: grid; place-items: center; }
-.vitrina__fondo { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; filter: brightness(.7); }
-.vitrina__espera { position: relative; display: grid; justify-items: center; gap: 12px; text-align: center; padding: 24px; }
-.vitrina__espera .display { font-size: clamp(44px, 5.4vw, 88px); line-height: 1; letter-spacing: -.02em; color: var(--stone); }
-.vitrina__espera-t { font-size: 13px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: rgb(233 227 216 / 0.82); }
-
-/* resultados (León's): porcentaje grande + barras que se dibujan al entrar */
-.res { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: clamp(24px, 4vw, 64px); align-items: end; margin-top: 28px; }
-.res__pct { display: grid; gap: 10px; }
-.res__pct .display { font-size: clamp(72px, 8vw, 136px); line-height: .9; letter-spacing: -.03em; background: linear-gradient(90deg, #2b4dff, #00e5ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.caso--gris .res__pct .display { background: none; color: #1f3fd8; }
-.res__pct-t { font-size: 15px; color: var(--tinta-2); }
-.res__graf { margin: 0; }
-.res__graf svg { display: block; width: 100%; height: auto; overflow: visible; }
-.res__graf figcaption { margin-top: 12px; font-size: 14px; color: var(--tinta-2); }
-.res-base { stroke: rgb(11 15 26 / 0.18); stroke-width: 1; }
-.res-eti { font: 500 13px var(--font-text); fill: rgb(11 15 26 / 0.7); }
-.res-barra { transform-box: fill-box; transform-origin: bottom; }
-.res-linea { fill: none; stroke: #00a3c4; stroke-width: 2; stroke-dasharray: 1; stroke-dashoffset: 0; }
-.pag-viva .res:not(.is-dibujada) .res-barra { transform: scaleY(0); }
-.pag-viva .res:not(.is-dibujada) .res-linea { stroke-dashoffset: 1; }
-.pag-viva .res .res-barra { transition: transform 1s cubic-bezier(.2,.75,.15,1) calc(var(--i) * 80ms); }
-.pag-viva .res .res-linea { transition: stroke-dashoffset 1.4s cubic-bezier(.2,.75,.15,1) .5s; }
-.res-espera { display: grid; grid-template-columns: auto 1fr; column-gap: 14px; align-items: baseline; margin-top: 24px; padding: 26px 0 4px; border-top: 1px solid var(--gris-linea); max-width: 40rem; }
-.res-espera__punto { width: 10px; height: 10px; border-radius: 50%; background: #1f3fd8; box-shadow: 0 0 0 6px rgb(31 63 216 / 0.12); }
-.res-espera__t { font-size: clamp(28px, 2.6vw, 40px); line-height: 1.05; letter-spacing: -.02em; }
-.res-espera__x { grid-column: 2; margin-top: 8px; font-size: 16px; color: var(--tinta-2); }
-
-/* En el horno: cristal esmerilado sobre fondo borroso, el nombre centrado y "Coming soon"; la luz del borde, más sutil (.con-luz--sutil) */
-.horno { padding: clamp(110px, 16vh, 180px) var(--g) 0; }
-.horno__lista { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 3vw, 44px); margin: 0; padding: 0; list-style: none; }
-.horno__card { --luz-r: 30px; position: relative; display: grid; place-content: center; justify-items: center; gap: 14px; aspect-ratio: 16 / 10; padding: clamp(24px, 3vw, 44px); border-radius: 30px; text-align: center;
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.14), inset 0 1px 0 rgb(255 255 255 / 0.22), 0 40px 90px -50px rgb(0 0 0 / 0.9); }
-.horno__card img { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; max-width: none; object-fit: cover; border-radius: inherit; filter: brightness(.72); }
-.horno__nombre { font-size: clamp(36px, 3.8vw, 64px); line-height: 1; letter-spacing: -.02em; color: var(--stone); }
-.horno__estado { font-size: 13px; font-weight: 500; letter-spacing: .2em; text-transform: uppercase; color: rgb(233 227 216 / 0.86); }
-
-/* ==========================================================================
    contacto.html
    ========================================================================== */
 .pag-hero--contacto { min-height: 0; padding-bottom: clamp(40px, 7vh, 88px); }
@@ -327,14 +200,6 @@ a.vitrina { cursor: pointer; }
 .contacto--pagina .contacto__directo--linea a { color: var(--stone); }
 
 @media (max-width: 899px) {
-  .caso__vista > .vitrina, .caso__vista > .captura, .caso__ficha, .caso__reto, .caso__hicimos { grid-column: 1 / -1; }
-  .caso__cuerpo { row-gap: 48px; }
-  .caso__nombre { row-gap: 10px; }
-  .caso__vista { margin-top: 28px; }
-  .psi-caso__lista { display: grid; grid-template-columns: repeat(2, max-content); justify-content: start; gap: 18px 22px; }
-  .psi-g { --s: clamp(120px, 36vw, 150px); }
-  .horno__lista { grid-template-columns: 1fr; }
-  .res { grid-template-columns: 1fr; }
   .contacto--pagina .contacto__form, .contacto--pagina .contacto__directo--linea { grid-column: 1 / -1; }
 }
-@media (prefers-reduced-motion: reduce) { .vitrina__tira { animation: none !important; } }
+

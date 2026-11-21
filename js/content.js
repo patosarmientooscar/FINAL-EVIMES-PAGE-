@@ -2,7 +2,6 @@
 // (los elementos llevan data-c="ruta"). El HTML lleva el mismo texto para SEO.
 window.EVIMES_CONTENT = {
   menu: {
-    proyectos: 'Proyectos',
     planes: 'Planes',
     servicios: 'Servicios',
     contacto: 'Contacto',
@@ -87,7 +86,7 @@ window.EVIMES_CONTENT = {
 
   // ===== Home nueva (index.html, fase onda). La oficina aparcada usa las claves de arriba. =====
   inicio: {
-    menu: { servicios: 'Servicios', herramientas: 'Herramientas', proyectos: 'Proyectos', planes: 'Planes', contacto: 'Contacto', cta: 'Pide tu propuesta' },
+    menu: { servicios: 'Servicios', herramientas: 'Herramientas', planes: 'Planes', contacto: 'Contacto' },
     hero: {
       linea1: 'Tu negocio merece',
       linea2: 'una web a su altura.',      // en index.html "altura" va en <span class="accent"> (cian): si cambias esta frase, cámbiala también allí

@@ -31,7 +31,7 @@ window.EVIMES_SERVICIOS_PAGINA = {
         'Todo optimizado para que vaya fluido también en el móvil, con una versión ligera para quien prefiera menos movimiento.'
       ],
       incluye: ['Escenas y objetos 3D a medida', 'Animaciones con scroll (scrollytelling)', 'Interacción con ratón y táctil', 'Shaders y efectos de luz', 'Modelos optimizados (glTF)', 'Versión ligera y accesible'],
-      ctas: [{ texto: 'Pide tu propuesta', href: 'contacto.html' }, { texto: 'Ver un proyecto', href: 'proyectos.html#disco' }]
+      ctas: [{ texto: 'Pide tu propuesta', href: 'contacto.html' }, { texto: 'Ver un proyecto', href: 'index.html#trabajo' }]
     },
     {
       id: 'seo', kind: 'seo', num: '03', nombre: 'Posicionamiento',

@@ -108,22 +108,17 @@
   </div>
   <div class="grano" aria-hidden="true"></div>
 
-  <!-- ===== Cabecera flotante de cristal ===== -->
+  <!-- ===== Cabecera compacta (la misma en todas las páginas): Servicios · Planes · Contacto a la izquierda, EVIMES a la derecha ===== -->
   <header class="cabecera">
-    <a class="cabecera__marca" href="#inicio" aria-label="Evimes, inicio" data-logo="wordmark"></a>
+    <button class="cabecera__abrir" type="button" aria-expanded="false" aria-controls="cabecera-nav">Menú</button>
     <nav class="cabecera__nav" id="cabecera-nav" aria-label="Principal">
       <ul>
         <li><a href="servicios.html" data-scramble><span class="sl" data-c="inicio.menu.servicios">Servicios</span></a></li>
-        <li><a href="proyectos.html" data-scramble><span class="sl" data-c="inicio.menu.proyectos">Proyectos</span></a></li>
         <li><a href="planes.html" data-scramble><span class="sl" data-c="inicio.menu.planes">Planes</span></a></li>
         <li><a href="contacto.html" data-scramble><span class="sl" data-c="inicio.menu.contacto">Contacto</span></a></li>
       </ul>
     </nav>
-    <a class="pastilla cabecera__cta" href="contacto.html" data-scramble><span class="sl" data-c="inicio.menu.cta">Pide tu propuesta</span></a>
-    <button class="cabecera__abrir" type="button" aria-expanded="false" aria-controls="cabecera-nav">
-      <span class="sr-only">Menú</span>
-      <span class="cabecera__lineas" aria-hidden="true"><span></span><span></span></span>
-    </button>
+    <a class="cabecera__marca" href="#inicio" aria-label="Evimes, inicio">EVIMES</a>
   </header>
 
   <main id="contenido">
