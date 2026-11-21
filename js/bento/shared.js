@@ -73,9 +73,9 @@ export async function makeCard(el,setup,opts={}){
   const g2=cv.getContext('2d',{alpha:false});
   const scene=new THREE.Scene();scene.environment=await studioEnv(renderer);
   const camera=new THREE.PerspectiveCamera(30,1,.1,100);camera.position.set(0,0,9);
-  // lado: card horizontal de la home (el texto va fuera del canvas, a la izquierda): el objeto va centrado en su zona.
+  // lado: el canvas no lleva texto encima ("Qué hacemos" de la home, js/que-hacemos.js): el objeto va centrado en él.
   // espera: promesas de la escena (texturas, entornos) que tienen que estar antes de compilar.
-  const ctx={el,cv,renderer,scene,camera,W:1,H:1,pw:1,ph:1,ar:1,t:0,mx:0,my:0,tmx:0,tmy:0,hover:0,thover:0,visible:false,bg:null,espera:[],lado:!!el.closest('.que-hacemos')};
+  const ctx={el,cv,renderer,scene,camera,W:1,H:1,pw:1,ph:1,ar:1,t:0,mx:0,my:0,tmx:0,tmy:0,hover:0,thover:0,visible:false,bg:null,espera:[],lado:!!el.closest('.qh')};
   ctx.setBg=(frag,uniforms)=>{const u=Object.assign({uT:{value:0},uA:{value:1}},uniforms);const s=new THREE.Scene();
     s.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2),new THREE.ShaderMaterial({uniforms:u,depthWrite:false,depthTest:false,
       vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}`,fragmentShader:`varying vec2 vUv;uniform float uT,uA;\n`+COMMON_GLSL+frag})));

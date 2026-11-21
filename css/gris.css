@@ -1,7 +1,7 @@
 /* ==========================================================================
-   Panel gris (lo común). "Qué hacemos" (bento) está en css/bento.css;
-   Trabajo selecto + la oficina, en css/oficina.css; "Con quién trabajamos"
-   (la última sección del gris), en css/con-quien.css.
+   Panel gris (lo común). En la home solo queda "Con quién trabajamos"
+   (css/con-quien.css; "Qué hacemos" va en negro desde backup-pre-que-hacemos,
+   css/que-hacemos.css). La oficina (oficina.html) usa css/oficina.css.
    ========================================================================== */
 .panel {
   --tinta-2: rgb(11 15 26 / 0.7);               /* secundario sobre el gris ≥ 6:1 */
@@ -16,6 +16,5 @@
 .enlace--oscuro { color: var(--tinta-oscura); text-decoration-color: rgb(11 15 26 / 0.35); }
 .enlace--oscuro:hover { text-decoration-color: var(--tinta-oscura); }
 
-/* El gris va partido en dos (Qué hacemos | Trabajo selecto en negro | Con quién):
-   el segundo empieza con el propio aire de "Con quién" (.cq ya trae su padding). */
+/* "Con quién" empieza con su propio aire (.cq ya trae su padding). */
 .panel--cq { padding-top: 0; }

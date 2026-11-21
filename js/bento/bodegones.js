@@ -2,7 +2,7 @@
    bento/bodegones.js — Posicionamiento y Software con IA: dos bodegones
    quietos sobre hormigón oscuro (réplica del prototipo aprobado
    Downloads/evimes-cards/bodegones.html: geometrías, materiales, luces,
-   cámara, setViewOffset y texturas pintadas en canvas).
+   cámara, centrada, y texturas pintadas en canvas).
    · Posicionamiento: el móvil negro con la búsqueda "barbería cerca de mí"
      y "Tu negocio" el primero, sobre el bloque de hormigón.
    · Software con IA: pantalla de cristal ahumado con marco y pie de aluminio
@@ -198,7 +198,7 @@ function iaScene(st){
   g.position.set(.05,top,.02);g.rotation.y=-.38;scene.add(g);
   // una luz fría y muy débil de la pantalla sobre el hormigón
   const spill=new THREE.PointLight(0x9fb4c8,.5,1.6,2);spill.position.set(-.1,top+.5,0);scene.add(spill);
-  st.subject=new THREE.Vector3(.05,.92,.0);st.dir=new THREE.Vector3(-.42,.58,.7).normalize();st.dist=5.9;st.off=.15;
+  st.subject=new THREE.Vector3(.05,.92,.0);st.dir=new THREE.Vector3(-.42,.58,.7).normalize();st.dist=5.9;
 }
 
 /* ---------- pintar ---------- */
@@ -208,15 +208,14 @@ function conEstudio(r,fn){
   r.toneMappingExposure=1.0;r.shadowMap.enabled=true;r.shadowMap.type=THREE.PCFSoftShadowMap;
   try{return fn(r);}finally{r.toneMappingExposure=exp;r.shadowMap.enabled=sh;r.shadowMap.type=ty;}
 }
-// Cámara del prototipo: 'ancha' (la card de la home en escritorio: el objeto al tercio derecho,
-// setViewOffset) o 'centrada' (≤ 860 px y servicios.html: clearViewOffset). En las cards altas de
-// servicios.html (4:5, 1:1) la cámara se aleja lo justo para que el bodegón quepa de ancho.
-function encuadre(st,w,h,modo){
+// Cámara del prototipo, centrada (sin setViewOffset: el texto va debajo, en servicios.html y en
+// "Qué hacemos" de la home, 16:10). En las cards altas de servicios.html (4:5, 1:1) la cámara se
+// aleja lo justo para que el bodegón quepa de ancho.
+function encuadre(st,w,h){
   const ar=w/h;st.camera.aspect=ar;
-  let d=st.dist*(modo==='ancha'?1:.92);
-  if(modo==='centrada'&&ar<1.6)d*=Math.pow(1.6/ar,.75);
+  let d=st.dist*.92;
+  if(ar<1.6)d*=Math.pow(1.6/ar,.75);
   st.camera.position.copy(st.subject).addScaledVector(st.dir,d);st.camera.lookAt(st.subject);
-  if(modo==='ancha')st.camera.setViewOffset(w,h,-w*(st.off??.21),-h*.02,w,h);else st.camera.clearViewOffset();
   st.camera.updateProjectionMatrix();
 }
 // Tras pintar: fuera de la GPU las texturas y los mapas de sombra (la imagen ya está en el canvas 2D).
@@ -238,19 +237,17 @@ export async function bodegon(el,k,opts={}){
   // shaders compilados en paralelo con el estado de estas escenas (sombras, exposición 1)
   const mats=conEstudio(renderer,r=>Array.from(r.compile(st.scene,st.camera)));
   await G.listo(renderer,mats);await G.cede();
-  const enHome=!!el.closest('.que-hacemos'),estrecha=matchMedia('(max-width: 860px)');
-  const modo=()=>enHome&&!estrecha.matches?'ancha':'centrada';
   let pw=0,ph=0,visto=false;
   const pinta=()=>{
     const r=cv.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);
     const w=Math.max(1,r.width),h=Math.max(1,r.height),nw=Math.max(1,Math.floor(w*d)),nh=Math.max(1,Math.floor(h*d));
     if(nw===pw&&nh===ph&&cv.classList.contains('is-lista'))return;
     pw=nw;ph=nh;cv.width=pw;cv.height=ph;
-    encuadre(st,w,h,modo());
+    encuadre(st,w,h);
     pintaEn(g2,pw,ph,rd=>conEstudio(rd,x=>x.render(st.scene,st.camera)));
     liberar(st);cv.classList.add('is-lista');
   };
-  const ctx={el,k,st,pinta,capturar:(w,h,m)=>{const c=document.createElement('canvas');c.width=w;c.height=h;encuadre(st,w,h,m);
+  const ctx={el,k,st,pinta,capturar:(w,h)=>{const c=document.createElement('canvas');c.width=w;c.height=h;encuadre(st,w,h);
     pintaEn(c.getContext('2d',{alpha:false}),w,h,rd=>conEstudio(rd,x=>x.render(st.scene,st.camera)));liberar(st);pw=0;return c.toDataURL('image/png');}};
   bodegones.push(ctx);
   if(opts.captura){pinta();return ctx;}

@@ -1,11 +1,13 @@
 /* ==========================================================================
-   bento/index.js — arranque de "Qué hacemos" (4 cards 3D) y UN solo bucle
-   para las cuatro (dentro de gsap.ticker, el bucle único de la web; si no
-   hubiera GSAP, requestAnimationFrame).
+   bento/index.js — las 4 cards 3D de servicios.html (una por oficio) y UN
+   solo bucle para las cuatro (dentro de gsap.ticker, el bucle único de la
+   web; si no hubiera GSAP, requestAnimationFrame). La home ya no usa el
+   bento (desde backup-pre-que-hacemos): su "Qué hacemos" es js/que-hacemos.js,
+   que reutiliza estas mismas escenas (shared · web · star · bodegones).
    · Textos: js/data/servicios.js (BORRADOR) → las cards (el HTML lleva los
      mismos textos de respaldo).
    · Entrada: cada card recibe .in al entrar en pantalla (css/bento.css hace
-     la subida de 40 px y el escalonado de 0,08 s).
+     la subida de 40 px).
    · Three.js y las escenas se importan al acercarse el bento (a menos de un
      viewport). Un solo renderer para las cuatro (shared.js) y cada card se
      crea en su turno (EV.gpu.turno), con los shaders compilados en paralelo.
@@ -16,7 +18,7 @@
      se pintan una vez al entrar en pantalla y otra solo si cambia el tamaño.
    · Versión fija (movimiento reducido, ahorro de datos, ?modo=fijo) o sin
      WebGL: póster estático de cada card, sacado del propio render
-     (assets/bento/ y assets/img/bodegon-*, ver ?bento=captura).
+     (assets/bento/ y assets/img/bodegon-*-cuadrada, ver ?bento=captura).
    ========================================================================== */
 const EV = window.EV || {};
 // Bodegones sin WebGL: captura de cada escena (AVIF/WebP) con su descripción.
@@ -24,7 +26,7 @@ const BODEGON_ALT = {
   seo: 'Un móvil negro sobre un bloque de hormigón oscuro; en la pantalla, la búsqueda «barbería cerca de mí» con «Tu negocio» como primer resultado.',
   ia: 'Una pantalla de cristal ahumado con marco de aluminio negro y un teclado negro sobre un bloque de hormigón oscuro; en la pantalla, el código de una reserva automática por WhatsApp.'
 };
-// Uno o varios contenedores [data-bento] (la home tiene uno; servicios.html, uno por oficio):
+// Uno o varios contenedores [data-bento] (servicios.html, uno por oficio):
 // todas sus cards comparten el mismo bucle.
 const roots = Array.from(document.querySelectorAll('[data-bento]'));
 if (roots.length) init();
@@ -72,10 +74,9 @@ function posters(els) {
     const pic = document.createElement('picture');
     pic.className = 'poster';
     if (k in BODEGON_ALT) {
-      // ancha (16:9, objeto al tercio derecho): la card de la home en escritorio · movil (16:10, centrada): la home en ≤ 860 px · cuadrada (1:1): servicios.html
-      const b = 'assets/img/bodegon-' + k, ancha = !!el.closest('.que-hacemos');
-      pic.innerHTML = (ancha ? `<source media="(max-width: 860px)" type="image/avif" srcset="${b}-movil.avif"><source media="(max-width: 860px)" type="image/webp" srcset="${b}-movil.webp"><source type="image/avif" srcset="${b}-ancha.avif">`
-        : `<source type="image/avif" srcset="${b}-cuadrada.avif">`) + `<img src="${b}-${ancha ? 'ancha' : 'cuadrada'}.webp" alt="" loading="lazy" decoding="async">`;
+      // cuadrada (1:1, centrada): servicios.html
+      const b = 'assets/img/bodegon-' + k;
+      pic.innerHTML = `<source type="image/avif" srcset="${b}-cuadrada.avif"><img src="${b}-cuadrada.webp" alt="" loading="lazy" decoding="async">`;
       pic.querySelector('img').alt = BODEGON_ALT[k];
     } else pic.innerHTML = `<source media="(max-width: 900px)" srcset="assets/bento/${k}-movil.png"><img src="assets/bento/${k}-escritorio.png" alt="" loading="lazy" decoding="async">`;
     el.querySelector('canvas').after(pic);
@@ -107,7 +108,7 @@ async function arrancar(els, captura) {
     if (window.gsap) gsap.ticker.add((time, dms) => frame(Math.min(.05, (dms || 16.7) / 1000)));
     else { let last = performance.now(); const f = now => { requestAnimationFrame(f); const dt = Math.min(.05, (now - last) / 1000); last = now; frame(dt); }; requestAnimationFrame(f); }
   }
-  // Con todas las cards juntas (la home) se crean a la vez; repartidas por la página
+  // Con todas las cards juntas se crean a la vez; repartidas por la página
   // (servicios.html, un contenedor por oficio) cada una se crea a una pantalla de
   // distancia: crear los 4 renderers de golpe costaba ~1,8 s de CPU en móvil.
   if (roots.length < 2 || captura) await Promise.all(els.map(crear));
@@ -125,7 +126,7 @@ async function arrancar(els, captura) {
   if (captura) {
     await S.ehListo;
     window.__bentoPosters = () => { const o = {}; cards.forEach(c => { c.render(); o[c.el.dataset.kind] = c.cv.toDataURL('image/png'); }); return o; };
-    // bodegones → assets/img/bodegon-<k>-ancha (16:9, home escritorio) · -movil (16:10, home ≤ 860 px) · -cuadrada (1:1, servicios.html), en AVIF y WebP
-    window.__bodegones = () => { const o = {}; B.bodegones.forEach(b => { o[b.k] = { ancha: b.capturar(1600, 900, 'ancha'), movil: b.capturar(1600, 1000, 'centrada'), cuadrada: b.capturar(1100, 1100, 'centrada') }; }); return o; };
+    // bodegones → assets/img/bodegon-<k>-cuadrada (1:1, servicios.html), en AVIF y WebP
+    window.__bodegones = () => { const o = {}; B.bodegones.forEach(b => { o[b.k] = { cuadrada: b.capturar(1100, 1100) }; }); return o; };
   }
 }

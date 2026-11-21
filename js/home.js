@@ -44,7 +44,7 @@
   function measure() {
     vw = window.innerWidth; vh = window.innerHeight;
     var y = scrollY();
-    // Las secciones grises (el gris va partido: Qué hacemos | Trabajo selecto en negro | Con quién).
+    // Las secciones grises (desde backup-pre-que-hacemos solo queda una: Con quién trabajamos).
     lay.grises = $$('.panel').map(function (n) { var r = n.getBoundingClientRect(); return { top: r.top + y, bottom: r.bottom + y }; });
     var c = el.cab.getBoundingClientRect();
     lay.cabTop = c.top; lay.cabBottom = c.bottom;

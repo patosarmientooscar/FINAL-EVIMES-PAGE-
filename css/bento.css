@@ -1,100 +1,25 @@
 /* ==========================================================================
-   bento.css — "Qué hacemos": cuatro oficios, un mismo nivel (panel gris).
-   Portado tal cual del prototipo aprobado (Downloads/evimes-cards/bento.html):
-   mismos valores, tiempos, sombras y radios. Solo cambia la estructura:
-   todo va dentro de .que-hacemos y usa --gris y --display del proyecto
-   (mismos valores que el prototipo). Los cuatro colores propios del
-   prototipo que no coinciden con los tokens globales (navy #070a13,
-   stone #ece7dd, tinta #0b1020) viven aquí, en el ámbito de la sección,
-   para no mover el resto de la web.
-   Escenas 3D: js/bento/ (Posicionamiento y Software con IA: bodegones.js) · textos: js/data/servicios.js
+   bento.css — las cards 3D de servicios.html (una por oficio: .sp-serv__obj.bento,
+   que define --b-navy y compañía en css/paginas-evimes.css). Portado del
+   prototipo aprobado (Downloads/evimes-cards/bento.html): mismos valores,
+   tiempos, sombras y radios. La home ya no usa el bento (desde
+   backup-pre-que-hacemos): su "Qué hacemos" es css/que-hacemos.css.
+   Escenas 3D: js/bento/ (Posicionamiento y Software con IA: bodegones.js)
    ========================================================================== */
-.que-hacemos {
-  --b-ink: #0b1020;
-  --b-navy: #070a13;
-  --b-stone: #ece7dd;
-  --b-cyan: #00e5ff;
-  color: var(--b-ink);
-  font-family: var(--font-text);
-  font-size: 16px;
-  line-height: normal;
-}
-/* El prototipo no equilibra titulares ni párrafos: igual aquí. */
-.que-hacemos h2, .que-hacemos h3, .que-hacemos p { margin: 0; }
-.que-hacemos h2, .que-hacemos h3 { text-wrap: balance; }
-.que-hacemos p { text-wrap: pretty; }
-
-.que-hacemos .label { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: rgba(11,16,32,.62); } /* prototipo .55 = 3,9:1; .62 = 4,9:1 (AA) */
-.que-hacemos h2 { font-size: clamp(38px,5.6vw,84px); line-height: 1; margin-top: 0; max-width: 15ch; }
-
-.bento { margin-top: clamp(36px,6vh,64px); display: grid; grid-template-columns: repeat(12,1fr); grid-auto-rows: clamp(380px,36vw,600px); gap: clamp(12px,1.4vw,20px); max-width: 1400px; }
-.c-web { grid-column: span 5 } .c-3d { grid-column: span 7 } .c-seo { grid-column: span 7 } .c-ia { grid-column: span 5 }
-
 .bento .card { position: relative; border-radius: 30px; overflow: hidden; background: var(--b-navy); isolation: isolate; touch-action: pan-y;
   box-shadow: 0 1px 0 rgba(255,255,255,.7), 0 40px 80px -40px rgba(11,12,15,.55), 0 18px 36px -24px rgba(11,12,15,.4); }
 /* Entrada (solo con JS: la clase is-cine / is-still la pone el script del <head>):
-   opacidad + subida de 40 px al entrar en pantalla, 0,08 s entre cards. */
+   opacidad + subida de 40 px al entrar en pantalla. */
 :is(.is-cine, .is-still) .bento .card { opacity: .6; transform: translateY(40px) scale(.98); transition: opacity 1s cubic-bezier(.2,.7,.2,1), transform 1.2s cubic-bezier(.2,.7,.2,1); }
 :is(.is-cine, .is-still) .bento .card.in { opacity: 1; transform: none; }
-.bento .card:nth-child(2) { transition-delay: .08s; }
-.bento .card:nth-child(3) { transition-delay: .16s; }
-.bento .card:nth-child(4) { transition-delay: .24s; }
-.c-3d { cursor: grab } .c-3d:active { cursor: grabbing }
 .bento .card::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; box-shadow: inset 0 0 0 1px rgba(255,255,255,.07), inset 0 1px 0 rgba(255,255,255,.12); }
 .bento .card canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 /* Póster (sin WebGL o versión fija): fotograma del propio render, assets/bento/. */
 .bento .card .poster { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-/* En la versión fija no hay nada que arrastrar ni a lo que acercarse: sin pistas. */
-.bento.is-fija .hint { display: none; }
 .bento .card .poster img { width: 100%; height: 100%; max-width: none; object-fit: cover; display: block; }
-.bento .num { position: absolute; top: clamp(20px,2.6vw,36px); left: clamp(22px,3vw,44px); font-size: 13px; letter-spacing: .16em; color: rgba(236,231,221,.55); pointer-events: none; }
-.bento .num b { color: var(--b-stone); font-weight: 500; }
-.bento .hint { position: absolute; top: clamp(20px,2.6vw,36px); right: clamp(22px,3vw,44px); font-size: 12px; letter-spacing: .14em; color: rgba(236,231,221,.56); pointer-events: none;
-  /* AA: prototipo .4 = 3,3:1; .56 = 5,4:1. El halo navy la sostiene cuando un rayo del destello pasa por detrás. */
-  text-shadow: 0 0 2px rgba(11,12,15,.9), 0 0 12px rgba(11,12,15,.85); }
-.bento .meta { position: absolute; left: clamp(22px,3vw,44px); right: clamp(22px,3vw,44px); bottom: clamp(22px,3vw,40px); display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; color: var(--b-stone); pointer-events: none; }
-.bento .meta h3 { font-size: clamp(28px,3vw,48px); line-height: 1; }
-.bento .meta p { margin-top: 12px; font-size: clamp(14px,1.05vw,16px); line-height: 1.5; color: rgba(236,231,221,.68); max-width: 32ch; }
-.bento .more { pointer-events: auto; color: var(--b-stone); text-decoration: none; font-size: 15px; white-space: nowrap; padding: 12px 20px; border-radius: 999px;
-  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); transition: background .3s; }
-.bento .more:hover { background: rgba(255,255,255,.14); }
-/* Foco visible sobre la card navy (el contorno oscuro del panel no se vería). */
-.bento .more:focus-visible { outline: 2px solid var(--b-stone); outline-offset: 3px; }
-.c-web .meta, .c-ia .meta { flex-direction: column; align-items: flex-start; }
-@media (max-width: 900px) {
-  .bento { grid-template-columns: 1fr; grid-auto-rows: auto; }
-  .c-web, .c-3d, .c-seo, .c-ia { grid-column: auto; aspect-ratio: 4/5; }
-  .bento .meta { flex-direction: column; align-items: flex-start; } .bento .hint { display: none; }
-}
-/* ---------- Desde v-pre-negro: cuatro cards iguales y horizontales ----------
-   Rejilla 2×2 en 16:9 (una columna en 4:3 en móvil). Texto (número, título,
-   frase y "Ver más") a la izquierda; el objeto 3D a la derecha: el canvas solo
-   ocupa esa zona y se funde por su borde izquierdo con el navy de la card
-   (máscara estática). Solo el destello se mueve (js/bento/index.js). */
-.que-hacemos .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: auto; }
-.que-hacemos .bento .card { grid-column: auto; aspect-ratio: 16 / 9; }
-.que-hacemos .bento .card canvas,
-.que-hacemos .bento .card .poster { inset: 0 0 0 auto; width: 56%;
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 24%); mask-image: linear-gradient(to right, transparent, #000 24%); }
-/* Sin numeración (desde backup-pre-trabajo-selecto): el texto va centrado en vertical en su columna, sin hueco arriba. */
-.que-hacemos .bento .meta { top: 0; bottom: 0; right: auto; width: 46%; flex-direction: column; justify-content: center; align-items: flex-start; gap: 20px; }
-.que-hacemos .bento .meta h3 { font-size: clamp(26px, 2.3vw, 40px); }
-.que-hacemos .bento .meta p { max-width: 28ch; }
-@media (max-width: 900px) {
-  .que-hacemos .bento { grid-template-columns: 1fr; }
-  .que-hacemos .bento .card { aspect-ratio: 4 / 3; }
-  .que-hacemos .bento .card canvas, .que-hacemos .bento .card .poster { width: 56%; }
-  .que-hacemos .bento .meta { width: 46%; gap: 14px; }
-  .que-hacemos .bento .meta h3 { font-size: clamp(22px, 6.4vw, 28px); }
-  .que-hacemos .bento .meta p { margin-top: 8px; font-size: 14px; line-height: 1.45; }
-  .que-hacemos .bento .more { padding: 10px 16px; font-size: 14px; }
-}
 /* ---------- Bodegones: Posicionamiento y Software con IA (desde backup-pre-bodegones) ----------
-   Prototipo aprobado Downloads/evimes-cards/bodegones.html (js/bento/bodegones.js). La misma caja
-   que las otras dos cards; la escena ocupa toda la card (su fondo es el color liso de la card), el
-   objeto queda a la derecha (setViewOffset) y el texto abajo a la izquierda, protegido por un
-   degradado suave. Quietas: el hover solo sube la card 2 px y aclara el borde (sin 3D). En móvil
-   (≤ 860 px) el texto va debajo de la escena y la cámara se centra. */
+   Prototipo aprobado Downloads/evimes-cards/bodegones.html (js/bento/bodegones.js). Quietas: el
+   hover solo sube la card 2 px y aclara el borde (sin 3D). */
 .bento .bodegon { transition: opacity 1s cubic-bezier(.2,.7,.2,1), transform 1.2s cubic-bezier(.2,.7,.2,1), translate .5s cubic-bezier(.2,.75,.15,1); }
 .bento .bodegon:hover { translate: 0 -2px; }
 .bento .bodegon::after { transition: box-shadow .5s cubic-bezier(.2,.75,.15,1); }
@@ -103,19 +28,6 @@
 .bento .bodegon canvas { opacity: 0; transition: opacity .5s cubic-bezier(.2,.7,.2,1); }
 .bento .bodegon canvas.is-lista { opacity: 1; }
 .bento.is-fija .bodegon canvas { display: none; }
-.que-hacemos .bento .bodegon canvas,
-.que-hacemos .bento .bodegon .poster { inset: 0; width: 100%; -webkit-mask-image: none; mask-image: none; }
-.que-hacemos .bento .bodegon::before { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: inherit; pointer-events: none;
-  background: linear-gradient(90deg, rgb(7 10 19 / .7) 0%, rgb(7 10 19 / 0) 40%); }
-.que-hacemos .bento .bodegon .meta { z-index: 2; top: auto; bottom: clamp(22px,3vw,40px); width: 52%; justify-content: flex-end; }
-@media (max-width: 860px) {
-  .que-hacemos .bento .bodegon { aspect-ratio: auto; display: flex; flex-direction: column; }
-  .que-hacemos .bento .bodegon canvas,
-  .que-hacemos .bento .bodegon .poster { position: relative; inset: auto; width: 100%; height: auto; aspect-ratio: 16 / 10; }
-  .que-hacemos .bento .bodegon .poster img { position: absolute; inset: 0; }   /* la captura 1:1 no estira la caja 16:10 */
-  .que-hacemos .bento .bodegon::before { display: none; }
-  .que-hacemos .bento .bodegon .meta { position: relative; inset: auto; width: auto; padding: 4px clamp(22px,3vw,44px) clamp(22px,3vw,40px); }
-}
 @media (prefers-reduced-motion: reduce) {
   :is(.is-cine, .is-still) .bento .card { opacity: 1; transform: none; transition: none; }
   .bento .bodegon, .bento .bodegon::after, .bento .bodegon canvas { transition: none; }
