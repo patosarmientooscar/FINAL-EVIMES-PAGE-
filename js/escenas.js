@@ -92,7 +92,7 @@
   function sinEsperas(renderer) { renderer.debug.checkShaderErrors = false; return renderer; }
 
   /* geometria(T, receta, ops): la geometría pesada (tubos y extrusiones)
-     se genera en js/geo-worker.js con el mismo Three.js y los
+     (y las piezas de las ondas) se genera en js/geo-worker.js con el mismo Three.js y los
      mismos parámetros; aquí solo se monta el BufferGeometry con sus arrays.
      Si el worker no arranca, se genera igual en el hilo principal (mismo código). */
   var base = (document.currentScript && document.currentScript.src) || location.href;
@@ -111,10 +111,11 @@
     Object.keys(d.attrs).forEach(function (k) { var a = d.attrs[k]; g.setAttribute(k, new T.BufferAttribute(a.array, a.itemSize, a.normalized)); });
     if (d.index) g.setIndex(new T.BufferAttribute(d.index, 1));
     (d.groups || []).forEach(function (gr) { g.addGroup(gr.start, gr.count, gr.materialIndex); });
+    if (d.extra) g.userData.extra = d.extra;
     return g;
   }
   function geoLocal(T, r, ops) {
-    var geo;
+    var geo, extra = {};
     if (r.tipo === 'tube') geo = new T.TubeGeometry(new T.CatmullRomCurve3(r.pts.map(function (p) { return new T.Vector3(p[0], p[1], p[2]); }), !!r.cerrada, r.curva || 'centripetal'), r.seg, r.r, r.radial, !!r.tubeCerrado);
     else if (r.tipo === 'extrude') { var sh = [].concat(r.shapes).map(function (j) { return new T.Shape().fromJSON(j); }); geo = new T.ExtrudeGeometry(sh.length === 1 ? sh[0] : sh, r.opts); }
     (ops || []).forEach(function (op) {
@@ -125,7 +126,20 @@
         var pos = geo.attributes.position, uv2 = geo.attributes.uv, g0 = geo.groups[0], S = op[1];
         for (var k = g0.start; k < g0.start + g0.count; k++) { var u = (pos.getX(k) + S) / (2 * S), v = (pos.getY(k) + S) / (2 * S); if (op[2] !== false && pos.getZ(k) < 0) u = 1 - u; uv2.setXY(k, u, v); }
       }
+      else if (op[0] === 'ondas') {                // blade() de js/ondas.js (lo mismo que en geo-worker.js)
+        geo.computeBoundingBox();
+        var c = new T.Vector3(); geo.boundingBox.getCenter(c); geo.translate(-c.x, -c.y, 0); geo.computeVertexNormals();
+        var p = geo.attributes.position, col = new Float32Array(p.count * 3), bb = geo.boundingBox, w = bb.max.x - bb.min.x, oc = new T.Color(op[1]), sc = new T.Color(op[3]), tmp = new T.Color();
+        for (var i = 0; i < p.count; i++) {
+          var uu = (p.getX(i) + c.x - bb.min.x) / w; if (!op[2]) uu = 1 - uu;
+          var kk = Math.pow(Math.max(0, (uu - .35) / .65), 1.6);
+          tmp.copy(oc).lerp(sc, kk); col[i * 3] = tmp.r; col[i * 3 + 1] = tmp.g; col[i * 3 + 2] = tmp.b;
+        }
+        geo.setAttribute('color', new T.BufferAttribute(col, 3));
+        extra.c = [c.x, c.y, c.z];
+      }
     });
+    geo.userData.extra = extra;
     return geo;
   }
   function geometria(T, receta, ops) {

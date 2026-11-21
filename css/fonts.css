@@ -22,3 +22,13 @@
   font-display: swap;
   src: url("../assets/fonts/fraunces-latin.woff2") format("woff2");
 }
+/* Cursiva de Fraunces (desde backup-pre-ondas): el punto del h1 de la home y las
+   palabras en cursiva de "Qué hacemos". Variable: opsz 9–144, wght 400–800.
+   Solo se descarga donde se usa. */
+@font-face {
+  font-family: "Fraunces";
+  font-style: italic;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("../assets/fonts/fraunces-italic-latin.woff2") format("woff2");
+}

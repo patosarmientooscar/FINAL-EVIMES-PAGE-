@@ -8,7 +8,10 @@
      extrude { shapes: shape.toJSON(), opts }
    Operaciones después (en orden): ['translate',x,y,z] · ['scale',x,y,z] ·
      ['aS'] (atributo aS = uv.x, la de los tubos de la onda) ·
-     ['capUV', S, espejoAtras] (planarCapUV de js/bento/shared.js, igual).
+     ['capUV', S, espejoAtras] (planarCapUV de js/bento/shared.js, igual) ·
+     ['ondas', colorExterior, interiorEnMasX, colorUnion] (las piezas de js/ondas.js:
+       centra en x/y por su caja, normales y el degradado de color de vértices
+       hacia la unión; devuelve el centro original en extra.c).
    ========================================================================== */
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js';
 
@@ -24,6 +27,20 @@ function crear(r) {
   throw new Error('receta desconocida: ' + r.tipo);
 }
 
+// blade() de js/ondas.js (misma cuenta, mismo Three.js): centrado, normales y colores de vértice.
+function ondas(geo, outer, innerAtPlusX, seam, extra) {
+  geo.computeBoundingBox();
+  const c = new THREE.Vector3(); geo.boundingBox.getCenter(c); geo.translate(-c.x, -c.y, 0); geo.computeVertexNormals();
+  const pos = geo.attributes.position, col = new Float32Array(pos.count * 3), bb = geo.boundingBox, w = bb.max.x - bb.min.x, oc = new THREE.Color(outer), sc = new THREE.Color(seam), tmp = new THREE.Color();
+  for (let i = 0; i < pos.count; i++) {
+    let u = (pos.getX(i) + c.x - bb.min.x) / w; if (!innerAtPlusX) u = 1 - u;
+    const k = Math.pow(Math.max(0, (u - .35) / .65), 1.6);
+    tmp.copy(oc).lerp(sc, k); col[i * 3] = tmp.r; col[i * 3 + 1] = tmp.g; col[i * 3 + 2] = tmp.b;
+  }
+  geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  extra.c = [c.x, c.y, c.z];
+}
+
 // planarCapUV de js/bento/shared.js (misma cuenta).
 function capUV(geo, S, mirrorBack) {
   const pos = geo.attributes.position, uv = geo.attributes.uv, g0 = geo.groups[0];
@@ -37,16 +54,17 @@ function capUV(geo, S, mirrorBack) {
 self.onmessage = e => {
   const { id, receta, ops } = e.data;
   try {
-    const geo = crear(receta);
+    const geo = crear(receta), extra = {};
     for (const op of ops || []) {
       if (op[0] === 'translate') geo.translate(op[1], op[2], op[3]);
       else if (op[0] === 'scale') geo.scale(op[1], op[2], op[3]);
       else if (op[0] === 'aS') { const uv = geo.attributes.uv, a = new Float32Array(uv.count); for (let i = 0; i < uv.count; i++) a[i] = uv.getX(i); geo.setAttribute('aS', new THREE.BufferAttribute(a, 1)); }
       else if (op[0] === 'capUV') capUV(geo, op[1], op[2] !== false);
+      else if (op[0] === 'ondas') ondas(geo, op[1], op[2], op[3], extra);
     }
     const attrs = {}, trans = [];
     for (const k in geo.attributes) { const a = geo.attributes[k]; attrs[k] = { array: a.array, itemSize: a.itemSize, normalized: a.normalized }; trans.push(a.array.buffer); }
     const index = geo.index ? geo.index.array : null; if (index) trans.push(index.buffer);
-    self.postMessage({ id, attrs, index, groups: geo.groups }, trans);
+    self.postMessage({ id, attrs, index, groups: geo.groups, extra }, trans);
   } catch (err) { self.postMessage({ id, error: String(err && err.message || err) }); }
 };

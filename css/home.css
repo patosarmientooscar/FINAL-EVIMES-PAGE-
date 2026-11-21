@@ -25,6 +25,21 @@
 /* Nada se sale por los lados (el degradado del hero es más ancho que el texto):
    sin esto, Chrome móvil reduce la página para que quepa. clip no rompe sticky. */
 .inicio main { overflow-x: clip; }
+/* Home con las ondas (desde backup-pre-ondas): main sin z-index propio, para que el
+   canvas fijo de las ondas (#ondas, z-index 5) pase por delante del H1 y del gris
+   y por detrás de los textos que lo piden (z-index 6) y de la cabecera (20). */
+.inicio--ondas main { z-index: auto; }
+#ondas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .8s cubic-bezier(.2, .75, .15, 1);
+}
+#ondas.is-viva { opacity: 1; }
 
 /* ---------- Botones ---------- */
 .pastilla {
@@ -78,71 +93,118 @@
 .etiqueta--oscura { color: rgb(11 15 26 / 0.66); }
 
 /* ==========================================================================
-   Hero
+   Hero (desde backup-pre-ondas). Prototipo aprobado: Downloads/evimes-home-ondas.
+   Arriba, la línea de datos; el H1 gigante en dos líneas escalonadas (texto
+   HTML visible desde el primer fotograma: es el LCP, sin animación de entrada);
+   .portada__escena es el ancla de las ondas (data-ondas, js/ondas.js), por
+   delante del H1: el canvas fijo (#ondas, z-index 5) pasa entre el H1 (2) y
+   los textos de arriba y abajo (6). Abajo, el texto, la prueba y "Hablemos".
    ========================================================================== */
 .portada {
-  position: relative;
-  min-height: 100vh;
-  min-height: 100svh;
-  display: flex;
-  align-items: flex-end;
-  padding: 120px var(--g) clamp(56px, 12vh, 130px);
+  --hg: clamp(16px, 4vw, 56px);                 /* el margen de la cabecera */
+  --h-ink: #ecebe7;
+  --h-muted: rgb(236 235 231 / .56);
+  --h-soft: rgb(236 235 231 / .5);              /* prototipo .36 → .5: AA en 12 px (4,6:1) */
+  position: relative;                           /* sin z-index: no atrapa al H1 bajo el canvas */
+  height: 100vh;
+  height: 100svh;
+  min-height: 640px;
   overflow: clip;
+  color: var(--h-ink);
 }
-.portada__texto { position: relative; max-width: min(780px, 92vw); }
-/* Degradado navy detrás del bloque: las bandas nunca compiten con el texto. */
-.portada__texto::before {
-  content: "";
+.portada__meta {
   position: absolute;
-  inset: -22% -34% -26% -44%;
-  z-index: -1;
-  pointer-events: none;
-  background: radial-gradient(closest-side, rgb(11 12 15 / 0.86), rgb(11 12 15 / 0.6) 55%, rgb(11 12 15 / 0));
-}
-.portada__h1 { font-size: clamp(42px, 6.4vw, 100px); }
-/* "altura" en cian (el punto final, no). Va dentro del span que sube: entra con su línea. */
-.portada__h1 .accent { color: var(--cyan); }
-.linea { display: block; overflow: hidden; padding-bottom: 0.12em; margin-bottom: -0.12em; }
-.linea > span { display: inline-block; }
-.portada__sub {
-  margin-top: 26px;
-  max-width: 34rem;
-  font-size: clamp(17px, 1.45vw, 21px);
-  line-height: 1.55;
-  color: rgb(233 227 216 / 0.82);           /* stone al 82 %: ≥ 7:1 sobre el scrim del hero */
-}
-.portada__sub strong { font-weight: 600; color: var(--stone); white-space: nowrap; }
-.portada__botones { margin-top: 34px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 26px; }
-.portada__desliza {
-  position: absolute;
-  right: var(--g);
-  bottom: clamp(56px, 12vh, 130px);
+  z-index: 6;
+  top: calc(84px + env(safe-area-inset-top, 0px));
+  left: var(--hg);
+  right: var(--hg);
   display: flex;
-  align-items: center;
-  gap: 12px;
+  justify-content: space-between;
+  gap: 20px;
+  margin: 0;
+  padding-top: 14px;
+  border-top: 1px solid rgb(255 255 255 / .08);
   font-size: 12px;
-  letter-spacing: 0.18em;
+  line-height: 1.4;
+  letter-spacing: .14em;
   text-transform: uppercase;
-  color: var(--texto-2);
+  color: var(--h-soft);
 }
-.portada__desliza i {
-  display: block;
-  width: 1px;
-  height: 46px;
-  background: linear-gradient(var(--stone), rgb(233 227 216 / 0));
-  transform-origin: top;
+.portada__meta > span:nth-child(2) { display: none; }
+.portada__h1 {
+  position: absolute;
+  z-index: 2;
+  left: var(--hg);
+  right: var(--hg);
+  top: 47%;
+  transform: translateY(-56%);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--display);
+  font-weight: 560;
+  font-variation-settings: "opsz" 144;
+  font-size: clamp(60px, 12.8vw, 214px);
+  line-height: .84;
+  letter-spacing: -.045em;
 }
-@media (max-width: 51.24rem) { .portada__desliza { display: none; } }
-
-/* Entrada: el H1 sube línea a línea; subtítulo y botones después. */
-.is-cine .linea > span { transform: translateY(105%); animation: subir 1.1s var(--ease) 0.1s forwards; }
-.is-cine .linea + .linea > span { animation-delay: 0.18s; }
-.is-cine .aparece { opacity: 0; animation: aparecer 0.8s var(--ease) 0.4s forwards; }
-.is-cine .portada__botones.aparece { animation-delay: 0.52s; }
-.is-cine .portada__desliza i { animation: respirar 2.4s cubic-bezier(0.45, 0, 0.55, 1) infinite; }
-@keyframes subir { to { transform: none; } }
-@keyframes aparecer { to { opacity: 1; } }
-@keyframes respirar { 0%, 100% { transform: scaleY(0.35); opacity: 0.4; } 50% { transform: scaleY(1); opacity: 1; } }
+.portada__h1 > span { display: block; white-space: nowrap; }
+.portada__h1 .r { align-self: flex-end; }
+/* El punto en cursiva: ancho fijo (el de su glifo, medido) para que "en Madrid" no se mueva
+   cuando llega la Fraunces cursiva (CLS). */
+.portada__h1 .punto { display: inline-block; width: .139em; font-style: italic; font-weight: 420; color: rgb(236 235 231 / .42); }
+.portada__escena { position: absolute; left: 44%; right: 6%; top: 24%; height: 40%; pointer-events: none; }
+.portada__pie {
+  position: absolute;
+  z-index: 6;
+  left: var(--hg);
+  right: var(--hg);
+  bottom: clamp(64px, 9vh, 96px);
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 32px;
+}
+.portada__lede { max-width: 30ch; margin: 0; font-size: clamp(15px, 1.15vw, 18px); line-height: 1.5; color: var(--h-muted); }
+.portada__lado { display: flex; align-items: end; gap: 28px; }
+.portada__prueba { color: inherit; text-decoration: none; border-radius: 4px; }
+.portada__prueba small { display: block; font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--h-soft); }
+.portada__prueba b { display: block; margin-top: 6px; font-size: 15px; font-weight: 500; }
+.portada__prueba > span { display: flex; gap: 12px; margin-top: 4px; font-size: 13.5px; color: var(--h-muted); }
+.portada__prueba i { font-style: normal; color: var(--h-ink); }
+.portada__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 12px 20px;
+  border: 1px solid rgb(255 255 255 / .18);
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--h-ink);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color .35s cubic-bezier(.2, .75, .15, 1), color .35s cubic-bezier(.2, .75, .15, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+.portada__cta:hover { background: var(--h-ink); color: var(--navy); }
+.portada__cta:focus-visible, .portada__prueba:focus-visible { outline: 2px solid var(--cyan); outline-offset: 4px; }
+/* Entrada (como el prototipo): datos, texto y prueba suben y aparecen. El H1, no: es el LCP. */
+.is-cine .portada__entra { opacity: 0; transform: translateY(14px); animation: portada-entra 1.1s cubic-bezier(.2, .75, .15, 1) forwards; }
+.is-cine .portada__meta.portada__entra { animation-delay: .1s; }
+.is-cine .portada__lede.portada__entra { animation-delay: .5s; }
+.is-cine .portada__lado.portada__entra { animation-delay: .6s; }
+@keyframes portada-entra { to { opacity: 1; transform: none; } }
+@media (min-width: 900px) { .portada__meta > span:nth-child(2) { display: inline; } }
+@media (max-width: 860px) {
+  .portada__meta .lg { display: none; }
+  .portada__h1 { top: 44%; font-size: clamp(54px, 17vw, 120px); line-height: .88; }
+  .portada__escena { left: 8%; right: 8%; top: 14%; height: 26%; }
+  .portada__pie { flex-direction: column; align-items: flex-start; bottom: 60px; gap: 22px; }
+  .portada__lado { width: 100%; justify-content: space-between; }
+}
 
 /* ==========================================================================
    Herramientas
@@ -247,7 +309,6 @@ html:not(.cinta-viva) .cinta__lista { flex-wrap: wrap; gap: 8px 40px; padding: 0
 
 /* Móvil: los titulares grandes, de verdad grandes. */
 @media (max-width: 47.99rem) {
-  .portada__h1 { font-size: 11.4vw; }
   .contacto__titulo { font-size: 15vw; }
 }
 
@@ -357,3 +418,50 @@ html:not(.cinta-viva) .cinta__lista { flex-wrap: wrap; gap: 8px 40px; padding: 0
 .pie__legales { display: flex; flex-wrap: wrap; gap: 0 20px; margin: 0; padding: 0; list-style: none; }
 .pie__legales a { display: inline-flex; align-items: center; min-height: 44px; text-decoration: none; }
 .pie__legales a:hover { color: var(--stone); }
+
+/* ==========================================================================
+   Anclas de las ondas (js/ondas.js) en el resto de la home (desde
+   backup-pre-ondas): elementos vacíos en zonas libres, sin tocar el diseño de
+   cada sección. Las piezas se centran y escalan con su caja.
+   ========================================================================== */
+.ondas-ancla { pointer-events: none; }
+/* Trabajo selecto: pequeña, arriba a la derecha, en el aire de encima de la etiqueta. */
+.ondas-ancla--ts {
+  position: absolute;
+  top: calc(clamp(96px, 16vh, 180px) * .5);
+  height: calc(clamp(96px, 16vh, 180px) * .42);
+  left: 62%;
+  right: var(--g);
+}
+/* Con quién: en escritorio, el hueco entre las líneas 2–4 del titular (las cortas) y la columna lateral;
+   se coloca desde su sitio en el flujo (justo encima del titular) con las medidas del propio titular. */
+.panel--cq .cq { position: relative; }
+.ondas-ancla--cq {
+  --cq-h2: clamp(40px, 5.4vw, 88px);
+  --cq-aire: clamp(40px, 7vh, 72px);
+  position: absolute;
+  left: calc(6.7 * var(--cq-h2));                                          /* después de "la programamos." (~6,4 alturas de letra) */
+  right: calc(33.333% - .667 * clamp(16px, 2vw, 32px) + 24px);              /* 24 px antes de la columna lateral (columna 9 de 12) */
+  margin-top: calc(var(--cq-aire) + 1.05 * var(--cq-h2));
+  height: calc(2.85 * var(--cq-h2));
+}
+/* Contacto: debajo del texto, en la columna del titular (va con ella, que es sticky). */
+.ondas-ancla--contacto {
+  position: absolute;
+  top: calc(100% + 40px);
+  left: 0;
+  width: 86%;
+  height: clamp(140px, 24vh, 240px);
+}
+@media (max-width: 900px) {
+  /* Con quién en móvil: el aire entre el interruptor y el titular (no suma altura: margen negativo) */
+  .ondas-ancla--cq { position: relative; left: 18%; right: auto; width: 64%; margin: 0 0 calc(-1 * var(--cq-aire)); height: var(--cq-aire); }
+}
+@media (max-width: 899px) {
+  /* Contacto en móvil: el hueco entre el texto y el formulario (contacto.css la deja static: aquí, relative) */
+  .contacto .contacto__cab { position: relative; top: auto; }
+  .ondas-ancla--contacto { top: 100%; left: 18%; width: 64%; height: 56px; }
+}
+@media (max-width: 860px) {
+  .ondas-ancla--ts { left: var(--g); }
+}

@@ -1,208 +1,157 @@
 /* ==========================================================================
-   que-hacemos.js — "Qué hacemos" en la home (desde backup-pre-que-hacemos):
-   un panel fijo (sticky, css/que-hacemos.css) y 4 servicios que cambian con
-   el scroll. Sustituye al bento de 4 cards; reutiliza sus escenas (js/bento/).
-   · Índice activo = progreso del scroll dentro de la sección (posiciones
-     cacheadas; se leen de nuevo solo al cambiar el tamaño): 0–25 %, 25–50 %,
-     50–75 %, 75–100 %, con una histéresis del 5 % del tramo (no tiembla en
-     los límites). Dentro de gsap.ticker, el bucle único de la web.
-   · Cambio (0,7 s): la imagen saliente se funde y baja 12 px; la entrante
-     sube 12 px con un clip-path de abajo arriba; el texto entra línea a
-     línea (60 ms). Solo transform, opacity y clip-path.
-   · Clic (o Enter) en un título: Lenis.scrollTo (1,1 s) al inicio de su tramo.
-     Flechas arriba/abajo (izquierda/derecha en móvil): foco entre títulos.
-   · Escenas: el renderer compartido del bento (un solo contexto WebGL).
-     Desarrollo web se pinta una vez en su pose; los bodegones (Software con
-     IA, Posicionamiento) una vez y se reutilizan como imagen; el destello
-     (Animaciones 3D) es lo único que anima, y solo si está activo y la
-     sección en pantalla. Three.js se importa a menos de un viewport.
-   · Sin JS, con movimiento reducido o en versión fija (EV.mode 'still'): los
-     4 en lista con su póster (assets/img/que-hacemos-*, ?qh=captura).
+   que-hacemos.js — "Qué hacemos" en la home (desde backup-pre-ondas).
+   Prototipo aprobado: Downloads/evimes-home-ondas. Sección gris alta con un
+   panel fijo (css/que-hacemos.css): un tramo de scroll por servicio.
+   · Índice activo = progreso del scroll en la sección (posiciones cacheadas,
+     se miden solo al cambiar el tamaño), en cuartos, con una histéresis del
+     5 % del tramo. Dentro de gsap.ticker, el bucle único de la web.
+   · Cambio: el texto entrante, palabra a palabra (máscara, 55 ms entre
+     palabras, desenfoque que se aclara; brillo en la cursiva); la descripción
+     y las etiquetas después. El saliente sube y se desvanece (clases .is-on /
+     .is-out; las transiciones están en el CSS).
+   · Las ondas (js/ondas.js): cada servicio con su movimiento en el ancla
+     .qh__stage (data-m → EvimesOndas.setStepMotion).
+   · Clic (o Enter) en un título: Lenis.scrollTo (1,1 s) al centro de su tramo.
+     Flechas arriba/abajo (izquierda/derecha en móvil): el servicio siguiente.
+   · Sin JS, movimiento reducido o versión fija (EV.mode 'still'): los 4 en
+     lista (el CSS), sin pestañas.
    ========================================================================== */
-const EV = window.EV || {};
-const raiz = document.querySelector('[data-qh]');
-if (raiz) iniciar();
+(function () {
+  var EV = window.EV || {};
+  var raiz = document.querySelector('[data-qh]');
+  if (!raiz) return;
+  var tabs = [].slice.call(raiz.querySelectorAll('[role="tab"]'));
+  var panes = tabs.map(function (t) { return document.getElementById(t.getAttribute('aria-controls')); });
+  var N = panes.length;
 
-function iniciar() {
-  const tabs = Array.from(raiz.querySelectorAll('[role="tab"]'));
-  const paneles = tabs.map(t => document.getElementById(t.getAttribute('aria-controls')));
-  const captura = new URLSearchParams(location.search).get('qh') === 'captura';
-  const N = paneles.length;
-
-  // Versión fija / movimiento reducido: lista con pósters, sin pestañas ni Three.js.
-  if (EV.mode !== 'cine' && !captura) {
-    paneles.forEach(p => { p.removeAttribute('role'); p.removeAttribute('aria-labelledby'); });
+  // Versión fija / movimiento reducido: lista, sin pestañas (las ondas, quietas en su ancla).
+  if (EV.mode !== 'cine') {
+    panes.forEach(function (p) { p.removeAttribute('role'); p.removeAttribute('aria-labelledby'); });
     return;
   }
 
-  const pista = raiz.querySelector('.qh__pista');
-  const fijo = raiz.querySelector('.qh__fijo');
-  const fila = raiz.querySelector('.qh__tabs');
-  const estrecha = matchMedia('(max-width: 860px)');
-  const gs = window.gsap;
-  const media = paneles.map(p => p.querySelector('.qh__media'));
-  const textos = paneles.map(p => p.querySelector('.qh__texto'));
-  const lineas = paneles.map(p => Array.from(p.querySelectorAll('.qh__l > span')));
-  const barras = tabs.map(t => t.querySelector('.qh__barra i'));
+  var pin = raiz.querySelector('.qh__pin');
+  var fila = raiz.querySelector('.qh__titulos');
+  var stage = document.getElementById('qhStage');
+  var num = raiz.querySelector('.qh__n');
+  var barras = tabs.map(function (t) { return t.querySelector('i'); });
+  var estrecha = matchMedia('(max-width: 860px)');
+  var activo = 0, bloqueo = 0, ultimaY = -1;
+  var lay = { inicio: 0, recorrido: 1 };
 
-  let activo = 0, bloqueo = 0, ultimaY = -1, enVista = false;
-  const lay = { inicio: 0, recorrido: 1 };
-
-  // inicio: el estado de reposo de los 4 (solo el primero a la vista)
-  paneles.forEach((p, i) => { if (i) p.inert = true; });
+  /* ---------- palabras con máscara (el texto sigue en el HTML) ---------- */
+  panes.forEach(function (p) {
+    var h = p.querySelector('h3'), n = 0;
+    var envolver = function (texto, padre) {
+      texto.split(/(\s+)/).forEach(function (t) {
+        if (!t) return;
+        if (/^\s+$/.test(t)) { padre.appendChild(document.createTextNode(' ')); return; }
+        var w = document.createElement('span'), i = document.createElement('span');
+        w.className = 'w'; i.textContent = t; i.style.transitionDelay = (n++ * 55) + 'ms';
+        w.appendChild(i); padre.appendChild(w);
+      });
+    };
+    [].slice.call(h.childNodes).forEach(function (c) {
+      if (c.nodeType === 3) { var fr = document.createDocumentFragment(); envolver(c.textContent, fr); h.replaceChild(fr, c); }
+      else { var t = c.textContent; c.textContent = ''; envolver(t, c); }
+    });
+    h.setAttribute('aria-label', h.textContent.replace(/\s+/g, ' ').trim());   // el lector lee la frase, no palabra a palabra
+  });
+  panes.forEach(function (p, k) { p.inert = k !== 0; });
 
   /* ---------- medidas (solo al cambiar el tamaño) ---------- */
   function medir() {
-    let y = 0, n = pista; while (n) { y += n.offsetTop; n = n.offsetParent; }
-    const top = parseFloat(getComputedStyle(fijo).top) || 0;
-    lay.inicio = y - top;                                       // donde el panel se queda fijo
-    lay.recorrido = Math.max(1, pista.offsetHeight - fijo.offsetHeight);
+    var y = 0, n = raiz; while (n) { y += n.offsetTop; n = n.offsetParent; }
+    lay.inicio = y;                                               // el panel se queda fijo arriba (top: 0)
+    lay.recorrido = Math.max(1, raiz.offsetHeight - pin.offsetHeight);
     ultimaY = -1;
   }
   medir();
   addEventListener('resize', medir);
   if (window.ResizeObserver) new ResizeObserver(medir).observe(document.body);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(medir);
-  estrecha.addEventListener('change', () => { barras.forEach(b => { b.style.transform = ''; }); ultimaY = -1; });
 
-  const lenis = () => (EV.home && EV.home.lenis) || null;
-  const scrollY = () => { const l = lenis(); return l ? l.scroll : window.scrollY; };
+  var lenis = function () { return (EV.home && EV.home.lenis) || null; };
+  var scrollY = function () { var l = lenis(); return l ? l.scroll : window.scrollY; };
+
+  /* ---------- las ondas: el movimiento del servicio activo ---------- */
+  function ondas() { if (window.EvimesOndas && stage) window.EvimesOndas.setStepMotion(stage, tabs[activo].dataset.m); }
+  ondas();
+  addEventListener('ondas:listo', ondas);
+
+  /* ---------- el cambio ---------- */
+  function mostrar(i) {
+    if (i === activo) return;
+    var a = panes[activo], b = panes[i];
+    barras[activo].style.transform = '';
+    a.classList.remove('is-on'); a.classList.add('is-out'); a.inert = true;
+    setTimeout(function () { a.classList.remove('is-out'); }, 700);
+    b.classList.remove('is-out'); b.inert = false;
+    void b.offsetWidth;
+    setTimeout(function () { b.classList.add('is-on'); }, 30);
+    tabs.forEach(function (t, k) { t.setAttribute('aria-selected', String(k === i)); t.tabIndex = k === i ? 0 : -1; });
+    if (num) num.textContent = ('0' + (i + 1)).slice(-2) + ' / ' + ('0' + N).slice(-2);
+    activo = i;
+    ondas();
+    if (estrecha.matches) {                                         // en móvil, el título activo siempre a la vista
+      var t = tabs[i], x = t.offsetLeft - (fila.clientWidth - t.offsetWidth) / 2;
+      fila.scrollTo({ left: Math.max(0, x), behavior: 'smooth' });
+    }
+  }
 
   /* ---------- estado por scroll ---------- */
   function tick() {
-    const y = scrollY();
+    var y = scrollY();
     if (y === ultimaY) return;
     ultimaY = y;
-    const p = Math.min(1, Math.max(0, (y - lay.inicio) / lay.recorrido));
-    const f = Math.min(N - 1e-4, p * N);
+    var p = Math.min(1, Math.max(0, (y - lay.inicio) / lay.recorrido));
+    var f = Math.min(N - 1e-4, p * N);
     if (!bloqueo) {
-      const H = 0.05;                                           // histéresis: 5 % del tramo
-      if (f < activo - H || f >= activo + 1 + H) cambiar(Math.min(N - 1, Math.max(0, Math.floor(f))));
+      var H = 0.05;                                                 // histéresis: 5 % del tramo
+      if (f < activo - H || f >= activo + 1 + H) mostrar(Math.min(N - 1, Math.max(0, Math.floor(f))));
     }
-    const local = Math.min(1, Math.max(0, f - activo));
-    const b = barras[activo], s = (estrecha.matches ? 'scaleX(' : 'scaleY(') + local.toFixed(4) + ')';
-    if (b.style.transform !== s) b.style.transform = s;
-  }
-
-  /* ---------- el cambio entre servicios ---------- */
-  const EASE = 'power4.out';                                    // la curva suave de la web (cubic-bezier(.16, 1, .3, 1), casi igual)
-  function cambiar(i, desdeClic) {
-    if (i === activo) return;
-    const prev = activo;
-    activo = i;
-    tabs.forEach((t, k) => { t.setAttribute('aria-selected', String(k === i)); t.tabIndex = k === i ? 0 : -1; });
-    barras[prev].style.transform = '';
-    paneles.forEach((p, k) => { p.classList.toggle('is-activo', k === i); p.inert = k !== i; });
-    if (estrecha.matches && !desdeClic) {                       // en móvil, el título activo siempre a la vista
-      const t = tabs[i], x = t.offsetLeft - (fila.clientWidth - t.offsetWidth) / 2;
-      fila.scrollTo({ left: Math.max(0, x), behavior: 'smooth' });
+    if (!estrecha.matches) {
+      var s = 'scaleY(' + Math.min(1, Math.max(0, f - activo)).toFixed(4) + ')';
+      if (barras[activo].style.transform !== s) barras[activo].style.transform = s;
     }
-    escenas.activo(i);
-    if (!gs) return;
-    const todo = k => [paneles[k], media[k], textos[k], ...lineas[k]];
-    paneles.forEach((p, k) => { if (k !== i && k !== prev) { gs.killTweensOf(todo(k)); gs.set(p, { opacity: 0, zIndex: 0 }); } });
-    // sale: el texto se va enseguida (nunca dos textos a la vez); la imagen se funde y baja 12 px
-    const po = paneles[prev];
-    gs.killTweensOf(todo(prev));
-    gs.set(po, { zIndex: 0 });
-    gs.to(textos[prev], { opacity: 0, duration: 0.18, ease: 'power1.out' });
-    gs.to(po, { opacity: 0, duration: 0.45, ease: 'power2.out' });
-    gs.to(media[prev], { y: 12, duration: 0.7, ease: EASE });
-    // entra: sube desde 12 px con clip-path de abajo arriba; el texto, línea a línea (60 ms)
-    const pi = paneles[i];
-    gs.killTweensOf(todo(i));
-    gs.set(pi, { opacity: 1, zIndex: 2 });
-    gs.set(textos[i], { opacity: 1 });
-    gs.fromTo(media[i], { y: 12, clipPath: 'inset(100% 0% 0% 0% round 14px)' },
-      { y: 0, clipPath: 'inset(0% 0% 0% 0% round 14px)', duration: 0.7, ease: EASE, clearProps: 'clipPath' });
-    gs.fromTo(lineas[i], { yPercent: 105 }, { yPercent: 0, duration: 0.6, ease: EASE, stagger: 0.06, delay: 0.16 });
   }
 
   /* ---------- clic y teclado ---------- */
   function ir(i) {
-    const destino = Math.round(lay.inicio + (i / N) * lay.recorrido) + (i ? 1 : 0);
+    var destino = Math.round(lay.inicio + lay.recorrido * (i + 0.5) / N);  // el centro de su tramo
     clearTimeout(bloqueo);
-    cambiar(i, true);
-    bloqueo = setTimeout(() => { bloqueo = 0; ultimaY = -1; }, 1400);
-    const fin = () => { clearTimeout(bloqueo); bloqueo = 0; ultimaY = -1; };
-    const l = lenis();
-    if (l) l.scrollTo(destino, { duration: 1.1, easing: t => 1 - Math.pow(1 - t, 4), onComplete: fin });
+    mostrar(i);
+    var fin = function () { clearTimeout(bloqueo); bloqueo = 0; ultimaY = -1; };
+    bloqueo = setTimeout(fin, 1400);
+    var l = lenis();
+    if (l) l.scrollTo(destino, { duration: 1.1, easing: function (t) { return 1 - Math.pow(1 - t, 4); }, onComplete: fin });
     else window.scrollTo({ top: destino, behavior: 'smooth' });
   }
-  tabs.forEach((t, i) => t.addEventListener('click', () => ir(i)));
-  fila.addEventListener('keydown', e => {
-    const k = tabs.indexOf(document.activeElement);
+  tabs.forEach(function (t, i) { t.addEventListener('click', function () { ir(i); }); });
+  fila.addEventListener('keydown', function (e) {
+    var k = tabs.indexOf(document.activeElement);
     if (k < 0) return;
-    const sig = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key];
-    let n = -1;
+    var sig = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key], n = -1;
     if (sig) n = (k + sig + N) % N; else if (e.key === 'Home') n = 0; else if (e.key === 'End') n = N - 1;
     if (n < 0) return;
     e.preventDefault();
-    tabs[n].focus();
+    tabs[n].click();
+    tabs[n].focus({ preventScroll: true });
   });
   // un gesto del usuario suelta el bloqueo del salto (si lo interrumpe, manda el scroll)
-  ['wheel', 'touchstart'].forEach(ev => addEventListener(ev, () => { if (bloqueo) { clearTimeout(bloqueo); bloqueo = 0; ultimaY = -1; } }, { passive: true }));
+  ['wheel', 'touchstart'].forEach(function (ev) {
+    addEventListener(ev, function () { if (bloqueo) { clearTimeout(bloqueo); bloqueo = 0; ultimaY = -1; } }, { passive: true });
+  });
 
-  new IntersectionObserver(es => { enVista = es[0].isIntersecting; }, { rootMargin: '0px' }).observe(raiz);
+  // El primer servicio entra (palabra a palabra) cuando la sección llega a la pantalla.
+  var p0 = panes[0];
+  p0.classList.remove('is-on');
+  new IntersectionObserver(function (es, o) {
+    if (!es[0].isIntersecting) return;
+    o.disconnect();
+    if (activo === 0) p0.classList.add('is-on');
+  }, { threshold: 0.25 }).observe(pin);
 
-  /* ---------- escenas (las del bento) ---------- */
-  const escenas = montarEscenas();
-  if (gs) gs.ticker.add((time, dms) => { tick(); escenas.frame(Math.min(0.05, (dms || 16.7) / 1000)); });
-  else { const f = now => { requestAnimationFrame(f); tick(); escenas.frame(1 / 60); }; requestAnimationFrame(f); }
-
-  function montarEscenas() {
-    let destello = null, vivoActivo = activo;
-    const api = {
-      activo(i) { vivoActivo = i; },
-      // Solo el destello se mueve: si está activo, la sección en pantalla y la pestaña visible.
-      frame(dt) { if (destello && vivoActivo === 1 && enVista && !document.hidden) { destello.step(dt); destello.render(); } }
-    };
-    const lista = c => c.classList.add('is-lista');
-    const arrancar = async () => {
-      const [S, { webCard }, { starCard }, B] = await Promise.all([
-        import('./bento/shared.js'), import('./bento/web.js'), import('./bento/star.js'), import('./bento/bodegones.js')
-      ]);
-      const el = k => media[paneles.findIndex(p => p.dataset.k === k)];
-      const turno = fn => S.G.turno(fn, 1);                     // una escena por turno (js/escenas.js); la onda va antes
-      if (captura) media.forEach(m => { m.style.width = '1600px'; m.style.height = '1000px'; m.style.aspectRatio = 'auto'; });
-      const pintar = c => { c.render(); c.step(0); c.render(); };
-      const tareas = [
-        // Desarrollo web: una vez en su pose (la del bento) y al cambiar de tamaño
-        turno(async () => {
-          const c = await S.makeCard(el('web'), webCard, { captura });
-          c.quieta = true; c.step(6.88); pintar(c); lista(c.cv);
-          c.trasResize = () => { c.step(0); pintar(c); };
-        }),
-        // Animaciones 3D: el destello (el único que anima)
-        turno(async () => {
-          const c = await S.makeCard(el('star'), starCard, { captura });
-          c.quieta = true;                                       // fuera del bucle del bento: lo mueve frame()
-          c.step(captura ? 1.5 : 0); c.render(); c.step(0); c.render(); lista(c.cv);
-          c.trasResize = () => { c.step(0); c.render(); };
-          destello = c;
-        }),
-        // Software con IA y Posicionamiento: bodegones quietos, una vez
-        turno(() => B.bodegon(el('ia'), 'ia', { captura })),
-        turno(() => B.bodegon(el('seo'), 'seo', { captura }))
-      ];
-      await Promise.all(tareas);
-      // ?qh=captura: los pósters (assets/img/que-hacemos-<web|3d|ia|seo>, 1600 × 1000) del propio render
-      if (captura) {
-        await S.ehListo;
-        window.__qhPosters = () => {
-          const o = {};
-          S.cards.forEach(c => { c.render(); o[c.el.closest('.qh__panel').dataset.k] = c.cv.toDataURL('image/png'); });
-          B.bodegones.forEach(b => { o[b.k] = b.capturar(1600, 1000); });
-          return o;
-        };
-      }
-    };
-    const cerca = new IntersectionObserver(es => {
-      if (!es.some(e => e.isIntersecting)) return;
-      cerca.disconnect();
-      arrancar().catch(err => console.warn('[que-hacemos] sin escenas en vivo, pósters', err));
-    }, { rootMargin: '100% 0px' });
-    cerca.observe(raiz);
-    return api;
-  }
-}
+  if (window.gsap) gsap.ticker.add(tick);
+  else (function f() { requestAnimationFrame(f); tick(); })();
+})();

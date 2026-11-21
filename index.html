@@ -68,17 +68,16 @@
       var rm = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
       var c = navigator.connection || {}, lenta = c.saveData || /(^|-)(2g|3g)$/.test(c.effectiveType || '');
       EV.reducedMotion = rm;
+      EV.lenta = !!lenta;
       EV.mode = q === 'fijo' ? 'still' : q === 'cine' ? 'cine' : (rm || lenta) ? 'still' : 'cine';
       document.documentElement.classList.add(EV.mode === 'cine' ? 'is-cine' : 'is-still');
       if (window.matchMedia) matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', function () { if (!q) location.reload(); });
     })();
   </script>
-  <link rel="preload" as="image" type="image/avif" href="assets/onda/onda-movil.avif" media="(max-width: 719px)">
-  <link rel="preload" as="image" type="image/avif" href="assets/onda/onda-escritorio.avif" media="(min-width: 720px)">
   <link rel="preload" href="assets/fonts/fraunces-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/schibsted-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <!-- Import map: "three" = la MISMA URL que usan js/fondo/onda.js y js/bento/ (un solo Three.js 0.160.0);
-       lo necesitan los addons que importan "three" a secas (RoundedBoxGeometry en js/trabajo-selecto.js). -->
+  <!-- Import map: "three" = la MISMA URL en toda la web (un solo Three.js 0.160.0): la usan js/ondas.js
+       y los addons que importan "three" a secas (RoundedBoxGeometry en js/trabajo-selecto.js). -->
   <script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js" } }</script>
   <link rel="stylesheet" href="css/fonts.css">
   <link rel="stylesheet" href="css/tokens.css">
@@ -91,21 +90,13 @@
   <link rel="stylesheet" href="css/con-quien.css">
   <link rel="stylesheet" href="css/contacto.css">
 </head>
-<body class="inicio">
+<body class="inicio inicio--ondas">
+  <!-- Las dos ondas (js/ondas.js): un solo canvas fijo sobre la página; las piezas viven en las anclas [data-ondas]. -->
+  <canvas id="ondas" aria-hidden="true"></canvas>
   <div class="bg-grid" aria-hidden="true"></div>
   <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
-  <!-- ===== Fondo global: negro con líneas finas + la onda de cromo (Three.js) + grano ===== -->
-  <div class="fondo" aria-hidden="true">
-    <!-- Póster (hasta que arranca la onda, que se funde encima en 400 ms) y versión fija: fotograma del propio render (AVIF; WebP de respaldo). -->
-    <picture class="fondo__fija">
-      <source media="(max-width: 719px)" type="image/avif" srcset="assets/onda/onda-movil.avif">
-      <source media="(max-width: 719px)" type="image/webp" srcset="assets/onda/onda-movil.webp">
-      <source type="image/avif" srcset="assets/onda/onda-escritorio.avif">
-      <img src="assets/onda/onda-escritorio.webp" alt="" width="1920" height="1080" decoding="async" fetchpriority="high">
-    </picture>
-    <canvas class="fondo__onda"></canvas>
-  </div>
+  <!-- ===== Fondo: negro con la cuadrícula (.bg-grid) + grano. Desde backup-pre-ondas la home no lleva los tubos. ===== -->
   <div class="grano" aria-hidden="true"></div>
 
   <!-- ===== Cabecera compacta (la misma en todas las páginas): Servicios · Planes · Contacto a la izquierda, EVIMES a la derecha ===== -->
@@ -123,20 +114,21 @@
 
   <main id="contenido">
 
-    <!-- ===== Hero ===== -->
+    <!-- ===== Hero (desde backup-pre-ondas; prototipo aprobado Downloads/evimes-home-ondas) =====
+         El H1 es texto HTML, visible desde el primer fotograma (el LCP). .portada__escena es el ancla
+         de las ondas (js/ondas.js): forman la firma al cargar y a los 2,6 s pasan a la hélice (js/home.js).
+         Las cifras de Disco son las REALES de PageSpeed (js/data/pagespeed.js). Estilos: css/home.css -->
     <section class="portada" id="inicio" aria-labelledby="h1">
-      <div class="portada__texto">
-        <h1 class="display portada__h1" id="h1">
-          <span class="linea"><span data-c="inicio.hero.linea1">Tu negocio merece</span></span>
-          <span class="linea"><span data-c="inicio.hero.linea2">una web a su <span class="accent">altura</span>.</span></span>
-        </h1>
-        <p class="portada__sub aparece"><span data-c="inicio.hero.sub">Diseño web a medida en Madrid. Webs rápidas, únicas y pensadas para convertir visitas en clientes.</span> <strong data-c="inicio.hero.desde">Desde 150&nbsp;€.</strong></p>
-        <div class="portada__botones aparece">
-          <a class="pastilla pastilla--grande" href="#contacto" data-scramble><span class="sl" data-c="inicio.hero.cta">Pide tu propuesta</span></a>
-          <a class="enlace" href="#trabajo" data-scramble><span class="sl" data-c="inicio.hero.secundario">Ver proyectos</span></a>
+      <p class="portada__meta portada__entra"><span>Estudio de diseño web<span class="lg"> · Madrid</span></span><span>Agencias creativas y negocios locales</span><span><span class="lg">Webs </span>desde 150&nbsp;€</span></p>
+      <h1 class="portada__h1" id="h1"><span>Diseño web</span><span class="r">en Madrid<span class="punto">.</span></span></h1>
+      <div class="portada__escena" id="heroStage" data-ondas="firma" data-ondas-scale="1.05" aria-hidden="true"></div>
+      <div class="portada__pie">
+        <p class="portada__lede portada__entra" data-c="inicio.hero.lede">Webs que no se parecen a ninguna otra: rápidas, a medida y con 3D de verdad, para agencias creativas y negocios locales.</p>
+        <div class="portada__lado portada__entra">
+          <a class="portada__prueba" href="#trabajo"><small>Trabajo selecto</small><b>Disco Producción</b><span><span><i>99</i> Rendimiento</span><span><i>100</i> SEO</span></span></a>
+          <a class="portada__cta" href="#contacto" data-scramble><span class="sl" data-c="inicio.hero.cta">Hablemos</span> <span aria-hidden="true">→</span></a>
         </div>
       </div>
-      <p class="portada__desliza" aria-hidden="true"><i></i><span data-c="inicio.hero.desliza">Desliza</span></p>
     </section>
 
     <!-- ===== Herramientas ===== -->
@@ -175,74 +167,52 @@
       </div>
     </section>
 
-    <!-- ===== Qué hacemos (NEGRO, el fondo global): 4 servicios en un panel fijo que cambian con el scroll
-         (desde backup-pre-que-hacemos; sustituye al bento de 4 cards). Un tramo de scroll por servicio:
-         0–25 % · 25–50 % · 50–75 % · 75–100 %. A la izquierda los 4 títulos (pestañas: clic = scroll suave
-         a su tramo), a la derecha solo el activo: su escena (las del bento, js/bento/), su frase y el enlace.
-         Todo el contenido está aquí (lo lee Google); sin JS, con movimiento reducido o en versión fija,
-         los 4 en lista con su póster. Estilos: css/que-hacemos.css · JS: js/que-hacemos.js ===== -->
-    <section class="qh" id="que-hacemos" aria-labelledby="qh-h" data-qh>
-      <div class="qh__pista">
-        <div class="qh__fijo">
-          <div class="qh__marco">
-            <h2 class="qh__kicker" id="qh-h">Qué hacemos</h2>
-
-            <div class="qh__tabs" role="tablist" aria-label="Servicios" aria-orientation="vertical">
-              <button class="qh__tab" type="button" role="tab" id="qh-tab-web" aria-controls="qh-web" aria-selected="true" tabindex="0"><span class="qh__barra" aria-hidden="true"><i></i></span><span class="qh__nombre">Desarrollo web</span></button>
-              <button class="qh__tab" type="button" role="tab" id="qh-tab-3d" aria-controls="qh-3d" aria-selected="false" tabindex="-1"><span class="qh__barra" aria-hidden="true"><i></i></span><span class="qh__nombre">Animaciones 3D</span></button>
-              <button class="qh__tab" type="button" role="tab" id="qh-tab-ia" aria-controls="qh-ia" aria-selected="false" tabindex="-1"><span class="qh__barra" aria-hidden="true"><i></i></span><span class="qh__nombre">Software con IA</span></button>
-              <button class="qh__tab" type="button" role="tab" id="qh-tab-seo" aria-controls="qh-seo" aria-selected="false" tabindex="-1"><span class="qh__barra" aria-hidden="true"><i></i></span><span class="qh__nombre">Posicionamiento</span></button>
-            </div>
-
-            <div class="qh__escenario">
-              <article class="qh__panel is-activo" id="qh-web" role="tabpanel" aria-labelledby="qh-tab-web" data-k="web">
-                <h3 class="qh__titulo">Desarrollo web</h3>
-                <div class="qh__media">
-                  <picture><source type="image/avif" srcset="assets/img/que-hacemos-web.avif"><img src="assets/img/que-hacemos-web.webp" alt="Cuatro láminas de cristal oscuro con filo de cromo, separadas como las capas de una web: la estructura, las imágenes, el texto y los botones." width="1600" height="1000" loading="lazy" decoding="async"></picture>
-                  <canvas aria-hidden="true"></canvas>
-                </div>
-                <div class="qh__texto">
-                  <p class="qh__frase"><span class="qh__l"><span>Webs a medida, rápidas y pensadas para vender.</span></span> <span class="qh__l"><span>Diseño propio, código limpio y 100 en SEO técnico.</span></span></p>
-                  <a class="qh__mas" href="servicios.html#web"><span class="qh__l"><span>Ver servicio <span aria-hidden="true">→</span></span></span><span class="sr-only">: Desarrollo web</span></a>
-                </div>
-              </article>
-
-              <article class="qh__panel" id="qh-3d" role="tabpanel" aria-labelledby="qh-tab-3d" data-k="star">
-                <h3 class="qh__titulo">Animaciones 3D</h3>
-                <div class="qh__media">
-                  <picture><source type="image/avif" srcset="assets/img/que-hacemos-3d.avif"><img src="assets/img/que-hacemos-3d.webp" alt="Una estrella de cromo de cuatro puntas con el monograma EH grabado, sobre una ráfaga de rayos azules y cian." width="1600" height="1000" loading="lazy" decoding="async"></picture>
-                  <canvas aria-hidden="true"></canvas>
-                </div>
-                <div class="qh__texto">
-                  <p class="qh__frase"><span class="qh__l"><span>3D y WebGL que se recuerdan:</span></span> <span class="qh__l"><span>piezas interactivas que hacen que tu marca no se parezca a ninguna otra.</span></span></p>
-                  <a class="qh__mas" href="servicios.html#3d"><span class="qh__l"><span>Ver servicio <span aria-hidden="true">→</span></span></span><span class="sr-only">: Animaciones 3D</span></a>
-                </div>
-              </article>
-
-              <article class="qh__panel" id="qh-ia" role="tabpanel" aria-labelledby="qh-tab-ia" data-k="ia">
-                <h3 class="qh__titulo">Software con IA</h3>
-                <div class="qh__media">
-                  <picture><source type="image/avif" srcset="assets/img/que-hacemos-ia.avif"><img src="assets/img/que-hacemos-ia.webp" alt="Una pantalla de cristal ahumado con marco de aluminio negro y un teclado negro sobre un bloque de hormigón oscuro; en la pantalla, el código de una reserva automática por WhatsApp." width="1600" height="1000" loading="lazy" decoding="async"></picture>
-                  <canvas aria-hidden="true"></canvas>
-                </div>
-                <div class="qh__texto">
-                  <p class="qh__frase"><span class="qh__l"><span>Automatizaciones a medida: reservas, avisos y facturas</span></span> <span class="qh__l"><span>que se hacen solos, conectados a WhatsApp.</span></span></p>
-                  <a class="qh__mas" href="servicios.html#ia"><span class="qh__l"><span>Ver servicio <span aria-hidden="true">→</span></span></span><span class="sr-only">: Software con IA</span></a>
-                </div>
-              </article>
-
-              <article class="qh__panel" id="qh-seo" role="tabpanel" aria-labelledby="qh-tab-seo" data-k="seo">
-                <h3 class="qh__titulo">Posicionamiento</h3>
-                <div class="qh__media">
-                  <picture><source type="image/avif" srcset="assets/img/que-hacemos-seo.avif"><img src="assets/img/que-hacemos-seo.webp" alt="Un móvil negro sobre un bloque de hormigón oscuro; en la pantalla, la búsqueda «barbería cerca de mí» con «Tu negocio» como primer resultado." width="1600" height="1000" loading="lazy" decoding="async"></picture>
-                  <canvas aria-hidden="true"></canvas>
-                </div>
-                <div class="qh__texto">
-                  <p class="qh__frase"><span class="qh__l"><span>Que te encuentren primero cuando te buscan cerca:</span></span> <span class="qh__l"><span>SEO local, Google Business y webs que cargan al instante.</span></span></p>
-                  <a class="qh__mas" href="servicios.html#seo"><span class="qh__l"><span>Ver servicio <span aria-hidden="true">→</span></span></span><span class="sr-only">: Posicionamiento</span></a>
-                </div>
-              </article>
-            </div>
+    <!-- ===== Qué hacemos (GRIS; desde backup-pre-ondas, prototipo aprobado Downloads/evimes-home-ondas) =====
+         Sección alta con un panel fijo: un tramo de scroll por servicio (0–25 % · 25–50 % · 50–75 % · 75–100 %).
+         A la izquierda los 4 títulos (pestañas: clic = scroll suave al centro de su tramo); a la derecha, arriba,
+         el ancla de las ondas (.qh__stage: cada servicio con su movimiento, data-m) y debajo su texto.
+         Todo el texto está aquí (lo lee Google); sin JS, con movimiento reducido o en versión fija, los 4 en lista.
+         Estilos: css/que-hacemos.css · JS: js/que-hacemos.js -->
+    <section class="qh is-grey" id="que-hacemos" aria-labelledby="qh-t" data-nav="light" data-qh>
+      <div class="qh__pin">
+        <div class="qh__kick"><h2 id="qh-t">Qué hacemos</h2><span class="qh__n" aria-hidden="true">01 / 04</span></div>
+        <div class="qh__titulos" role="tablist" aria-label="Servicios" aria-orientation="vertical">
+          <button type="button" role="tab" id="qh-tab-web" aria-selected="true" aria-controls="qh-web" data-m="espejo"><i aria-hidden="true"></i>Desarrollo web</button>
+          <button type="button" role="tab" id="qh-tab-3d" aria-selected="false" aria-controls="qh-3d" data-m="giroscopio" tabindex="-1"><i aria-hidden="true"></i>Animaciones 3D</button>
+          <button type="button" role="tab" id="qh-tab-ia" aria-selected="false" aria-controls="qh-ia" data-m="orbita" tabindex="-1"><i aria-hidden="true"></i>Software con IA</button>
+          <button type="button" role="tab" id="qh-tab-seo" aria-selected="false" aria-controls="qh-seo" data-m="persecucion" tabindex="-1"><i aria-hidden="true"></i>Posicionamiento</button>
+        </div>
+        <div class="qh__der">
+          <div class="qh__stage" id="qhStage" data-ondas="espejo" data-ondas-scale=".62" aria-hidden="true"></div>
+          <div class="qh__panes">
+            <article class="qh__pane is-on" id="qh-web" role="tabpanel" aria-labelledby="qh-tab-web">
+              <p class="qh__srv">Desarrollo web</p>
+              <h3>Webs que cargan antes de que <em>parpadees.</em></h3>
+              <p class="qh__desc">Diseño propio y código limpio, pensado para vender. Nada de plantillas: cada web se hace para su marca.</p>
+              <ul class="qh__tags"><li>Diseño a medida</li><li>100 en SEO técnico</li><li>Panel para editar</li></ul>
+              <a class="qh__mas" href="servicios.html#web">Ver servicio <span aria-hidden="true">→</span><span class="sr-only">: Desarrollo web</span></a>
+            </article>
+            <article class="qh__pane" id="qh-3d" role="tabpanel" aria-labelledby="qh-tab-3d">
+              <p class="qh__srv">Animaciones 3D</p>
+              <h3>Que tu marca se pueda <em>girar.</em></h3>
+              <p class="qh__desc">Piezas 3D y WebGL interactivas que hacen que tu web se recuerde, sin sacrificar velocidad.</p>
+              <ul class="qh__tags"><li>Three.js y WebGL</li><li>Interacción con el ratón</li><li>Optimizado para móvil</li></ul>
+              <a class="qh__mas" href="servicios.html#3d">Ver servicio <span aria-hidden="true">→</span><span class="sr-only">: Animaciones 3D</span></a>
+            </article>
+            <article class="qh__pane" id="qh-ia" role="tabpanel" aria-labelledby="qh-tab-ia">
+              <p class="qh__srv">Software con IA</p>
+              <h3>El trabajo repetitivo, que lo haga <em>la web.</em></h3>
+              <p class="qh__desc">Automatizaciones a medida: reservas, avisos y facturas que se hacen solos, conectados a WhatsApp.</p>
+              <ul class="qh__tags"><li>Reservas automáticas</li><li>WhatsApp</li><li>Facturas y avisos</li></ul>
+              <a class="qh__mas" href="servicios.html#ia">Ver servicio <span aria-hidden="true">→</span><span class="sr-only">: Software con IA</span></a>
+            </article>
+            <article class="qh__pane" id="qh-seo" role="tabpanel" aria-labelledby="qh-tab-seo">
+              <p class="qh__srv">Posicionamiento</p>
+              <h3>Primero en Google cuando te buscan <em>cerca.</em></h3>
+              <p class="qh__desc">SEO local, Google Business y webs que cargan al instante, para que te encuentren antes que a la competencia.</p>
+              <ul class="qh__tags"><li>SEO local</li><li>Google Business</li><li>Core Web Vitals</li></ul>
+              <a class="qh__mas" href="servicios.html#seo">Ver servicio <span aria-hidden="true">→</span><span class="sr-only">: Posicionamiento</span></a>
+            </article>
           </div>
         </div>
       </div>
@@ -253,6 +223,8 @@
          a la derecha el texto y los datos REALES de PageSpeed (js/data/pagespeed.js). La card lleva a la oficina
          (oficina.html). Composición al revés que "Con quién trabajamos". Estilos: css/trabajo-selecto.css ===== -->
     <section class="ts" id="trabajo" aria-labelledby="ts-h">
+      <!-- Ancla de las ondas (js/ondas.js): pequeña, arriba a la derecha, sobre la etiqueta (el portátil ocupa la izquierda). -->
+      <div class="ondas-ancla ondas-ancla--ts" data-ondas="apilar" data-ondas-scale=".6" aria-hidden="true"></div>
       <div class="ts__visual">
         <a class="ts-card" href="oficina.html" aria-label="Entrar en la oficina: Disco Producción" aria-describedby="ts-escena">
           <div class="ts-card__escena" data-ts-escena>
@@ -286,7 +258,7 @@
     </section>
 
     <!-- ===== Panel gris: Con quién trabajamos (el único gris de la home desde backup-pre-que-hacemos) ===== -->
-    <section class="panel panel--cq" aria-label="Con quién trabajamos">
+    <section class="panel panel--cq is-grey" aria-label="Con quién trabajamos">
 
       <!-- 3. Con quién trabajamos (última sección del gris). Prototipo aprobado: evimes-cards/con-quien.html.
            Textos: js/data/clientes.js (BORRADOR; js/gris/clientes.js repinta los paneles desde ahí).
@@ -296,6 +268,9 @@
           <p class="label" id="cq-label">Con quién trabajamos</p>
           <div class="switch" role="radiogroup" aria-label="Elige tu caso" data-v="0" data-cq-switch></div>
         </div>
+        <!-- Ancla de las ondas: en escritorio, en el hueco entre las líneas cortas del titular y la columna;
+             en móvil, en el aire entre el interruptor y el titular. Fuera de .cq-stage (js/gris/clientes.js lo repinta). -->
+        <div class="ondas-ancla ondas-ancla--cq" data-ondas="intercambio" data-ondas-scale=".75" aria-hidden="true"></div>
         <div class="cq-stage" data-cq-stage>
             <div class="cq-p" data-p="0">
               <h2 class="display">
@@ -339,6 +314,8 @@
       <div class="contacto__cab">
         <h2 class="display contacto__titulo" id="h-contacto" data-c="inicio.contacto.titulo">¿Hacemos que se te vea?</h2>
         <p class="contacto__intro">Cuéntanos qué necesitas. Te respondemos con una propuesta clara.</p>
+        <!-- Ancla de las ondas: debajo del texto, en la columna izquierda (nunca encima del formulario). -->
+        <div class="ondas-ancla ondas-ancla--contacto" data-ondas="firma" aria-hidden="true"></div>
         <p class="contacto__directo" data-directo hidden>
           <a data-whatsapp href="#" target="_blank" rel="noopener" hidden>WhatsApp</a>
           <a data-email href="#" hidden></a>
@@ -409,7 +386,7 @@
     </nav>
   </footer>
 
-  <!-- Librerías (diferidas). Three.js 0.160.0 lo importa js/fondo/onda.js tras la carga. -->
+  <!-- Librerías (diferidas). Three.js 0.160.0 lo importa js/ondas.js (vía js/home.js) en un momento libre tras la carga. -->
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script defer src="https://unpkg.com/lenis@1.1.20/dist/lenis.min.js"></script>
 
@@ -421,12 +398,11 @@
   <script defer src="js/brand.js"></script>
   <script defer src="js/engine/util.js"></script>
   <script defer src="js/escenas.js"></script>
-  <script defer src="js/fondo/onda.js"></script>
   <script defer src="js/home.js"></script>
   <script defer src="js/gris/clientes.js"></script>
   <script defer src="js/contacto/form.js"></script>
-  <!-- Qué hacemos: módulo ES; reutiliza las escenas de js/bento/ (Three.js 0.160.0, la misma URL que la onda), importadas al acercarse. -->
-  <script type="module" src="js/que-hacemos.js"></script>
+  <!-- Qué hacemos: el panel fijo, los textos y el movimiento de las ondas por servicio. -->
+  <script defer src="js/que-hacemos.js"></script>
   <!-- Trabajo selecto: el portátil 3D (Three.js 0.160.0, el mismo import map) se crea al entrar la sección en pantalla. -->
   <script type="module" src="js/trabajo-selecto.js"></script>
   <script type="module" src="js/ui/scramble.js"></script>

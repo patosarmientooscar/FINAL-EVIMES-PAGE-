@@ -2,8 +2,8 @@
    bento/index.js — las 4 cards 3D de servicios.html (una por oficio) y UN
    solo bucle para las cuatro (dentro de gsap.ticker, el bucle único de la
    web; si no hubiera GSAP, requestAnimationFrame). La home ya no usa el
-   bento (desde backup-pre-que-hacemos): su "Qué hacemos" es js/que-hacemos.js,
-   que reutiliza estas mismas escenas (shared · web · star · bodegones).
+   bento ni sus escenas (desde backup-pre-ondas su "Qué hacemos" lleva las
+   dos ondas, js/ondas.js + js/que-hacemos.js).
    · Textos: js/data/servicios.js (BORRADOR) → las cards (el HTML lleva los
      mismos textos de respaldo).
    · Entrada: cada card recibe .in al entrar en pantalla (css/bento.css hace

@@ -1,10 +1,13 @@
 /* ==========================================================================
-   home.js — la home (fase onda). Un único bucle: gsap.ticker.
+   home.js — la home. Un único bucle: gsap.ticker.
      1. Lenis.raf                 (prioritario)
-     2. tick(): scroll → hero, opacidad del fondo, cabecera clara
-     3. EV.onda.render            (Three.js; se salta si nadie lo ve)
-   Versión fija (EV.mode === 'still'): sin Lenis ni Three; imagen fija de las
-   bandas, cards visibles.
+     2. tick(): scroll → cabecera (con velo al bajar; clara sobre el gris)
+     3. las dos ondas (js/ondas.js, su propio callback en el mismo ticker)
+   Desde backup-pre-ondas la home no lleva los tubos (js/fondo/onda.js sigue en
+   las demás páginas): las ondas se importan con import() en un momento libre
+   tras el primer pintado. Versión fija (EV.mode === 'still'): sin Lenis; con
+   movimiento reducido las ondas se quedan quietas en la firma; con ahorro de
+   datos o conexión lenta no se cargan.
    ========================================================================== */
 (function () {
   var EV = window.EV;
@@ -16,20 +19,11 @@
   var $ = function (s, c) { return (c || document).querySelector(s); };
   var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
 
-  var el = {
-    fondo: $('.fondo'), onda: $('.fondo__onda'), fija: $('.fondo__fija'),
-    cab: $('.cabecera'), panel: $('.panel'), portada: $('.portada')
-  };
+  var el = { cab: $('.cabecera') };
   var lenis = null;
   var vw = 0, vh = 0;
   var lay = {};                           // posiciones cacheadas (se recalculan al cambiar el tamaño)
-  var mouse = { x: 0, y: 0 };
-  var ondaOpacity = -1, fijaOpacity = -1, posterFuera = false, cruce = 0;
-  var CRUCE = 0.4;                        // póster → onda en vivo: fundido de 400 ms
-  var st = { hero: 0, op: 0, cubierta: false };                         // estado por scroll (reutilizado: sin objetos por fotograma)
-  var inp = { mx: 0, my: 0, hero: 0, luz: true, cuerdas: true };       // entrada de la onda (reutilizada)
-  var cabClara = null;
-  var sinOnda = false;                    // Three.js no cargó: imagen fija en su lugar
+  var cabClara = null, ultimaY = -1;
 
   /* ---------- textos desde js/content.js ---------- */
   function bindContent() {
@@ -44,10 +38,11 @@
   function measure() {
     vw = window.innerWidth; vh = window.innerHeight;
     var y = scrollY();
-    // Las secciones grises (desde backup-pre-que-hacemos solo queda una: Con quién trabajamos).
-    lay.grises = $$('.panel').map(function (n) { var r = n.getBoundingClientRect(); return { top: r.top + y, bottom: r.bottom + y }; });
+    // Las secciones grises: "Qué hacemos" (data-nav="light") y "Con quién trabajamos" (.panel).
+    lay.grises = $$('.panel, [data-nav="light"]').map(function (n) { var r = n.getBoundingClientRect(); return { top: r.top + y, bottom: r.bottom + y }; });
     var c = el.cab.getBoundingClientRect();
     lay.cabTop = c.top; lay.cabBottom = c.bottom;
+    ultimaY = -1;
   }
 
   /* ---------- Lenis en gsap.ticker ---------- */
@@ -182,91 +177,43 @@
 
   /* ---------- estado por scroll (sin lecturas de layout por fotograma) ---------- */
   function estado(y) {
-    var hero = U.clamp01(y / vh);
-    // Opacidad de las bandas: 1 en el hero → 0.3 fuera; 0 si una sección gris cubre la pantalla.
-    var mid = (lay.cabTop + lay.cabBottom) / 2, cubierta = false, dentro = false;
-    for (var i = 0; i < lay.grises.length; i++) {
-      var t = lay.grises[i].top - y, b = lay.grises[i].bottom - y;
-      if (t <= 0 && b >= vh) cubierta = true;
-      if (t < mid && b > mid) dentro = true;
-    }
-    var op = cubierta ? 0 : U.lerp(1, 0.3, U.smooth(0.3, 1.05, hero));
-
+    if (y === ultimaY) return;
+    ultimaY = y;
     // Cabecera clara cuando una sección gris pasa por su línea central.
     // Sobre la oficina (js/oficina/), cristal oscuro: la oficina pone EV.cabeceraOscura.
+    var mid = (lay.cabTop + lay.cabBottom) / 2, dentro = false;
+    for (var i = 0; i < lay.grises.length; i++) {
+      var t = lay.grises[i].top - y, b = lay.grises[i].bottom - y;
+      if (t < mid && b > mid) dentro = true;
+    }
     var clara = dentro && !EV.cabeceraOscura;
     if (clara !== cabClara) { cabClara = clara; el.cab.classList.toggle('is-clara', clara); }
 
     var scrolled = y > 40;
     if (el.cab._s !== scrolled) { el.cab._s = scrolled; el.cab.classList.toggle('is-scroll', scrolled); }
-
-    st.hero = hero; st.op = op; st.cubierta = cubierta;
-    return st;
   }
+  function tick() { estado(scrollY()); }
 
-  function setOpacity(node, v, last) {
-    v = Math.round(v * 1000) / 1000;
-    if (v !== last) node.style.opacity = v;
-    return v;
-  }
-
-  /* ---------- bucle ----------
-     Hasta que arranca la onda se ve el póster (las bandas sin luces, con
-     transparencia, sacadas del propio render, assets/onda/). La onda carga en
-     un momento libre (requestIdleCallback) o con el primer gesto y, desde su
-     primer fotograma en vivo, el póster se funde encima en 400 ms. */
-  function tick(time, dtMs) {
-    var dt = Math.min((dtMs || 16.7) / 1000, 0.1);
-    var st = estado(scrollY());
-    var vivo = EV.onda.ok && !sinOnda;
-    // Un solo conjunto de tubos, siempre: el póster es el mismo render en la misma
-    // pose, así que en el primer fotograma en vivo se cambia de golpe (antes se
-    // fundían 1,4 s con el póster a opacidad 1 mientras los tubos vivos ya se
-    // movían con el scroll y el ratón: se veían dos conjuntos desplazados).
-    // El póster es el mismo render en la misma pose: el fundido es corto (400 ms) y
-    // el póster BAJA desde el primer fotograma (nunca se queda a opacidad 1 encima
-    // de los tubos en vivo; así se veían dos conjuntos desplazados).
-    if (!posterFuera && !sinOnda) {
-      if (vivo) {
-        cruce = Math.min(1, cruce + dt / CRUCE);
-        var k = cruce * cruce * (3 - 2 * cruce);
-        fijaOpacity = setOpacity(el.fija, st.op * (1 - k), fijaOpacity);
-        if (cruce >= 1) { posterFuera = true; root.classList.add('onda-viva'); }
-      } else fijaOpacity = setOpacity(el.fija, st.op, fijaOpacity);
-    }
-
-    if (vivo) {
-      var op = st.op;
-      ondaOpacity = setOpacity(el.onda, op, ondaOpacity);
-      if (op > 0.001) {
-        inp.mx = mouse.x; inp.my = mouse.y; inp.hero = st.hero; inp.cuerdas = !EV.reducedMotion;
-        EV.onda.render(dt, inp);
-      }
-    }
-  }
-
-  /* ---------- versión fija ---------- */
-  function fijo() {
-    root.classList.add('fondo-fijo');
-    var upd = function () {
-      var st = estado(window.scrollY);
-      fijaOpacity = setOpacity(el.fija, st.op, fijaOpacity);
+  /* ---------- las dos ondas (js/ondas.js) ----------
+     import() en el primer momento libre tras la carga (requestIdleCallback; sin él,
+     a los 1,5 s). El montaje va troceado (EV.gpu): no bloquea el hilo. Al aparecer,
+     forman la firma (con su destello) y a los 2,6 s el hero pasa a la hélice. */
+  function ondas() {
+    if (!document.getElementById('ondas')) return;
+    if (EV.lenta || /[?&]modo=fijo/.test(location.search)) return;     // ahorro de datos / 2G-3G / versión fija forzada
+    if (EV.mode !== 'cine' && !EV.reducedMotion) return;
+    var go = function () {
+      import('./ondas.js').then(function (m) { return m.listo; }).then(function (api) {
+        if (!api || EV.reducedMotion) return;
+        var escena = document.getElementById('heroStage');
+        if (escena) setTimeout(function () { escena.dataset.ondas = 'helice'; }, 2600);
+      }).catch(function (e) { console.warn('[ondas] no cargan', e); });
     };
-    window.addEventListener('scroll', upd, { passive: true });
-    window.addEventListener('resize', function () { measure(); upd(); });
-    upd();
-  }
-
-  function cargarOnda() {
-    EV.onda.load(el.onda).catch(function (e) {
-      console.warn('[onda] sin Three.js/WebGL, imagen fija', e);
-      root.classList.add('fondo-fijo');
-      sinOnda = true;
-      fijaOpacity = -1;
-      var upd = function () { fijaOpacity = setOpacity(el.fija, estado(scrollY()).op, fijaOpacity); };
-      if (lenis) lenis.on('scroll', upd); else window.addEventListener('scroll', upd, { passive: true });
-      upd();
-    });
+    var enReposo = function () {
+      if ('requestIdleCallback' in window) requestIdleCallback(go, { timeout: 3000 });
+      else setTimeout(go, 1500);
+    };
+    if (document.readyState === 'complete') enReposo(); else window.addEventListener('load', enReposo, { once: true });
   }
 
   /* ---------- arranque ---------- */
@@ -285,44 +232,13 @@
     if (window.ResizeObserver) new ResizeObserver(re).observe(document.body);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(re);
 
-    var captura = /[?&]onda=captura/.test(location.search);
-    if (cine && !captura) {
-      window.addEventListener('pointermove', function (e) {
-        mouse.x = e.clientX / vw - 0.5; mouse.y = e.clientY / vh - 0.5;
-        if (EV.onda.pointer) EV.onda.pointer(e.clientX, e.clientY, true);
-      }, { passive: true });
-      // Cuerdas con el dedo: el scroll táctil cancela los pointer events, touchmove no.
-      var dedo = function (e) { var t = e.touches[0]; if (t && EV.onda.pointer) EV.onda.pointer(t.clientX, t.clientY, true); };
-      window.addEventListener('touchstart', dedo, { passive: true });
-      window.addEventListener('touchmove', dedo, { passive: true });
-      var fuera = function () { if (EV.onda.pointer) EV.onda.pointer(0, 0, false); };
-      document.documentElement.addEventListener('pointerleave', fuera);
-      window.addEventListener('touchend', fuera, { passive: true });
-      window.addEventListener('touchcancel', fuera, { passive: true });
-      window.addEventListener('blur', fuera);
-      gsap.ticker.add(tick);
-      // Three.js en el primer momento libre tras la carga (requestIdleCallback;
-      // sin él, a los 1,5 s) o antes si llega un gesto. El montaje va troceado
-      // (js/escenas.js + onda.js): no bloquea el hilo; hasta entonces, el póster.
-      var gestos = ['pointermove', 'pointerdown', 'wheel', 'touchstart', 'keydown', 'scroll'];
-      var lanzada = false;
-      var go = function () {
-        if (lanzada) return; lanzada = true;
-        gestos.forEach(function (n) { window.removeEventListener(n, go, { passive: true }); });
-        cargarOnda();
-      };
-      gestos.forEach(function (n) { window.addEventListener(n, go, { passive: true }); });
-      var enReposo = function () {
-        if ('requestIdleCallback' in window) requestIdleCallback(go, { timeout: 4000 });
-        else setTimeout(go, 1500);
-      };
-      if (document.readyState === 'complete') enReposo(); else window.addEventListener('load', enReposo, { once: true });
-    } else if (!captura) fijo();
-
-    // ?onda=captura: fotograma fijo para assets/onda/ (ver assets/onda/LEEME.md).
-    if (captura) {
-      EV.onda.load(el.onda).then(function () { window.__ondaCaptura = EV.onda.capture; });
+    if (cine) gsap.ticker.add(tick);
+    else {
+      window.addEventListener('scroll', tick, { passive: true });
+      window.addEventListener('resize', function () { measure(); tick(); });
+      tick();
     }
+    ondas();
 
     var h = location.hash.slice(1);
     if (h && document.getElementById(h)) setTimeout(function () { ir(h); }, 80);
