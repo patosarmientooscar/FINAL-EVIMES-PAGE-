@@ -2,7 +2,7 @@
    home.js — la home. Un único bucle: gsap.ticker.
      1. Lenis.raf                 (prioritario)
      2. tick(): scroll → cabecera (fundido al bajar; clara sobre el gris)
-     3. las dos ondas, la red del hero y la sección lateral (js/ondas.js, js/red.js, js/lateral.js: cada una su callback en el mismo ticker)
+     3. las dos ondas, la red del hero y las secciones laterales (js/ondas.js, js/red.js, js/recorrido.js: cada una su callback en el mismo ticker)
    Desde backup-pre-ondas la home no lleva los tubos (js/fondo/onda.js sigue en
    las demás páginas): las ondas se importan con import() en un momento libre
    tras el primer pintado. Versión fija (EV.mode === 'still'): sin Lenis; con
@@ -38,7 +38,7 @@
   function measure() {
     vw = window.innerWidth; vh = window.innerHeight;
     var y = scrollY();
-    // "Con quién trabajamos" (.panel). La sección lateral avisa ella (EV.cabeceraClara): su gris se abre con el scroll.
+    // Secciones grises normales. #lateral y #con-quien avisan ellas (EV.cabeceraClara, js/recorrido.js): su gris se mueve.
     lay.grises = $$('.panel, [data-nav="light"]').map(function (n) { var r = n.getBoundingClientRect(); return { top: r.top + y, bottom: r.bottom + y }; });
     var c = el.cab.getBoundingClientRect();
     lay.cabTop = c.top; lay.cabBottom = c.bottom;
@@ -61,15 +61,16 @@
   function ir(id) {
     var t = document.getElementById(id);
     if (!t) return;
-    if (EV.lateral) EV.lateral.preparar();   // su alto es el definitivo antes de calcular el destino
+    if (EV.recorrido) EV.recorrido.preparar();   // su alto es el definitivo antes de calcular el destino
     // Mientras dura el salto, la oficina no arranca su visita automática al cruzarla (EV.home.saltando).
     EV.saltando = true;
     var fin = function () { EV.saltando = false; };
     var off = id === 'inicio' ? 0 : -Math.round((el.cab ? el.cab.getBoundingClientRect().bottom : 80) + 16);
     var yT = 0, m = t; while (m) { yT += m.offsetTop; m = m.offsetParent; }
-    var destino = id === 'lateral' && EV.lateral ? EV.lateral.destino() : Math.max(0, yT + off);
+    var propio = EV.recorrido ? EV.recorrido.destino(id) : null;   // #lateral y #con-quien: abiertas, no su borde de arriba
+    var destino = propio !== null ? propio : Math.max(0, yT + off);
     if (lenis) lenis.scrollTo(id === 'inicio' ? 0 : destino, { duration: Math.min(2.2, 0.8 + Math.abs(t.getBoundingClientRect().top) / 4000), onComplete: fin });
-    else if (id === 'lateral' && EV.lateral) { window.scrollTo({ top: destino, behavior: EV.reducedMotion ? 'auto' : 'smooth' }); setTimeout(fin, 1200); }
+    else if (propio !== null) { window.scrollTo({ top: destino, behavior: EV.reducedMotion ? 'auto' : 'smooth' }); setTimeout(fin, 1200); }
     else { t.scrollIntoView({ behavior: EV.reducedMotion ? 'auto' : 'smooth' }); setTimeout(fin, 1200); }
     setTimeout(fin, 2600);
     if (id !== 'inicio') {

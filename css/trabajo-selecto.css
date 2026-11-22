@@ -1,7 +1,7 @@
 /* ==========================================================================
    trabajo-selecto.css — "Trabajo selecto" en la home, en NEGRO (el fondo
    global: #0b0c0f con las líneas finas; la sección no pinta fondo propio).
-   Composición al revés que "Con quién trabajamos": la tarjeta visual a la
+   Composición: la tarjeta visual a la
    izquierda (7 columnas) y el texto a la derecha (5).
    · .ts-card: tarjeta oscura con la escena 3D (js/trabajo-selecto.js) y, debajo,
      el nombre y una línea. Toda la tarjeta es un enlace a oficina.html.

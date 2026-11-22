@@ -445,18 +445,6 @@ html:not(.cinta-viva) .cinta__lista { flex-wrap: wrap; gap: 8px 40px; padding: 0
   left: 62%;
   right: var(--g);
 }
-/* Con quién: en escritorio, el hueco entre las líneas 2–4 del titular (las cortas) y la columna lateral;
-   se coloca desde su sitio en el flujo (justo encima del titular) con las medidas del propio titular. */
-.panel--cq .cq { position: relative; }
-.ondas-ancla--cq {
-  --cq-h2: clamp(40px, 5.4vw, 88px);
-  --cq-aire: clamp(40px, 7vh, 72px);
-  position: absolute;
-  left: calc(6.7 * var(--cq-h2));                                          /* después de "la programamos." (~6,4 alturas de letra) */
-  right: calc(33.333% - .667 * clamp(16px, 2vw, 32px) + 24px);              /* 24 px antes de la columna lateral (columna 9 de 12) */
-  margin-top: calc(var(--cq-aire) + 1.05 * var(--cq-h2));
-  height: calc(2.85 * var(--cq-h2));
-}
 /* Contacto: debajo del texto, en la columna del titular (va con ella, que es sticky). */
 .ondas-ancla--contacto {
   position: absolute;
@@ -464,10 +452,6 @@ html:not(.cinta-viva) .cinta__lista { flex-wrap: wrap; gap: 8px 40px; padding: 0
   left: 0;
   width: 86%;
   height: clamp(140px, 24vh, 240px);
-}
-@media (max-width: 900px) {
-  /* Con quién en móvil: el aire entre el interruptor y el titular (no suma altura: margen negativo) */
-  .ondas-ancla--cq { position: relative; left: 18%; right: auto; width: 64%; margin: 0 0 calc(-1 * var(--cq-aire)); height: var(--cq-aire); }
 }
 @media (max-width: 899px) {
   /* Contacto en móvil: el hueco entre el texto y el formulario (contacto.css la deja static: aquí, relative) */

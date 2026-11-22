@@ -1,21 +1,14 @@
 /* ==========================================================================
-   Panel gris (lo común): "Con quién trabajamos" (css/con-quien.css). El otro gris de
-   la home es la sección lateral, liso y con su propio CSS (css/lateral.css).
-   La oficina
-   (oficina.html) usa css/oficina.css.
+   Panel gris de la oficina (oficina.html, con css/oficina.css). Los grises de
+   la home son lisos y con su propio CSS (css/lateral.css, css/con-quien.css).
    ========================================================================== */
 .panel {
   --tinta-2: rgb(11 15 26 / 0.7);               /* secundario sobre el gris ≥ 6:1 */
   padding-top: clamp(64px, 11vh, 120px);
   padding-bottom: clamp(64px, 10vh, 120px);
-  /* El gris termina después de "Con quién", recto: debajo vuelve el fondo
-     global (negro con líneas + tubos) para Planes y Contacto. */
 }
 /* Foco visible sobre el gris: el cian no tiene contraste aquí. */
 .panel :focus-visible { outline: 2px solid var(--tinta-oscura); outline-offset: 3px; }
 
 .enlace--oscuro { color: var(--tinta-oscura); text-decoration-color: rgb(11 15 26 / 0.35); }
 .enlace--oscuro:hover { text-decoration-color: var(--tinta-oscura); }
-
-/* "Con quién" empieza con su propio aire (.cq ya trae su padding). */
-.panel--cq { padding-top: 0; }

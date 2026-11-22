@@ -4,7 +4,9 @@
    pide el brief: apertura desde una línea de 1 px, sin esquinas redondeadas,
    sin tramo negro al final y el gris liso.
    · Sin JS: los bloques uno debajo de otro, en gris, legibles.
-   · .is-viva (la pone js/lateral.js): panel fijo + pista horizontal.
+   · .is-viva (la pone js/recorrido.js): panel fijo + pista horizontal. #con-quien usa esto mismo
+     (.lateral.cq; lo que cambia, en css/con-quien.css).
+   · .lat-cortina: la franja que se ensancha y baja como una persiana hacia #con-quien.
    La familia "Schibsted Lateral" es el MISMO archivo de Schibsted (no se
    descarga otra vez), con todo su eje de peso (400–900): en css/fonts.css está
    declarada hasta 600 y abrirla allí engordaría las negritas de toda la web.
@@ -25,6 +27,7 @@
   z-index: 1;                                   /* bajo el canvas de las ondas (5) */
   font-family: "Schibsted Lateral", var(--font-text);
 }
+#lateral { z-index: 2; }                       /* la persiana pasa por encima de #con-quien */
 .lateral :where(h2, p, ul) { margin: 0; }
 .lateral:focus { outline: none; }               /* el destino de #lateral no es un control */
 .lat-window { background: var(--gris); color: var(--lat-tinta); }
@@ -77,7 +80,7 @@
   background: linear-gradient(90deg, #ff7a22 0%, #ff4f3a 55%, #ff3d7f 100%);
 }
 .p-band span { font-weight: 800; text-transform: uppercase; letter-spacing: .02em; line-height: 1; font-size: clamp(28px, 3.4vw, 58px); color: #0b0c0f; }
-.lat-ui { display: none; }
+.lat-ui, .lat-cortina { display: none; }
 
 /* ---------- el recorrido ---------- */
 .lateral.is-viva .lat-pin {
@@ -155,7 +158,36 @@
 .lat-cifra { display: inline-block; height: 18px; overflow: hidden; vertical-align: top; }
 .lat-cifra > span { display: block; white-space: pre; }
 
-/* ---------- las letras: tres franjas las cruzan mientras se enfocan (js/lateral.js las escribe) ---------- */
+/* ---------- la persiana hacia #con-quien ---------- */
+.is-viva .lat-cortina {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: var(--barra);
+  opacity: 0;
+  pointer-events: none;
+}
+.lat-cortina i { position: absolute; inset: 0; background: linear-gradient(90deg, #ff7a22 0%, #ff4f3a 55%, #ff3d7f 100%); transform-origin: right; }
+.lat-cortina b { position: relative; display: flex; font-weight: inherit; }
+.lat-cortina span {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+  line-height: 1;
+  font-size: clamp(28px, 3.4vw, 58px);
+  color: #0b0c0f;
+}
+.en-pantalla .lat-cortina, .en-pantalla .lat-cortina i { will-change: transform; }
+/* bajando: por encima del naranja ya se ve (y se pulsa) #con-quien */
+#lateral.se-baja { pointer-events: none; }
+#lateral.se-baja .lat-window { background: none; }
+#lateral.se-baja .lat-track, #lateral.se-baja .lat-ui { opacity: 0 !important; }
+
+/* ---------- las letras: tres franjas las cruzan mientras se enfocan (js/recorrido.js las escribe) ---------- */
 .sw { display: inline-block; white-space: nowrap; visibility: hidden; }   /* solo se ve la letra ya escrita */
 .sc {
   position: relative;
@@ -185,7 +217,7 @@
   .is-viva .lat-list li { font-size: max(19px, min(10vw, (100svh - 150px) / 11)); }   /* 19 px en negrita: el gris sigue siendo AA */
   .is-viva .lat-ondas { left: 40vw; right: auto; top: 68px; width: 60vw; height: max(48px, (100svh - 100vw) / 2 - 130px); }
   .is-viva .p-band { width: 60vw; min-width: 0; }
-  .is-viva .p-band span { font-size: max(28px, 3.4vw); }
+  .is-viva .p-band span, .lat-cortina span { font-size: max(28px, 3.4vw); }
 }
 
 @media (max-height: 500px) {
@@ -197,6 +229,13 @@
 .cabecera.is-lisa::before,
 .cabecera.is-lisa::after { opacity: 0 !important; transition: none; }
 .cabecera.is-franja::after { clip-path: inset(0 var(--franja, 0px) 0 0); }
+
+/* sobre el naranja el logo va claro y el cristal oscurece lo de detrás, como sobre el gris (sin esto, 4,4:1) */
+.cabecera.is-naranja .cabecera__nav,
+.cabecera.is-naranja .cabecera__abrir {
+  -webkit-backdrop-filter: blur(16px) saturate(140%) brightness(.15);
+  backdrop-filter: blur(16px) saturate(140%) brightness(.15);
+}
 
 @media (prefers-reduced-motion: reduce) {
   .lateral.se-ve .lat-hint b { animation: none; }
