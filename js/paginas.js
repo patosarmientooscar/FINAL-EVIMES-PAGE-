@@ -1,5 +1,5 @@
 /* ==========================================================================
-   paginas.js — proyectos.html y planes.html: los mismos datos que la home
+   paginas.js — páginas planas: los mismos datos que la home
    (js/data/), en una página plana.
    ========================================================================== */
 (function () {
