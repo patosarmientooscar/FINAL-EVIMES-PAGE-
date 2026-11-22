@@ -7,7 +7,7 @@
    · Anclas: cada sección marca dónde viven las piezas con un elemento vacío
      [data-ondas="<movimiento>"] (+ data-ondas-scale opcional). Movimientos:
      firma, orbita, espejo, tijera, persecucion, intercambio, apilar, helice,
-     encaje, giroscopio. "Qué hacemos" cambia el suyo por servicio con
+     encaje, giroscopio. Un ancla puede cambiar el suyo con
      window.EvimesOndas.setStepMotion(el, nombre).
    · Lo carga js/home.js con import() en un momento libre tras el primer
      pintado. Montaje troceado (js/escenas.js → EV.gpu): la extrusión en

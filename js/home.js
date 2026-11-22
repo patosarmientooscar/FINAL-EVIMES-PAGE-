@@ -2,7 +2,7 @@
    home.js — la home. Un único bucle: gsap.ticker.
      1. Lenis.raf                 (prioritario)
      2. tick(): scroll → cabecera (fundido al bajar; clara sobre el gris)
-     3. las dos ondas y la red del hero (js/ondas.js, js/red.js: cada una su callback en el mismo ticker)
+     3. las dos ondas, la red del hero y la sección lateral (js/ondas.js, js/red.js, js/lateral.js: cada una su callback en el mismo ticker)
    Desde backup-pre-ondas la home no lleva los tubos (js/fondo/onda.js sigue en
    las demás páginas): las ondas se importan con import() en un momento libre
    tras el primer pintado. Versión fija (EV.mode === 'still'): sin Lenis; con
@@ -38,7 +38,7 @@
   function measure() {
     vw = window.innerWidth; vh = window.innerHeight;
     var y = scrollY();
-    // Las secciones grises: "Qué hacemos" (data-nav="light") y "Con quién trabajamos" (.panel).
+    // "Con quién trabajamos" (.panel). La sección lateral avisa ella (EV.cabeceraClara): su gris se abre con el scroll.
     lay.grises = $$('.panel, [data-nav="light"]').map(function (n) { var r = n.getBoundingClientRect(); return { top: r.top + y, bottom: r.bottom + y }; });
     var c = el.cab.getBoundingClientRect();
     lay.cabTop = c.top; lay.cabBottom = c.bottom;
@@ -61,12 +61,15 @@
   function ir(id) {
     var t = document.getElementById(id);
     if (!t) return;
+    if (EV.lateral) EV.lateral.preparar();   // su alto es el definitivo antes de calcular el destino
     // Mientras dura el salto, la oficina no arranca su visita automática al cruzarla (EV.home.saltando).
     EV.saltando = true;
     var fin = function () { EV.saltando = false; };
     var off = id === 'inicio' ? 0 : -Math.round((el.cab ? el.cab.getBoundingClientRect().bottom : 80) + 16);
     var yT = 0, m = t; while (m) { yT += m.offsetTop; m = m.offsetParent; }
-    if (lenis) lenis.scrollTo(id === 'inicio' ? 0 : Math.max(0, yT + off), { duration: Math.min(2.2, 0.8 + Math.abs(t.getBoundingClientRect().top) / 4000), onComplete: fin });
+    var destino = id === 'lateral' && EV.lateral ? EV.lateral.destino() : Math.max(0, yT + off);
+    if (lenis) lenis.scrollTo(id === 'inicio' ? 0 : destino, { duration: Math.min(2.2, 0.8 + Math.abs(t.getBoundingClientRect().top) / 4000), onComplete: fin });
+    else if (id === 'lateral' && EV.lateral) { window.scrollTo({ top: destino, behavior: EV.reducedMotion ? 'auto' : 'smooth' }); setTimeout(fin, 1200); }
     else { t.scrollIntoView({ behavior: EV.reducedMotion ? 'auto' : 'smooth' }); setTimeout(fin, 1200); }
     setTimeout(fin, 2600);
     if (id !== 'inicio') {
@@ -186,13 +189,14 @@
       var t = lay.grises[i].top - y, b = lay.grises[i].bottom - y;
       if (t < mid && b > mid) dentro = true;
     }
-    var clara = dentro && !EV.cabeceraOscura;
+    var clara = (dentro || !!EV.cabeceraClara) && !EV.cabeceraOscura;
     if (clara !== cabClara) { cabClara = clara; el.cab.classList.toggle('is-clara', clara); }
 
     var scrolled = y > 40;
     if (el.cab._s !== scrolled) { el.cab._s = scrolled; el.cab.classList.toggle('is-scroll', scrolled); }
   }
   function tick() { estado(scrollY()); }
+  function refrescar() { ultimaY = -1; tick(); }
 
   /* ---------- las dos ondas (js/ondas.js) ----------
      import() en el primer momento libre tras la carga (requestIdleCallback; sin él,
@@ -245,7 +249,7 @@
     var h = location.hash.slice(1);
     if (h && document.getElementById(h)) setTimeout(function () { ir(h); }, 80);
     // API mínima para los módulos del panel gris (js/gris/*): mismo scroll, mismo bucle.
-    EV.home = { scrollY: scrollY, get lenis() { return lenis; }, get saltando() { return !!EV.saltando; }, cine: cine, ir: ir, elegirPlan: elegirPlan };
+    EV.home = { scrollY: scrollY, get lenis() { return lenis; }, get saltando() { return !!EV.saltando; }, cine: cine, ir: ir, refrescar: refrescar, elegirPlan: elegirPlan };
     root.classList.add('is-ready');
   }
 

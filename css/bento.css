@@ -3,7 +3,7 @@
    que define --b-navy y compañía en css/paginas-evimes.css). Portado del
    prototipo aprobado (Downloads/evimes-cards/bento.html): mismos valores,
    tiempos, sombras y radios. La home ya no usa el bento (desde
-   backup-pre-que-hacemos): su "Qué hacemos" es css/que-hacemos.css.
+   backup-pre-que-hacemos): su sección de servicios es css/lateral.css.
    Escenas 3D: js/bento/ (Posicionamiento y Software con IA: bodegones.js)
    ========================================================================== */
 .bento .card { position: relative; border-radius: 30px; overflow: hidden; background: var(--b-navy); isolation: isolate; touch-action: pan-y;

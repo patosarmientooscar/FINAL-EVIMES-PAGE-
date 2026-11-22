@@ -1,0 +1,203 @@
+/* ==========================================================================
+   lateral.css — "Construimos y diseñamos…" (desde backup-pre-lateral).
+   Prototipo: Downloads/evimes-lateral (bloque LATERAL y .sw/.sc), con lo que
+   pide el brief: apertura desde una línea de 1 px, sin esquinas redondeadas,
+   sin tramo negro al final y el gris liso.
+   · Sin JS: los bloques uno debajo de otro, en gris, legibles.
+   · .is-viva (la pone js/lateral.js): panel fijo + pista horizontal.
+   La familia "Schibsted Lateral" es el MISMO archivo de Schibsted (no se
+   descarga otra vez), con todo su eje de peso (400–900): en css/fonts.css está
+   declarada hasta 600 y abrirla allí engordaría las negritas de toda la web.
+   ========================================================================== */
+@font-face {
+  font-family: "Schibsted Lateral";
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url("../assets/fonts/schibsted-grotesk-latin.woff2") format("woff2");
+}
+
+.lateral {
+  --lat-g: clamp(16px, 4vw, 56px);
+  --lat-tinta: #121317;
+  --lat-2: rgb(18 19 23 / .64);                 /* secundario: prototipo .58 (4,2:1) → AA */
+  position: relative;
+  z-index: 1;                                   /* bajo el canvas de las ondas (5) */
+  font-family: "Schibsted Lateral", var(--font-text);
+}
+.lateral :where(h2, p, ul) { margin: 0; }
+.lateral:focus { outline: none; }               /* el destino de #lateral no es un control */
+.lat-window { background: var(--gris); color: var(--lat-tinta); }
+.lat-panel { position: relative; padding: 64px var(--lat-g); }
+
+/* ---------- los textos ---------- */
+.lat-h {
+  font-family: inherit;
+  font-weight: 800;
+  text-transform: uppercase;
+  text-wrap: wrap;
+  letter-spacing: -.045em;
+  line-height: 1;
+  font-size: 8vw;
+}
+.lat-hint { display: none; }
+.lat-p {
+  max-width: 34em;
+  font-size: clamp(18px, 1.85vw, 32px);
+  font-weight: 600;
+  text-transform: uppercase;
+  text-wrap: wrap;
+  letter-spacing: .01em;
+  line-height: 1.28;
+}
+.lat-kick {
+  display: block;
+  margin-bottom: 22px;
+  font-size: 12px;
+  line-height: 1.4;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--lat-2);
+}
+.lat-list { display: flex; flex-direction: column; gap: .02em; padding: 0; list-style: none; }
+.lat-list li {
+  font-size: clamp(30px, 4.6vw, 78px);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -.04em;
+  line-height: .9;
+  white-space: nowrap;
+}
+.lat-list li:nth-child(odd) { color: rgb(18 19 23 / .5); }   /* prototipo .28 (1,8:1) → AA en texto grande */
+.lat-ondas { display: none; }
+.p-band {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(90deg, #ff7a22 0%, #ff4f3a 55%, #ff3d7f 100%);
+}
+.p-band span { font-weight: 800; text-transform: uppercase; letter-spacing: .02em; line-height: 1; font-size: clamp(28px, 3.4vw, 58px); color: #0b0c0f; }
+.lat-ui { display: none; }
+
+/* ---------- el recorrido ---------- */
+.lateral.is-viva .lat-pin {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100lvh;                               /* el gris llega abajo también sin la barra del móvil */
+  overflow: hidden;
+  overflow: clip;                               /* clip: nada puede hacer scroll dentro del panel (buscar, foco) */
+  contain: layout paint style;
+}
+.is-viva .lat-window {
+  --barra: calc(100lvh - 100svh);               /* lo que tapa la barra del móvil: el contenido se centra sin ella */
+  position: absolute;
+  inset: 0;
+  clip-path: inset(50% 100% 50% 0);             /* cerrada; la abre js/lateral.js */
+}
+.is-viva .lat-track { position: absolute; inset: 0 auto 0 0; display: flex; }
+/* capas propias solo mientras la sección está en pantalla */
+.en-pantalla .lat-window { will-change: clip-path; }
+.en-pantalla .lat-track, .en-pantalla .lat-list li { will-change: transform; }
+.is-viva .lat-panel {
+  flex: none;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 var(--lat-g) var(--barra);
+}
+.is-viva .p-head { padding-right: 16vw; }
+.is-viva .lat-h {
+  width: max-content;
+  font-size: min(clamp(64px, 11.2vw, 200px), (100svh - 230px) / 4);   /* el del prototipo; baja solo si la pantalla es baja */
+}
+.is-viva .lat-hint {
+  display: block;
+  position: absolute;
+  left: var(--lat-g);
+  bottom: calc(var(--barra) + 72px);
+  font-size: 12px;
+  line-height: 1.4;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--lat-2);
+}
+.lat-hint b { display: inline-block; font-weight: 500; }
+.lateral.se-ve .lat-hint b { animation: lat-empuje 1.6s cubic-bezier(.45, 0, .55, 1) infinite; }
+@keyframes lat-empuje { 50% { transform: translateX(6px); } }
+.is-viva .p-text { width: max(70vw, 760px); }
+.is-viva .p-list { width: max(100vw, 1040px); padding-left: 14vw; }
+.is-viva .lat-list li { font-size: max(19px, min(clamp(30px, 4.6vw, 78px), (100svh - 150px) / 11)); }
+.is-viva .lat-ondas { display: block; position: absolute; right: 6vw; top: 26%; width: 34vw; height: 42%; pointer-events: none; }
+.is-viva .p-band { width: 34vw; min-width: 280px; padding: 0 0 var(--barra); align-items: center; }
+.is-viva .p-band span { writing-mode: vertical-rl; transform: rotate(180deg); }
+.is-viva .lat-ui {
+  position: absolute;
+  left: var(--lat-g);
+  right: var(--lat-g);
+  bottom: calc(var(--barra) + 20px);
+  height: 18px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  contain: strict;
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: .14em;
+  color: rgb(18 19 23 / .85);                   /* al final cae sobre la franja: .58 no llegaba a AA */
+}
+.lat-bar { position: relative; flex: 1; height: 1px; overflow: hidden; background: rgb(18 19 23 / .18); }
+.lat-bar i { position: absolute; inset: 0; background: var(--lat-tinta); transform-origin: left; transform: scaleX(0); }
+.lat-count { flex: none; width: 92px; text-align: right; white-space: nowrap; }
+.lat-count b { font-weight: 500; font-variant-numeric: tabular-nums; }
+/* el contador: tres ruedas de cifras movidas con transform (cambiar el texto sería un layout por cifra) */
+.lat-cifra { display: inline-block; height: 18px; overflow: hidden; vertical-align: top; }
+.lat-cifra > span { display: block; white-space: pre; }
+
+/* ---------- las letras: tres franjas las cruzan mientras se enfocan (js/lateral.js las escribe) ---------- */
+.sw { display: inline-block; white-space: nowrap; visibility: hidden; }   /* solo se ve la letra ya escrita */
+.sc {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  overflow: clip;                               /* clip: hidden hace de cada letra un contenedor de scroll */
+  vertical-align: top;
+  /* .16em arriba y .04em abajo: tildes y Ñ. .05em a los lados: con el tracking negativo la letra es más ancha que su caja */
+  padding: .16em .05em .04em;
+  margin: -.16em -.05em -.04em;
+}
+/* transform: ponerle y quitarle el desenfoque no obliga a recalcular el layout. Solo se pinta lo que se ve:
+   las ~1.100 franjas pintadas a opacidad 0 costaban la mitad del fotograma. */
+.sc .m { display: inline-block; transform: translate(0); opacity: 0; visibility: hidden; }
+.sc .s { position: absolute; inset: 0; padding: inherit; transform: translateX(-100%); opacity: 0; visibility: hidden; pointer-events: none; -webkit-user-select: none; user-select: none; }
+.sc .s1 { clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%); color: #ff7a22; }
+.sc .s2 { clip-path: polygon(0 35%, 100% 35%, 100% 65%, 0 65%); color: #121317; }
+.sc .s3 { clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%); color: #ff7a22; }
+
+@media (max-width: 860px) {
+  .is-viva .p-head { padding-right: 30vw; }
+  .is-viva .lat-h { font-size: min(17vw, (100svh - 190px) / 4); }
+  /* el panel mide lo del prototipo (130vw) y el párrafo, una pantalla: js/lateral.js lo retiene mientras pasa su panel */
+  .is-viva .p-text { width: 130vw; }
+  .is-viva .lat-p { width: calc(100vw - 2 * var(--lat-g)); max-width: none; font-size: min(5vw, 5svh); }
+  .is-viva .p-list { width: 160vw; }
+  .is-viva .lat-list li { font-size: max(19px, min(10vw, (100svh - 150px) / 11)); }   /* 19 px en negrita: el gris sigue siendo AA */
+  .is-viva .lat-ondas { left: 40vw; right: auto; top: 68px; width: 60vw; height: max(48px, (100svh - 100vw) / 2 - 130px); }
+  .is-viva .p-band { width: 60vw; min-width: 0; }
+  .is-viva .p-band span { font-size: max(28px, 3.4vw); }
+}
+
+@media (max-height: 500px) {
+  .is-viva .lat-hint { display: none; }          /* apaisado: no cabe bajo el titular */
+}
+
+/* ---------- la cabecera sobre la sección ----------
+   Con la sección fija no sube nada por debajo del logo: sin fundido. Al soltarse, el fundido gris no pisa la franja. */
+.cabecera.is-lisa::before,
+.cabecera.is-lisa::after { opacity: 0 !important; transition: none; }
+.cabecera.is-franja::after { clip-path: inset(0 var(--franja, 0px) 0 0); }
+
+@media (prefers-reduced-motion: reduce) {
+  .lateral.se-ve .lat-hint b { animation: none; }
+}

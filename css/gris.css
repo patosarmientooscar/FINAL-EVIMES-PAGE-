@@ -1,7 +1,7 @@
 /* ==========================================================================
-   Panel gris (lo común): "Con quién trabajamos" (css/con-quien.css). Desde
-   backup-pre-ondas "Qué hacemos" también es gris, con su propio CSS
-   (css/que-hacemos.css, el mismo gris y las mismas líneas). La oficina
+   Panel gris (lo común): "Con quién trabajamos" (css/con-quien.css). El otro gris de
+   la home es la sección lateral, liso y con su propio CSS (css/lateral.css).
+   La oficina
    (oficina.html) usa css/oficina.css.
    ========================================================================== */
 .panel {
