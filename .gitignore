@@ -26,3 +26,7 @@ _archivo/
 .impeccable/
 .privado
 backup-*.zip
+
+# Grabación del vídeo de Disco (herramienta local: fotogramas y script no se publican)
+tools/frames/
+tools/record-disco.mjs
