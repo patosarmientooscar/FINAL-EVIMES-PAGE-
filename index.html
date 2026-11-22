@@ -99,8 +99,9 @@
   <!-- ===== Fondo: negro con la cuadrícula (.bg-grid) + grano. Desde backup-pre-ondas la home no lleva los tubos. ===== -->
   <div class="grano" aria-hidden="true"></div>
 
-  <!-- ===== Cabecera compacta (la misma en todas las páginas): Servicios · Planes · Contacto a la izquierda, EVIMES a la derecha ===== -->
+  <!-- ===== Cabecera (la misma en todas las páginas): EVIMES a la izquierda y los enlaces centrados en una píldora de cristal. En móvil, "Menú" a la derecha ===== -->
   <header class="cabecera">
+    <a class="cabecera__marca" href="#inicio" aria-label="Evimes, inicio">EVIMES</a>
     <button class="cabecera__abrir" type="button" aria-expanded="false" aria-controls="cabecera-nav">Menú</button>
     <nav class="cabecera__nav" id="cabecera-nav" aria-label="Principal">
       <ul>
@@ -109,7 +110,6 @@
         <li><a href="contacto.html" data-scramble><span class="sl" data-c="inicio.menu.contacto">Contacto</span></a></li>
       </ul>
     </nav>
-    <a class="cabecera__marca" href="#inicio" aria-label="Evimes, inicio">EVIMES</a>
   </header>
 
   <main id="contenido">
@@ -118,7 +118,9 @@
          El H1 es texto HTML, visible desde el primer fotograma (el LCP). .portada__escena es el ancla
          de las ondas (js/ondas.js): forman la firma al cargar y a los 2,6 s pasan a la hélice (js/home.js).
          Las cifras de Disco son las REALES de PageSpeed (js/data/pagespeed.js). Estilos: css/home.css -->
-    <section class="portada" id="inicio" aria-labelledby="h1">
+    <section class="portada" id="inicio" aria-labelledby="h1" data-red>
+      <!-- La red (js/red.js mete aquí su canvas). Hasta el primer gesto, o sin WebGL, la misma cuadrícula en CSS. -->
+      <div class="red-capa" aria-hidden="true"><div class="bg-grid"></div></div>
       <p class="portada__meta portada__entra"><span>Estudio de diseño web<span class="lg"> · Madrid</span></span><span>Agencias creativas y negocios locales</span><span><span class="lg">Webs </span>desde 150&nbsp;€</span></p>
       <h1 class="portada__h1" id="h1"><span>Diseño web</span><span class="r">en Madrid<span class="punto">.</span></span></h1>
       <div class="portada__escena" id="heroStage" data-ondas="firma" data-ondas-scale="1.05" aria-hidden="true"></div>

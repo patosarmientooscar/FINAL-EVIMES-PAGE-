@@ -1,8 +1,8 @@
 /* ==========================================================================
    home.js — la home. Un único bucle: gsap.ticker.
      1. Lenis.raf                 (prioritario)
-     2. tick(): scroll → cabecera (con velo al bajar; clara sobre el gris)
-     3. las dos ondas (js/ondas.js, su propio callback en el mismo ticker)
+     2. tick(): scroll → cabecera (fundido al bajar; clara sobre el gris)
+     3. las dos ondas y la red del hero (js/ondas.js, js/red.js: cada una su callback en el mismo ticker)
    Desde backup-pre-ondas la home no lleva los tubos (js/fondo/onda.js sigue en
    las demás páginas): las ondas se importan con import() en un momento libre
    tras el primer pintado. Versión fija (EV.mode === 'still'): sin Lenis; con
@@ -203,6 +203,8 @@
     if (EV.lenta || /[?&]modo=fijo/.test(location.search)) return;     // ahorro de datos / 2G-3G / versión fija forzada
     if (EV.mode !== 'cine' && !EV.reducedMotion) return;
     var go = function () {
+      // la red del hero: solo escucha; su WebGL espera al primer gesto sobre el hero
+      if (cine) import('./red.js').catch(function (e) { console.warn('[red] no carga', e); });
       import('./ondas.js').then(function (m) { return m.listo; }).then(function (api) {
         if (!api || EV.reducedMotion) return;
         var escena = document.getElementById('heroStage');

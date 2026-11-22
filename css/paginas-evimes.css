@@ -9,11 +9,6 @@
 .pag h1, .pag h2, .pag h3, .pag .display { text-wrap: balance; }
 .pag p:not(.display) { text-wrap: pretty; }
 
-/* menú: la página actual */
-.cabecera__nav a[aria-current="page"] { color: var(--stone); }
-.cabecera__nav a[aria-current="page"]::after { content: ""; display: inline-block; width: 5px; height: 5px; margin-left: 8px; border-radius: 50%; background: var(--cyan); vertical-align: middle; }
-.cabecera.is-clara .cabecera__nav a[aria-current="page"] { color: var(--tinta-oscura); }
-
 /* ---------- cabecera de página ---------- */
 .pag-hero { min-height: 88vh; min-height: 88svh; display: flex; flex-direction: column; justify-content: flex-end; padding: clamp(140px, 22vh, 220px) var(--g) clamp(64px, 10vh, 120px); }
 .pag-hero__etiqueta { font-size: 13px; letter-spacing: .18em; text-transform: uppercase; color: var(--texto-2); }

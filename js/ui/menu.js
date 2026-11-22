@@ -1,8 +1,8 @@
 /* ==========================================================================
-   ui/menu.js — la cabecera compacta en las páginas de texto (legales): abre y
-   cierra el menú móvil ("Menú") y pone el velo oscuro al hacer scroll
-   (is-scroll). En la home y en las páginas con el fondo global lo hacen
-   js/home.js y js/fondo/fondo.js.
+   ui/menu.js — la cabecera en las páginas de texto (legales): abre y cierra
+   el menú móvil ("Menú") y pone is-scroll (el fundido bajo la cabecera). En la
+   home y en las páginas con el fondo global lo hacen js/home.js y
+   js/fondo/fondo.js.
    ========================================================================== */
 (function () {
   var cab = document.querySelector('.cabecera');

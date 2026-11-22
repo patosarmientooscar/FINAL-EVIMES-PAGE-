@@ -112,67 +112,68 @@ input, textarea { caret-color: var(--cyan); }
 }
 
 /* ==========================================================================
-   Cabecera compacta: la misma en todas las páginas (desde backup-con-proyectos)
-   Barra fija de 56 px (52 en móvil). Servicios · Planes · Contacto a la
-   izquierda; EVIMES a la derecha, enlaza a la home. Transparente arriba; al
-   hacer scroll, velo oscuro (is-scroll); sobre las secciones grises, velo
-   claro y tinta (is-clara). Las clases las ponen js/home.js, js/fondo/fondo.js
-   y, en las páginas legales, js/ui/menu.js. En móvil: "Menú" a la izquierda y
-   la lista se despliega debajo de la barra.
+   Cabecera: la misma en todas las páginas (desde backup-pre-red; prototipo
+   Downloads/evimes-hero-red). 64 px, sin barra. EVIMES a la izquierda;
+   Servicios · Planes · Contacto centrados en la pantalla dentro de una píldora
+   de cristal oscuro con grano de tiza. En móvil, "Menú" a la derecha en una
+   píldora igual y la lista desplegada en el mismo cristal.
+   Sobre el gris (is-clara, la ponen js/home.js y js/fondo/fondo.js) el logo
+   pasa a tinta y la píldora se sigue viendo igual de oscura: como el fondo al
+   .52 sobre #e6e4df daba un gris medio (2,6:1 con los enlaces), ahí el cristal
+   oscurece lo que tiene detrás.
+   Con scroll (is-scroll, la ponen los mismos JS y js/ui/menu.js) lo que sube
+   se funde en el color del fondo antes de llegar al logo: sin eso, titulares y
+   formulario le pasaban por encima y no se leía. Sobre fondo liso no se ve.
+   La tiza y la sombra de la píldora van HORNEADAS (no volver a ponerlas en
+   vivo): el feTurbulence del SVG y la box-shadow desenfocada sobre el cristal
+   costaban ~200 ms de GPU en el primer pintado y bloqueaban el hilo principal
+   (TBT de escritorio 189 → 801 ms).
+     · assets/img/tiza.png: el SVG de ruido del prototipo, tal cual, a 120 px.
+     · assets/img/pildora-sombra.png: inset 0 1px 0 rgba(255,255,255,.06) +
+       0 10px 30px -12px rgba(0,0,0,.6) de una píldora de 88 × 46, a 2x
+       (márgenes 10 · 20 · 36 · 20), montada en 9 trozos con border-image.
    ========================================================================== */
 .cabecera {
-  --cab-h: 56px;
-  box-sizing: border-box;                  /* el borde inferior va dentro de los 56 px (las páginas legales no tienen el reset de la home) */
+  --cab-h: 64px;
   --cab-g: clamp(16px, 4vw, 56px);
+  --cab-sat: env(safe-area-inset-top, 0px);
+  --cristal: blur(16px) saturate(140%);
+  box-sizing: border-box;                  /* las páginas legales no tienen el reset de la home */
   position: fixed;
   inset: 0 0 auto 0;
   z-index: var(--z-header);
-  height: calc(var(--cab-h) + env(safe-area-inset-top, 0px));
-  padding: env(safe-area-inset-top, 0px) var(--cab-g) 0;
+  height: calc(var(--cab-h) + var(--cab-sat));
+  padding: var(--cab-sat) var(--cab-g) 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
   color: var(--stone);
   font-family: var(--font-text);
-  border-bottom: 1px solid transparent;
-  transition: background-color .4s cubic-bezier(.2,.75,.15,1), border-color .4s cubic-bezier(.2,.75,.15,1), color .4s cubic-bezier(.2,.75,.15,1);
+  pointer-events: none;                    /* la franja es transparente: solo se pulsan el logo y la píldora */
 }
-.cabecera.is-scroll,
-.cabecera.is-abierta {
-  background: rgb(11 12 15 / .8);
-  border-bottom-color: rgb(236 230 219 / .07);
-  -webkit-backdrop-filter: blur(12px) saturate(140%);
-  backdrop-filter: blur(12px) saturate(140%);
+.cabecera.is-clara { color: var(--tinta-oscura); }
+.cabecera::before,
+.cabecera::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: -1;
+  height: calc(var(--cab-h) + var(--cab-sat) + 20px);
+  background: linear-gradient(rgb(var(--velo) / .97) 0 calc(100% - 40px), rgb(var(--velo) / .6) calc(100% - 20px), rgb(var(--velo) / 0));
+  opacity: 0;
+  visibility: hidden;                      /* arriba del todo ni se pintan */
+  transition: opacity .25s cubic-bezier(.2,.75,.15,1), visibility 0s linear .25s;
 }
-.cabecera.is-clara {
-  color: var(--tinta-oscura);
-  background: rgb(246 245 242 / .86);
-  border-bottom-color: rgb(11 15 26 / .08);
-  -webkit-backdrop-filter: blur(12px) saturate(140%);
-  backdrop-filter: blur(12px) saturate(140%);
-}
-.cabecera__nav ul { display: flex; gap: 26px; margin: 0; padding: 0; list-style: none; }
-.cabecera__nav a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 40px;
-  font-size: 13.5px;
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: .01em;
-  color: rgb(233 227 216 / .62);
-  text-decoration: none;
-  transition: color .3s cubic-bezier(.2,.75,.15,1);
-}
-.cabecera__nav a:hover { color: var(--stone); }
-.cabecera.is-clara .cabecera__nav a { color: rgb(11 15 26 / .66); }
-.cabecera.is-clara .cabecera__nav a:hover { color: var(--tinta-oscura); }
+.cabecera.is-scroll::before,
+.cabecera.is-scroll::after { visibility: visible; transition-delay: 0s; }
+.cabecera::before { --velo: 11 12 15; }      /* el negro de la página */
+.cabecera::after { --velo: 230 228 223; }    /* el gris (#e6e4df) */
+.cabecera.is-scroll:not(.is-clara)::before,
+.cabecera.is-scroll.is-clara::after { opacity: 1; }
 .cabecera__marca {
   display: inline-flex;
   align-items: center;
-  min-height: 40px;
-  margin-right: -.34em;                    /* el último espaciado no cuenta: la marca toca el margen */
+  min-height: 44px;
   font-family: "Libre Baskerville", Georgia, serif;
   font-size: 13px;
   font-weight: 400;
@@ -180,44 +181,112 @@ input, textarea { caret-color: var(--cyan); }
   letter-spacing: .34em;
   color: inherit;
   text-decoration: none;
+  pointer-events: auto;
+  transition: color .3s cubic-bezier(.2,.75,.15,1);
 }
+
+/* el cristal: la píldora de los enlaces y la de "Menú" */
+.cabecera__nav,
+.cabecera__abrir {
+  box-sizing: border-box;
+  isolation: isolate;
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 999px;
+  background: rgba(18,19,23,.52);
+  -webkit-backdrop-filter: var(--cristal);
+  backdrop-filter: var(--cristal);
+  color: #ecebe7;
+  pointer-events: auto;
+}
+.cabecera.is-clara { --cristal: blur(16px) saturate(140%) brightness(.15); }
+.cabecera__nav::before,
+.cabecera__abrir::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: url("../assets/img/tiza.png");
+  opacity: .22;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+/* sombra interior fina y exterior suave */
+.cabecera__nav::after,
+.cabecera__abrir::after {
+  content: "";
+  position: absolute;
+  inset: -11px -21px -37px;                /* los márgenes del PNG + 1 px del borde */
+  z-index: -1;
+  box-sizing: border-box;
+  border: 0 solid transparent;
+  border-image: url("../assets/img/pildora-sombra.png") 64 84 116 84 / 32px 42px 58px 42px stretch;
+  pointer-events: none;
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .cabecera__nav, .cabecera__abrir { background: rgba(18,19,23,.94); }
+}
+
+.cabecera__nav {
+  position: absolute;
+  top: calc(var(--cab-sat) + 10px);
+  left: 0;
+  right: 0;
+  width: fit-content;
+  margin-inline: auto;                     /* centrado en la pantalla, sin transform (texto nítido) */
+  padding: 4px;
+}
+.cabecera__nav ul { display: flex; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.cabecera__nav li { margin: 0; padding: 0; }
+.cabecera__nav a {
+  display: flex;
+  align-items: center;
+  padding: 9px 16px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 16px;
+  color: rgba(236,235,231,.72);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color .3s cubic-bezier(.2,.75,.15,1), background-color .3s cubic-bezier(.2,.75,.15,1);
+}
+.cabecera__nav a:hover { color: #fff; background: rgba(255,255,255,.07); }
+.cabecera__nav a[aria-current="page"] { color: #fff; background: rgba(255,255,255,.1); }
 .cabecera__abrir { display: none; }
 .cabecera a:focus-visible,
-.cabecera button:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; border-radius: 4px; }
+.cabecera button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.cabecera__marca:focus-visible { outline-offset: 4px; border-radius: 4px; }
+.cabecera.is-clara .cabecera__abrir:focus-visible { outline-color: var(--tinta-oscura); }   /* el anillo cae sobre el gris */
+
 @media (max-width: 860px) {
-  .cabecera { --cab-h: 52px; }
   .cabecera__abrir {
+    position: relative;
     display: inline-flex;
     align-items: center;
     min-height: 44px;
-    padding: 0;
-    border: 0;
-    background: none;
-    color: inherit;
+    padding: 0 20px;
     font: 500 13.5px / 1 var(--font-text);
-    letter-spacing: .01em;
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
   }
   .cabecera__nav {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    padding: 4px var(--cab-g) 16px;
-    background: rgb(11 12 15 / .97);
-    border-bottom: 1px solid rgb(236 230 219 / .07);
+    top: calc(var(--cab-h) + var(--cab-sat));
+    left: auto;
+    right: var(--cab-g);
+    width: min(240px, calc(100% - 2 * var(--cab-g)));
+    margin: 0;
+    border-radius: 22px;                   /* el de la sombra horneada */
     opacity: 0;
     visibility: hidden;
     transform: translateY(-6px);
     transition: opacity .3s cubic-bezier(.2,.75,.15,1), transform .4s cubic-bezier(.2,.75,.15,1), visibility 0s linear .4s;
   }
   .cabecera.is-abierta .cabecera__nav { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
-  .cabecera__nav ul { flex-direction: column; gap: 0; }
-  .cabecera__nav a { width: 100%; min-height: 48px; font-size: 16px; color: var(--stone); }
-  .cabecera.is-clara .cabecera__nav { background: rgb(246 245 242 / .97); border-bottom-color: rgb(11 15 26 / .08); }
-  .cabecera.is-clara .cabecera__nav a { color: var(--tinta-oscura); }
+  .cabecera__nav ul { flex-direction: column; }
+  .cabecera__nav a { min-height: 48px; box-sizing: border-box; border-radius: 18px; font-size: 16px; color: #ecebe7; }
 }
-@media (prefers-reduced-motion: reduce) { .cabecera, .cabecera__nav { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .cabecera::before, .cabecera::after, .cabecera__marca, .cabecera__nav, .cabecera__nav a { transition: none; } }
 
 /* ==========================================================================
    Movimiento reducido
@@ -258,6 +327,6 @@ input, textarea { caret-color: var(--cyan); }
 .con-luz--sutil::after { opacity: .2; }
 @media (prefers-reduced-motion: reduce) { .con-luz::before, .con-luz::after { animation: none; --angle: 210deg; } }
 
-/* Anclas: la cabecera (56 px; 52 en móvil) + 16 px no tapan el título de la sección. */
-:where(main, footer) :where(section, article, div, header)[id] { scroll-margin-top: 72px; }
-@media (max-width: 860px) { :where(main, footer) :where(section, article, div, header)[id] { scroll-margin-top: 68px; } }
+/* Anclas: la cabecera (64 px) + 16 px no tapan el título de la sección. */
+:where(main, footer) :where(section, article, div, header)[id] { scroll-margin-top: 80px; }
+

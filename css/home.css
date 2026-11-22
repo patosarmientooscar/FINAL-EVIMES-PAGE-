@@ -64,7 +64,7 @@
 .pastilla--grande { min-height: 52px; padding: 0 26px; font-size: 15px; }
 .pastilla--linea { background: transparent; color: var(--stone); border-color: rgb(233 227 216 / 0.28); }
 .pastilla--linea:hover { background: rgb(233 227 216 / 0.06); border-color: rgb(233 227 216 / 0.6); }
-.pastilla:focus-visible, .enlace:focus-visible, .cabecera a:focus-visible, .cabecera button:focus-visible, .pie a:focus-visible {
+.pastilla:focus-visible, .enlace:focus-visible, .pie a:focus-visible {
   outline: 2px solid var(--cyan);
   outline-offset: 3px;
 }
@@ -112,6 +112,18 @@
   overflow: clip;
   color: var(--h-ink);
 }
+/* La red (js/red.js), al fondo del hero: z-index 0, bajo el H1 (2), las ondas (5) y los textos (6).
+   Es fija a la ventana, como .bg-grid, y .red-capa la recorta al hero (clip-path sí recorta lo fijo;
+   overflow no): la costura con la cuadrícula de la página coincide a cualquier altura de scroll.
+   Tapa la cuadrícula global con el negro y hasta el primer gesto enseña una copia idéntica. */
+.portada[data-red] {
+  background: #0b0c0f;
+  touch-action: pan-y pinch-zoom;               /* arrastrar en horizontal mueve la red; en vertical, scroll */
+}
+.red-capa { position: absolute; inset: 0; z-index: 0; clip-path: inset(0); pointer-events: none; }
+.red-canvas { position: fixed; inset: 0; z-index: 0; display: block; width: 100%; height: 100%; opacity: 0; }
+.red-capa.is-viva .red-canvas { opacity: 1; }
+.red-capa.is-viva .bg-grid { visibility: hidden; }
 .portada__meta {
   position: absolute;
   z-index: 6;
