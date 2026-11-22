@@ -137,7 +137,6 @@ input, textarea { caret-color: var(--cyan); }
   --cab-h: 64px;
   --cab-g: clamp(16px, 4vw, 56px);
   --cab-sat: env(safe-area-inset-top, 0px);
-  --cristal: blur(16px) saturate(140%);
   box-sizing: border-box;                  /* las páginas legales no tienen el reset de la home */
   position: fixed;
   inset: 0 0 auto 0;
@@ -193,12 +192,16 @@ input, textarea { caret-color: var(--cyan); }
   border: 1px solid rgba(255,255,255,.09);
   border-radius: 999px;
   background: rgba(18,19,23,.52);
-  -webkit-backdrop-filter: var(--cristal);
-  backdrop-filter: var(--cristal);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);   /* literal: Safari <= 17 no admite var() aquí */
+  backdrop-filter: blur(16px) saturate(140%);
   color: #ecebe7;
   pointer-events: auto;
 }
-.cabecera.is-clara { --cristal: blur(16px) saturate(140%) brightness(.15); }
+.cabecera.is-clara .cabecera__nav,
+.cabecera.is-clara .cabecera__abrir {
+  -webkit-backdrop-filter: blur(16px) saturate(140%) brightness(.15);
+  backdrop-filter: blur(16px) saturate(140%) brightness(.15);
+}
 .cabecera__nav::before,
 .cabecera__abrir::before {
   content: "";
