@@ -1,6 +1,9 @@
 /* ==========================================================================
-   trabajo-selecto.js — "Trabajo selecto" (home, en negro): la web de Disco
-   en la pantalla de un portátil 3D apoyado sobre un bloque de hormigón.
+   trabajo-selecto.js — el caso de Disco en #para-quien (pestaña "Agencias
+   creativas", desde backup-pre-fusion; antes, la sección "Trabajo selecto"): la
+   web de Disco en la pantalla de un portátil 3D sobre un bloque de hormigón.
+   · Con su pestaña oculta no pinta. Gira con EV.giroCaso (-6° → 0° al cruzar
+     la pantalla, lo pone js/para-quien.js), sumado al parallax del ratón.
    · Three.js 0.160.0 (la MISMA URL que la onda y el bento, vía el import map
      de index.html) + RoundedBoxGeometry. Se importa y se crea el renderer
      cuando la sección entra en pantalla (IntersectionObserver); fuera de
@@ -184,11 +187,18 @@ async function montar(THREE, RoundedBoxGeometry, heroImg) {
       ty = Math.max(-1, Math.min(1, ((e.clientY - r.top) / r.height) * 2 - 1));
     }, { passive: true });
   }
+  // con la pestaña de Disco oculta no se pinta; al volver, un fotograma nuevo
+  const panel = raiz.closest('[role="tabpanel"]');
+  if (panel) new MutationObserver(() => { if (!panel.hidden) sucio = true; }).observe(panel, { attributes: true, attributeFilter: ['hidden'] });
+  let giro = 0;
   const paso = (dt) => {
-    if (!visible) return;
+    if (!visible || (panel && panel.hidden)) return;
+    const g = EV.giroCaso || 0;
+    if (Math.abs(g - giro) > 1e-5) { giro = g; sucio = true; }
     const k = 1 - Math.pow(0.002, dt);                    // suave, igual a cualquier fps
     const ny = ry + (tx * 3 * GRADO - ry) * k, nx = rx + (ty * 3 * GRADO - rx) * k;   // ±3°
-    if (Math.abs(ny - ry) > 1e-5 || Math.abs(nx - rx) > 1e-5) { ry = ny; rx = nx; raizG.rotation.set(rx, ry, 0); sucio = true; }
+    if (Math.abs(ny - ry) > 1e-5 || Math.abs(nx - rx) > 1e-5) { ry = ny; rx = nx; sucio = true; }
+    if (sucio) raizG.rotation.set(rx, ry + giro, 0);
     if (sucio) pintar();
   };
   if (window.gsap) gsap.ticker.add((t, dms) => paso(Math.min(0.05, (dms || 16.7) / 1000)));

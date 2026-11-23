@@ -1,0 +1,226 @@
+/* ==========================================================================
+   para-quien.css — "Con quién trabajamos y nuestro trabajo" (#para-quien,
+   desde backup-pre-fusion). Gris liso, vertical, sin scroll secuestrado.
+   · Las pestañas: a todo el ancho, rectas, pegadas al borde de arriba y fijas
+     bajo la cabecera mientras se recorre la sección. El relleno oscuro se
+     desliza de una a otra (.45 s).
+   · Las dos opciones ocupan la misma celda (.pq-paneles): la oculta no se ve
+     ni se lee ([hidden] → visibility), y el alto es el de la más alta: cambiar
+     no mueve el scroll. js/para-quien.js iguala el alto de titulares y párrafos
+     para que la tarjeta del caso no salte de sitio.
+   · La tarjeta negra: el caso real (Disco en el portátil, Leon's en el móvil).
+   · .pq-vivo (lo pone js/para-quien.js): los estados de partida de las
+     animaciones. Sin JS o con movimiento reducido, todo se ve desde el principio.
+   ========================================================================== */
+.pq {
+  --pq-g: clamp(16px, 4vw, 56px);
+  --pq-tinta: #121317;
+  --pq-2: rgb(18 19 23 / .64);
+  --pq-linea: rgb(18 19 23 / .15);
+  --pq-ease: cubic-bezier(.2, .75, .15, 1);
+  position: relative;
+  z-index: 1;                                   /* bajo #lateral (la persiana) y bajo el canvas de las ondas (5) */
+  padding-top: calc(64px + env(safe-area-inset-top, 0px));   /* la franja de la cabecera: las pestañas van justo debajo */
+  background: var(--gris);
+  color: var(--pq-tinta);
+  font-family: "Schibsted Lateral", var(--font-text);
+}
+.pq :where(h3, h4, p, ul) { margin: 0; }
+.pq :focus-visible { outline: 2px solid var(--pq-tinta); outline-offset: 3px; }
+.pq:focus { outline: none; }
+
+/* ---------- las pestañas ---------- */
+.pq-pestanas {
+  position: sticky;
+  top: calc(64px + env(safe-area-inset-top, 0px));
+  z-index: 3;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 52px;
+  background: var(--gris);
+  border-top: 1px solid var(--pq-linea);
+  border-bottom: 1px solid var(--pq-linea);
+}
+.pq-pestanas::after { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--pq-linea); }
+.pq-pestanas__relleno {
+  position: absolute;
+  inset: -1px auto -1px 0;
+  width: 50%;
+  background: var(--pq-tinta);
+  transition: transform .45s var(--pq-ease);
+}
+.pq-pestanas[data-v="1"] .pq-pestanas__relleno { transform: translateX(100%); }
+.pq-pestanas__b {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 0;
+  appearance: none;
+  background: none;
+  font: 600 12.5px / 1 var(--font-text);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgb(18 19 23 / .6);
+  cursor: pointer;
+  transition: color .3s var(--pq-ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.pq-pestanas__b:hover { color: rgb(18 19 23 / .85); }
+.pq-pestanas__b[aria-selected="true"] { color: #ecebe7; }
+.pq-pestanas__b:focus-visible { outline-offset: -4px; }
+.pq-pestanas__b[aria-selected="true"]:focus-visible { outline-color: #ecebe7; }
+/* sin JS no hay pestañas: se ven las dos opciones, una debajo de otra */
+.pq:not(.pq-viva) .pq-pestanas { display: none; }
+
+/* ---------- el cuerpo ---------- */
+.pq-cuerpo { position: relative; padding: clamp(72px, 12vh, 136px) var(--pq-g) clamp(96px, 16vh, 168px); }
+.pq-paneles { display: grid; }
+.pq-panel { grid-area: 1 / 1; display: flex; flex-direction: column; }
+.pq-panel:focus { outline: none; }
+.pq:not(.pq-viva) .pq-panel { grid-area: auto; }
+.pq:not(.pq-viva) .pq-panel + .pq-panel { margin-top: clamp(96px, 16vh, 168px); }
+/* la que no toca: en su sitio, invisible y fuera del árbol de accesibilidad */
+.pq .pq-panel[hidden] { display: flex !important; visibility: hidden; transition: visibility 0s linear .35s; }
+.pq .pq-panel { transition: visibility 0s linear 0s; }
+/* el párrafo y los puntos se cruzan con un fundido al cambiar de pestaña (el titular se reescribe; la tarjeta, con el barrido) */
+.pq-p, .pq-puntos { transition: opacity .35s var(--pq-ease); }
+.pq-panel[hidden] .pq-p, .pq-panel[hidden] .pq-puntos { opacity: 0; }
+.pq-panel[hidden] .pq-caso, .pq-panel[hidden] .pq-h { visibility: hidden; }
+
+.pq-h {
+  max-width: 9.4em;
+  font-family: inherit;
+  font-size: clamp(52px, 7.6vw, 128px);
+  font-weight: 800;
+  line-height: .95;
+  letter-spacing: -.045em;
+  text-transform: uppercase;
+  text-wrap: wrap;
+}
+.pq-p {
+  max-width: 34em;
+  margin-top: clamp(32px, 5vh, 48px) !important;
+  font-family: var(--font-text);
+  font-size: clamp(18px, 1.45vw, 22px);
+  font-weight: 500;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+.pq-puntos {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0 clamp(16px, 2vw, 32px);
+  margin-top: clamp(56px, 9vh, 88px) !important;
+  padding: 0;
+  list-style: none;
+}
+.pq-puntos li { position: relative; padding-top: 18px; }
+.pq-puntos__linea { position: absolute; left: 0; right: 0; top: 0; height: 1px; background: var(--pq-tinta); transform-origin: left; }
+.pq-puntos__t { display: block; font: 600 14px / 1.35 var(--font-text); letter-spacing: .1em; text-transform: uppercase; }
+
+/* ---------- la tarjeta negra del caso ---------- */
+.pq-caso {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  align-items: center;
+  gap: clamp(24px, 3vw, 56px);
+  margin-top: clamp(56px, 9vh, 96px);
+  padding: clamp(14px, 1.4vw, 22px) clamp(28px, 3.6vw, 64px) clamp(14px, 1.4vw, 22px) clamp(14px, 1.4vw, 22px);
+  overflow: hidden;
+  border-radius: 20px;
+  background: #141518;
+  color: var(--stone);
+}
+.pq-caso__visual { position: relative; overflow: hidden; border-radius: 12px; }
+.pq-caso__nombre { font-family: var(--display); font-weight: 560; font-variation-settings: "opsz" 144; font-size: clamp(32px, 3vw, 52px); line-height: 1; letter-spacing: -.025em; color: #f4f1ea; }
+.pq-caso__linea { max-width: 34ch; margin-top: 14px !important; font-family: var(--font-text); font-size: clamp(15px, 1.1vw, 17px); line-height: 1.55; color: var(--ink-muted); }
+.pq-caso__datos { margin-top: clamp(28px, 4vh, 40px); }
+.pq-caso__fuente { margin-top: 16px !important; font-family: var(--font-text); font-size: 13px; color: var(--ink-faint); }
+.pq-caso__enlace { margin-top: clamp(20px, 3vh, 32px); font-family: var(--font-text); }
+.pq-caso .enlace:focus-visible { outline: 2px solid var(--stone); outline-offset: 3px; }
+
+/* el móvil fijo (sin WebGL o con movimiento reducido): la misma captura en un marco */
+.pq-caso__movil { display: grid; place-items: center; }
+.pq-movil-fijo {
+  position: absolute;
+  top: 7%;
+  bottom: 7%;
+  left: 50%;
+  aspect-ratio: 390 / 844;
+  transform: translateX(-50%);
+  overflow: hidden;
+  border: 7px solid #202125;
+  border-radius: 34px;
+  background: #000;
+  box-shadow: 0 30px 60px -30px rgb(0 0 0 / .8);
+  transition: opacity .6s var(--ease);
+}
+.pq-movil-fijo img { width: 100%; height: 100%; max-width: none; object-fit: cover; display: block; }
+.ts-card__escena.is-viva > .pq-movil-fijo { opacity: 0; }
+
+/* el barrido al cambiar de pestaña: tres franjas horizontales cruzan la tarjeta */
+.pq-barrido { position: absolute; inset: 0; z-index: 2; display: grid; grid-template-rows: repeat(3, 1fr); pointer-events: none; }
+.pq-barrido i { display: block; transform: translateX(-101%); }
+.pq-barrido i:nth-child(1), .pq-barrido i:nth-child(3) { background: #ff7a22; }
+.pq-barrido i:nth-child(2) { background: var(--gris); }
+.pq-caso.barre .pq-barrido i { animation: pq-barre .5s cubic-bezier(.65, 0, .35, 1) both; }
+.pq-caso.barre .pq-barrido i:nth-child(2) { animation-delay: .04s; }
+.pq-caso.barre .pq-barrido i:nth-child(3) { animation-delay: .08s; }
+@keyframes pq-barre { 0% { transform: translateX(-101%); } 45%, 55% { transform: none; } 100% { transform: translateX(101%); } }
+
+/* ---------- el cierre ---------- */
+.pq-cierre { margin-top: clamp(48px, 8vh, 80px); }
+.pq-boton {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 0 26px;
+  border-radius: 999px;
+  background: var(--pq-tinta);
+  color: #ecebe7;
+  font: 600 14px / 1 var(--font-text);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform .4s var(--pq-ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.pq-boton svg { flex: none; width: 13px; height: 12px; fill: none; stroke: currentColor; stroke-width: 10; transition: transform .4s var(--pq-ease); }
+.pq-boton:hover { transform: translateY(-2px); }
+.pq-boton:hover svg { transform: translateX(4px); }
+.pq-boton:active { transform: scale(.98); }
+
+/* ---------- las ondas: en el hueco a la derecha del titular ---------- */
+.pq-ondas { position: absolute; top: calc(clamp(72px, 12vh, 136px) + clamp(52px, 7.6vw, 128px) * .55); right: var(--pq-g); width: 26vw; height: calc(clamp(52px, 7.6vw, 128px) * 2.2); pointer-events: none; }
+
+/* ---------- la cabecera sobre la sección: con las pestañas fijas, la franja de arriba es gris y lisa ---------- */
+.cabecera.is-pestanas::after { height: calc(var(--cab-h) + var(--cab-sat)); background: rgb(230 228 223); }
+
+/* ---------- las animaciones (solo con .pq-vivo; js/para-quien.js) ---------- */
+.pq-vivo .pq-puntos__linea { transform: scaleX(0); }
+.pq-vivo .pq-puntos__t { opacity: 0; }
+.pq-vivo .pq-caso { clip-path: inset(100% 0 0 0); }
+
+@media (max-width: 860px) {
+  .pq-pestanas__b { padding: 0 8px; font-size: 12px; letter-spacing: .1em; }
+  .pq-cuerpo { padding-top: 132px; }
+  /* 13vw, salvo que la palabra más larga ("CONSTRUIMOS.", 7,8 em) no quepa: nunca se corta */
+  .pq-h { font-size: min(13vw, (100vw - 2 * var(--pq-g)) / 7.8); max-width: none; }
+  .pq-puntos { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 20px; }
+  .pq-caso { grid-template-columns: minmax(0, 1fr); gap: 24px; padding: 12px 12px 28px; }
+  .pq-caso__texto { padding: 0 12px; }
+  .pq-caso .ts-psi { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .pq-ondas { top: 40px; right: auto; left: 18vw; width: 64vw; height: 84px; }
+}
+@media (max-width: 370px) {
+  .pq-pestanas__b { letter-spacing: .06em; font-size: 11.5px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pq-pestanas__relleno, .pq-pestanas__b, .pq-boton, .pq-boton svg, .pq-p, .pq-puntos, .pq-movil-fijo { transition: none; }
+  .pq .pq-panel[hidden] { transition: none; }
+}
