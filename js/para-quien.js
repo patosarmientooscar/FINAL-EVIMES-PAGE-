@@ -56,6 +56,9 @@
   var C = 339.292;                                // el perímetro de los anillos (r 54)
 
   var botones = $$('.pq-aud'), frase = sec.querySelector('.pq-switch');
+  // el interruptor pequeño encima de cada ventana (uno por panel, sincronizados con la frase)
+  var segs = $$('.pq-seg'), radios = $$('.pq-seg__b');
+  var panelDe = function (el) { return el.closest('[data-aud]'); };
   var aud = 'ag', pendiente = null;
 
   sec.classList.add('pq-viva');
@@ -83,14 +86,25 @@
   var swap = 1, meta = 1;                         // 1: escrito y abierto · 0: borrado y cerrado (el cambio)
   function aplicar(n) {
     aud = n; pendiente = null;
+    var foco = document.activeElement;
     Object.keys(auds).forEach(function (k) { auds[k].panel.hidden = k !== n; });
+    // el foco estaba en el interruptor del panel que se va: pasa al mismo botón del que entra
+    if (foco && radios.indexOf(foco) >= 0) {
+      var otro = radios.filter(function (r) { return panelDe(r).dataset.aud === n && r.dataset.for === foco.dataset.for; })[0];
+      if (otro) otro.focus({ preventScroll: true });
+    }
     sec.dataset.active = n;
     if (EV.home && EV.home.lenis) EV.home.lenis.resize();
     sucio = true;
   }
   function elegir(n, foco) {
     botones.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.for === n)); });
-    if (foco) botones.filter(function (b) { return b.dataset.for === n; })[0].focus({ preventScroll: true });
+    segs.forEach(function (s) { s.dataset.on = n; });
+    radios.forEach(function (r) { var si = r.dataset.for === n; r.setAttribute('aria-checked', String(si)); r.tabIndex = si ? 0 : -1; });
+    if (foco === 'seg') {
+      var r = radios.filter(function (r) { return !panelDe(r).hidden && r.dataset.for === n; })[0];
+      if (r) r.focus({ preventScroll: true });
+    } else if (foco) botones.filter(function (b) { return b.dataset.for === n; })[0].focus({ preventScroll: true });
     if (n === (pendiente || aud)) return;
     tip.cambio();
     if (quieto) { aplicar(n); return; }
@@ -98,6 +112,14 @@
     pendiente = n; meta = 0;
   }
   botones.forEach(function (b) { b.addEventListener('click', function () { elegir(b.dataset.for); }); });
+  radios.forEach(function (r) { r.addEventListener('click', function () { elegir(r.dataset.for); }); });
+  segs.forEach(function (s) {
+    s.addEventListener('keydown', function (e) {
+      if (['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp'].indexOf(e.key) < 0) return;
+      e.preventDefault();
+      elegir((pendiente || aud) === 'ag' ? 'nl' : 'ag', 'seg');
+    });
+  });
   frase.addEventListener('keydown', function (e) {
     if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
     e.preventDefault();
@@ -215,8 +237,10 @@
     var titPlanes = document.querySelector('.planes__titulo'), letrasPlanes = null;
     var pon = {
       g: escritor(grande, 'transform'), gO: escritor(grande, 'opacity'), cO: escritor(chico, 'opacity'),
-      bO: escritor(banda, 'opacity'), cajaO: escritor(caja, 'opacity'), clip: escritor(gris, 'clipPath'), grisO: escritor(gris, 'opacity')
+      bO: escritor(banda, 'opacity'), cajaO: escritor(caja, 'opacity'), clip: escritor(gris, 'clipPath'), grisO: escritor(gris, 'opacity'),
+      audsO: escritor(sec.querySelector('.pq-auds'), 'opacity')
     };
+    var cerrando = false;
     var F = { top: 0, alto: 0, pin: 0, cx: 0, cy: 0, fs: 0 }, L = null, ponLat = null, k = 0, c = 0, visible = null, gr = null, os = null, ultima = null;
     function medir() {
       L = EV.lateralRelevo ? EV.lateralRelevo() : null;
@@ -254,8 +278,9 @@
       var e = io(k);
       c = quieto ? cm : c + (cm - c) * (1 - Math.exp(-dt * 9));
       if (Math.abs(cm - c) < 1e-4) c = cm;
-      // el título se va al empezar a cerrarse el gris
-      var vete = cl((y - (F.top - vh * .35)) / (vh * .3));
+      // el título se va al empezar a cerrarse el gris (con el contenido: desde backup-pre-ajustes-ondas el cierre empieza
+      // con el CTA a media pantalla y la ventana aún debajo de la franja)
+      var vete = quieto ? cl((y - (F.top - vh * .35)) / (vh * .3)) : cl(c / .26);
 
       var ve = (d > 0 || k > .002) && vete < 1;
       if (ve !== visible) { visible = ve; caja.classList.toggle('is-on', ve); }
@@ -277,6 +302,9 @@
       var v = (a * 50).toFixed(2), px = (a * .5).toFixed(2), lados = (b * 50).toFixed(2);
       pon.clip(c <= 0 ? 'none' : 'inset(calc(' + v + '% - ' + px + 'px) ' + lados + '% calc(' + v + '% - ' + px + 'px) ' + lados + '%)');
       pon.grisO(c <= 0 ? '' : (1 - b).toFixed(3));
+      // el contenido (por encima del pin) se va antes de que la franja gris lo deje fuera
+      pon.audsO(c <= 0 || quieto ? '' : (1 - cl(c / .26)).toFixed(3));
+      if ((c > .2) !== cerrando) { cerrando = c > .2; sec.classList.toggle('pq-cerrando', cerrando); }
       if (letrasPlanes) letrasPlanes.escribir(cl((c - .15) / .75));
       // la cabecera: oscura en cuanto el negro llega a su línea central, y mientras el cierre (ya negro) siga bajo ella
       bandera('cabeceraOscura', y >= F.top && y < F.top + F.alto && a * vh / 2 > 32);

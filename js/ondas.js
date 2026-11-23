@@ -7,8 +7,10 @@
    · Anclas: cada sección marca dónde viven las piezas con un elemento vacío
      [data-ondas="<movimiento>"] (+ data-ondas-scale y data-ondas-tempo opcionales:
      tempo .25 = el movimiento a un cuarto de velocidad). Movimientos:
-     firma, orbita, espejo, tijera, persecucion, intercambio, apilar, helice,
-     encaje, giroscopio. Un ancla puede cambiar el suyo con
+     orbita, espejo, tijera, persecucion, intercambio, apilar, helice, encaje,
+     giroscopio. NUNCA en línea (desde backup-pre-ajustes-ondas): ya no existe
+     "firma" (las dos piezas tumbadas y alineadas); arrancan en la hélice, el
+     clic no las junta y un nombre desconocido cae en la hélice. Un ancla puede cambiar el suyo con
      window.EvimesOndas.setStepMotion(el, nombre).
    · Lo carga js/home.js con import() en un momento libre tras el primer
      pintado. Montaje troceado (js/escenas.js → EV.gpu): la extrusión en
@@ -16,8 +18,8 @@
      shaders compilados antes y compileAsync antes del primer render.
    · Bucle: gsap.ticker (el único de la web). Parado con la pestaña oculta o
      cuando ningún ancla está cerca de la pantalla. pixelRatio ≤ 2 (1,5 en móvil).
-   · Movimiento reducido: quietas formando la firma (solo se recolocan con el
-     scroll, sin muelles, sin destello). Sin WebGL: no se muestra nada.
+   · Movimiento reducido: quietas en la pose de la hélice, una encima de la
+     otra (solo se recolocan con el scroll, sin muelles). Sin WebGL: no se muestra nada.
    ========================================================================== */
 import * as THREE from 'three';
 
@@ -112,19 +114,9 @@ async function montar() {
     const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(1.5, 6); return t;
   })();
 
-  /* light sweep: one band of light travels along the wave when the pieces lock into the logo */
-  function withSweep(mat) {
-    mat.onBeforeCompile = sh => {
-      sh.uniforms.uSweep = { value: 0 }; sh.uniforms.uSweepAmt = { value: 0 }; mat.userData.sh = sh;
-      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vWP;')
-        .replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\nvWP=(modelMatrix*vec4(transformed,1.)).xyz;');
-      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vWP;uniform float uSweep,uSweepAmt;')
-        .replace('#include <dithering_fragment>', 'float sw=exp(-pow((vWP.x-uSweep)*3.2,2.));gl_FragColor.rgb+=vec3(.9,.92,.95)*sw*uSweepAmt;\n#include <dithering_fragment>');
-    };
-    return mat;
-  }
-  const chrome = withSweep(new THREE.MeshPhysicalMaterial({ color: 0xffffff, vertexColors: true, metalness: 1, roughness: .09, clearcoat: .9, clearcoatRoughness: .05, envMapIntensity: 2 }));
-  const graph = withSweep(new THREE.MeshPhysicalMaterial({ color: 0xffffff, vertexColors: true, metalness: 1, roughness: .3, roughnessMap: brushed, bumpMap: brushed, bumpScale: .4, clearcoat: .7, clearcoatRoughness: .12, envMapIntensity: 1.6 }));
+  // (el destello que recorría la onda al formar la firma se quitó con la firma: "encaje" no se usa en la web)
+  const chrome = new THREE.MeshPhysicalMaterial({ color: 0xffffff, vertexColors: true, metalness: 1, roughness: .09, clearcoat: .9, clearcoatRoughness: .05, envMapIntensity: 2 });
+  const graph = new THREE.MeshPhysicalMaterial({ color: 0xffffff, vertexColors: true, metalness: 1, roughness: .3, roughnessMap: brushed, bumpMap: brushed, bumpScale: .4, clearcoat: .7, clearcoatRoughness: .12, envMapIntensity: 1.6 });
   const A = new THREE.Mesh(gA, chrome), B = new THREE.Mesh(gB, graph);
 
   /* gyroscope orbits */
@@ -151,7 +143,6 @@ async function montar() {
     return [p, new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(tg, y, z))];
   }
   const M = {
-    firma: t => { const g = .035 + .03 * (.5 - .5 * Math.cos(t * 1.4)); return [V(cA.x - g, cA.y, 0), E(.1, -.22 + Math.sin(t * .45) * .07, 0), V(cB.x + g, cB.y, 0), E(.1, -.22 + Math.sin(t * .45) * .07, 0)]; },
     orbita: t => { const a = t * .8, R = 1.15; return [V(Math.cos(a) * R, Math.sin(a) * R * .22, Math.sin(a) * R), E(.15, -a * .5, .08), V(-Math.cos(a) * R, -Math.sin(a) * R * .22, -Math.sin(a) * R), E(.15, -a * .5 + Math.PI, -.08)]; },
     espejo: t => { const o = ease(tri(t * .42)), sp = .25 + o * 1.0, r = o * .9; return [V(cA.x - sp, cA.y + o * .15, 0), E(0, -r, o * .18), V(cB.x + sp, cB.y + o * .15, 0), E(0, r, -o * .18)]; },
     tijera: t => { const o = .15 + .5 * (.5 - .5 * Math.cos(t * 1.3)); return [V(0, 0, .12), E(.1, -.2, o), V(0, 0, -.12), E(.1, -.2, -o + Math.PI)]; },
@@ -166,7 +157,7 @@ async function montar() {
     giroscopio: t => { const [pa, qa] = ringPose(n1, t * 3.0), [pb, qb] = ringPose(n2, t * 3.4 + 2.1); return [pa, qa, pb, qb, .68, 1]; },
   };
   function targetPose(name, t) {
-    const r = (M[name] || M.firma)(t);
+    const r = (M[name] || M.helice)(t);
     const q = x => x.isQuaternion ? x : new THREE.Quaternion().setFromEuler(x);
     return { pA: r[0], qA: q(r[1]), pB: r[2], qB: q(r[3]), s: r[4] ?? 1, rings: r[5] ?? 0 };
   }
@@ -174,7 +165,7 @@ async function montar() {
   /* ---------- anchors on the page ----------
      Un IntersectionObserver dice qué anclas están cerca de la pantalla (media pantalla de margen):
      solo esas se miden por fotograma; si no hay ninguna, el bucle se para. */
-  let anchors = [], stepMotion = null, stepEl = null, forceFirma = 0;
+  let anchors = [], stepMotion = null, stepEl = null;
   const cerca = new Set();
   const io = new IntersectionObserver(es => { es.forEach(e => { if (e.isIntersecting) cerca.add(e.target); else cerca.delete(e.target); }); }, { rootMargin: '50% 0px' });
   function collect() {
@@ -217,28 +208,21 @@ async function montar() {
     // con el dedo: al levantarlo, deja de apartarlas
     addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') mouse.on = false; }, { passive: true });
     addEventListener('pointercancel', () => { mouse.on = false; }, { passive: true });
-    addEventListener('click', e => {
-      // click near the pieces: they lock into the logo for a moment
-      const wpp = worldPerPx(), wx = (e.clientX - innerWidth / 2) * wpp, wy = -(e.clientY - innerHeight / 2) * wpp;
-      if (Math.hypot(wx - rig.position.x, wy - rig.position.y) < 1.6 * rig.scale.x) forceFirma = 2.6;
-    });
   }
 
   /* ---------- loop ---------- */
-  let T = 0, tempo = 1, lastFirma = false, sweepT = 1;
+  let T = 0, tempo = 1;
   let scale = 1, center = V(0, 0, 0), shadowOn = 0, primero = true, sucio = true, ultima = '';
   function size() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); sucio = true; }
   size(); addEventListener('resize', () => { size(); collect(); });
   function step(dt) {
-    forceFirma = Math.max(0, forceFirma - dt);
     const el = activeAnchor();
     // el ritmo del ancla (data-ondas-tempo), cambiado sin saltos: los muelles siguen a su velocidad
     const ritmo = (el && parseFloat(el.dataset.ondasTempo)) || 1;
     tempo += (ritmo - tempo) * (1 - Math.exp(-dt * 3));
     T += dt * tempo;
-    let name = (stepEl && el === stepEl && stepMotion) ? stepMotion : (el ? el.dataset.ondas : 'firma');
-    if (forceFirma > 0) name = 'firma';
-    if (reduce) name = 'firma';
+    let name = (stepEl && el === stepEl && stepMotion) ? stepMotion : (el ? el.dataset.ondas : 'helice');
+    if (reduce) name = 'helice';                       // quietas, una encima de la otra (nunca en línea)
     // anchor -> world centre and size
     const wpp = worldPerPx();
     if (el) {
@@ -265,12 +249,6 @@ async function montar() {
     ring1.scale.setScalar(R0); ring2.scale.setScalar(R0); ring1.quaternion.setFromUnitVectors(V(0, 0, 1), n1); ring2.quaternion.setFromUnitVectors(V(0, 0, 1), n2);
     rig.position.set(center.x, center.y, 0); rig.scale.setScalar(scale);
     rig.rotation.set(-mouse.y * .1, mouse.x * .16, 0);
-    // light sweep each time they lock into the logo
-    const isF = name === 'firma' && !reduce;
-    if (isF && !lastFirma) sweepT = -.6; lastFirma = isF;
-    sweepT = Math.min(1.6, sweepT + dt / 1.3);
-    const sx = center.x + (-2.2 + 4.4 * Math.max(0, Math.min(1, sweepT))) * scale, sa = sweepT > 0 && sweepT < 1 ? Math.sin(Math.PI * sweepT) * .55 : 0;
-    for (const m of [chrome, graph]) if (m.userData.sh) { m.userData.sh.uniforms.uSweep.value = sx; m.userData.sh.uniforms.uSweepAmt.value = sa; }
     // contact shadows on grey
     rig.updateMatrixWorld();
     for (const [sh, mesh] of [[shA, A], [shB, B]]) { const wp = mesh.getWorldPosition(V(0, 0, 0)); sh.position.set(wp.x, wp.y - .55 * scale, -.6); sh.scale.setScalar(scale * mesh.scale.x); }
@@ -278,10 +256,10 @@ async function montar() {
     return el;
   }
 
-  // start already locked in the logo
-  { const tp = targetPose('firma', 0); bA.p.copy(tp.pA); bA.q.copy(tp.qA); bB.p.copy(tp.pB); bB.q.copy(tp.qB); }
+  // arrancan ya en la hélice (una encima de la otra)
+  { const tp = targetPose('helice', 0); bA.p.copy(tp.pA); bA.q.copy(tp.qA); bB.p.copy(tp.pB); bB.q.copy(tp.qB); }
 
-  // shaders compilados en paralelo antes del primer render (con el sweep ya inyectado)
+  // shaders compilados en paralelo antes del primer render
   await renderer.compileAsync(scene, camera);
   await cede();
   // primer uso de cada programa y subida de cada malla, una pieza por tarea (el canvas aún no se ve):

@@ -176,31 +176,33 @@
   gap: 32px;
 }
 .portada__lede { max-width: 30ch; margin: 0; font-size: clamp(15px, 1.15vw, 18px); line-height: 1.5; color: var(--h-muted); }
-.portada__lado { display: flex; align-items: end; gap: 28px; }
-.portada__prueba { color: inherit; text-decoration: none; border-radius: 4px; }
-.portada__prueba small { display: block; font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--h-soft); }
-.portada__prueba b { display: block; margin-top: 6px; font-size: 15px; font-weight: 500; }
-.portada__prueba > span { display: flex; gap: 12px; margin-top: 4px; font-size: 13.5px; color: var(--h-muted); }
-.portada__prueba i { font-style: normal; color: var(--h-ink); }
+.portada__lado { display: flex; align-items: end; }
+/* El CTA (desde backup-pre-ajustes-ondas; sustituye a la prueba de Disco y a "Hablemos"): como los cierres de
+   #para-quien (.pq-cta), en blanco y más pequeño. Subrayado de .05em de izquierda a derecha y la flecha avanza. */
 .portada__cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 44px;
-  padding: 12px 20px;
-  border: 1px solid rgb(255 255 255 / .18);
-  border-radius: 999px;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1;
-  color: var(--h-ink);
-  text-decoration: none;
+  position: relative;
+  display: inline-block;
+  padding: 6px 0;
+  font-family: "Schibsted Lateral", var(--font-text);
+  font-size: clamp(22px, 2.4vw, 38px);
+  font-weight: 800;
+  letter-spacing: -.04em;
+  line-height: .95;
+  text-transform: uppercase;
   white-space: nowrap;
-  transition: background-color .35s cubic-bezier(.2, .75, .15, 1), color .35s cubic-bezier(.2, .75, .15, 1);
+  color: #fff;
+  text-decoration: none;
   -webkit-tap-highlight-color: transparent;
 }
-.portada__cta:hover { background: var(--h-ink); color: var(--navy); }
-.portada__cta:focus-visible, .portada__prueba:focus-visible { outline: 2px solid var(--cyan); outline-offset: 4px; }
+.portada__cta-f { display: inline-block; margin-left: .2em; transition: transform .5s cubic-bezier(.2, .75, .15, 1); }
+.portada__cta-f svg { display: block; width: .64em; height: .58em; fill: none; stroke: currentColor; stroke-width: 12; }
+.portada__cta::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: .05em; background: currentColor; transform: scaleX(0); transform-origin: left; transition: transform .7s cubic-bezier(.2, .75, .15, 1); }
+@media (hover: hover) {
+  .portada__cta:hover::after { transform: scaleX(1); }
+  .portada__cta:hover .portada__cta-f { transform: translateX(.18em); }
+}
+.portada__cta:focus-visible { outline: 2px solid var(--cyan); outline-offset: 4px; }
+@media (prefers-reduced-motion: reduce) { .portada__cta::after, .portada__cta-f { transition: none; } }
 /* Entrada (como el prototipo): datos, texto y prueba suben y aparecen. El H1, no: es el LCP. */
 .is-cine .portada__entra { opacity: 0; transform: translateY(14px); animation: portada-entra 1.1s cubic-bezier(.2, .75, .15, 1) forwards; }
 .is-cine .portada__meta.portada__entra { animation-delay: .1s; }
@@ -213,7 +215,7 @@
   .portada__h1 { top: 44%; font-size: clamp(54px, 17vw, 120px); line-height: .88; }
   .portada__escena { left: 8%; right: 8%; top: 14%; height: 26%; }
   .portada__pie { flex-direction: column; align-items: flex-start; bottom: 60px; gap: 22px; }
-  .portada__lado { width: 100%; justify-content: space-between; }
+  .portada__lado { width: 100%; }
 }
 
 /* ==========================================================================

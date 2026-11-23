@@ -6,7 +6,7 @@
    Desde backup-pre-ondas la home no lleva los tubos (js/fondo/onda.js sigue en
    las demás páginas): las ondas se importan con import() en un momento libre
    tras el primer pintado. Versión fija (EV.mode === 'still'): sin Lenis; con
-   movimiento reducido las ondas se quedan quietas en la firma; con ahorro de
+   movimiento reducido las ondas se quedan quietas en la hélice; con ahorro de
    datos o conexión lenta no se cargan.
    ========================================================================== */
 (function () {
@@ -208,8 +208,8 @@
 
   /* ---------- las dos ondas (js/ondas.js) ----------
      import() en el primer momento libre tras la carga (requestIdleCallback; sin él,
-     a los 1,5 s). El montaje va troceado (EV.gpu): no bloquea el hilo. Al aparecer,
-     forman la firma (con su destello) y a los 2,6 s el hero pasa a la hélice. */
+     a los 1,5 s). El montaje va troceado (EV.gpu): no bloquea el hilo. Aparecen ya en
+     la hélice lenta del hero (data-ondas-tempo); nunca en línea (sin "firma"). */
   function ondas() {
     if (!document.getElementById('ondas')) return;
     if (EV.lenta || /[?&]modo=fijo/.test(location.search)) return;     // ahorro de datos / 2G-3G / versión fija forzada
@@ -217,11 +217,7 @@
     var go = function () {
       // la red del hero: solo escucha; su WebGL espera al primer gesto sobre el hero
       if (cine) import('./red.js').catch(function (e) { console.warn('[red] no carga', e); });
-      import('./ondas.js').then(function (m) { return m.listo; }).then(function (api) {
-        if (!api || EV.reducedMotion) return;
-        var escena = document.getElementById('heroStage');
-        if (escena) setTimeout(function () { escena.dataset.ondas = 'helice'; }, 2600);
-      }).catch(function (e) { console.warn('[ondas] no cargan', e); });
+      import('./ondas.js').then(function (m) { return m.listo; }).catch(function (e) { console.warn('[ondas] no cargan', e); });
     };
     var enReposo = function () {
       if ('requestIdleCallback' in window) requestIdleCallback(go, { timeout: 3000 });

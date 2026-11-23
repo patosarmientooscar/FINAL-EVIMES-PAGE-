@@ -87,11 +87,11 @@ window.EVIMES_CONTENT = {
   // ===== Home nueva (index.html, fase onda). La oficina aparcada usa las claves de arriba. =====
   inicio: {
     menu: { servicios: 'Servicios', herramientas: 'Herramientas', planes: 'Planes', contacto: 'Contacto' },
-    // Hero (desde backup-pre-ondas). La línea de datos, el H1 ('Diseño web / en Madrid.') y la prueba de Disco
-    // (cifras reales de js/data/pagespeed.js) van escritos en index.html; aquí, lo que se enlaza con data-c.
+    // Hero (desde backup-pre-ondas). La línea de datos y el H1 ('Diseño web / en Madrid.') van escritos en
+    // index.html; aquí, lo que se enlaza con data-c (el texto y el CTA, desde backup-pre-ajustes-ondas).
     hero: {
       lede: 'Webs que no se parecen a ninguna otra: rápidas, a medida y con 3D de verdad, para agencias creativas y negocios locales.',
-      cta: 'Hablemos'
+      cta: 'Cuéntanos tu idea'
     },
     herramientas: 'Herramientas con las que trabajamos',
     panel: { etiqueta: 'Proyectos', titulo: 'Siéntate. Esto es lo que hacemos.' },

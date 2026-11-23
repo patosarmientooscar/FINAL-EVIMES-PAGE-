@@ -117,17 +117,16 @@
 
     <!-- ===== Hero (desde backup-pre-ondas; prototipo aprobado Downloads/evimes-home-ondas) =====
          El H1 es texto HTML, visible desde el primer fotograma (el LCP). .portada__escena es el ancla
-         de las ondas (js/ondas.js): forman la firma al cargar y a los 2,6 s pasan a la hélice (js/home.js).
-         Las cifras de Disco son las REALES de PageSpeed (js/data/pagespeed.js). Estilos: css/home.css -->
+         de las ondas (js/ondas.js): la hélice lenta desde que aparecen (nunca en línea). Abajo, el texto y un
+         CTA como los cierres de #para-quien. Estilos: css/home.css -->
     <section class="portada" id="inicio" aria-labelledby="h1" data-red>
       <p class="portada__meta portada__entra"><span>Estudio de diseño web<span class="lg"> · Madrid</span></span><span>Agencias creativas y negocios locales</span><span><span class="lg">Webs </span>desde 150&nbsp;€</span></p>
       <h1 class="portada__h1" id="h1"><span>Diseño web</span><span class="r">en Madrid<span class="punto">.</span></span></h1>
-      <div class="portada__escena" id="heroStage" data-ondas="firma" data-ondas-scale="1.05" aria-hidden="true"></div>
+      <div class="portada__escena" id="heroStage" data-ondas="helice" data-ondas-scale="1.05" data-ondas-tempo=".4" aria-hidden="true"></div>
       <div class="portada__pie">
         <p class="portada__lede portada__entra" data-c="inicio.hero.lede">Webs que no se parecen a ninguna otra: rápidas, a medida y con 3D de verdad, para agencias creativas y negocios locales.</p>
         <div class="portada__lado portada__entra">
-          <a class="portada__prueba" href="#para-quien"><small>Trabajo selecto</small><b>Disco Producción</b><span><span><i>99</i> Rendimiento</span><span><i>100</i> SEO</span></span></a>
-          <a class="portada__cta" href="#contacto" data-scramble><span class="sl" data-c="inicio.hero.cta">Hablemos</span> <span aria-hidden="true">→</span></a>
+          <a class="portada__cta" href="#contacto"><span data-c="inicio.hero.cta">Cuéntanos tu idea</span><span class="portada__cta-f" aria-hidden="true"><svg viewBox="0 0 100 100" focusable="false"><path d="M4 50H92M58 14L94 50L58 86"/></svg></span></a>
         </div>
       </div>
     </section>
@@ -197,7 +196,7 @@
              izquierda, si no cabe). js/para-quien.js la coloca, le pone el texto y dibuja la flecha. -->
         <div class="pq-tip" aria-hidden="true"><span class="pq-tip__t">¿Tienes un negocio?<br>Toca aquí</span><svg class="pq-tip__f" focusable="false"><path class="pq-tip__c" pathLength="1"/><path class="pq-tip__p" pathLength="1"/></svg></div>
         <!-- Ancla de las ondas: en el aire de debajo de la frase, a la derecha. -->
-        <div class="pq-ondas" data-ondas="intercambio" data-ondas-scale=".6" aria-hidden="true"></div>
+        <div class="pq-ondas" data-ondas="apilar" data-ondas-scale=".6" aria-hidden="true"></div>
       </div>
 
       <div class="pq-auds">
@@ -206,6 +205,10 @@
           <div class="pq-talk">
             <div class="pq-talk__pro"><small>El problema</small><p data-type="10">Tenéis el diseño. Os falta quien lo programe como lo habéis imaginado.</p></div>
             <div class="pq-talk__ans"><small>Lo que hacemos</small><p data-type="10" data-start=".8">Lo construimos con vuestra marca, en vuestros plazos y sin aparecer en la foto.</p></div>
+          </div>
+          <div class="pq-seg" role="radiogroup" aria-label="Elige tu caso" data-on="ag">
+            <button class="pq-seg__b" type="button" role="radio" aria-checked="true" tabindex="0" data-for="ag">Agencias creativas</button>
+            <button class="pq-seg__b" type="button" role="radio" aria-checked="false" tabindex="-1" data-for="nl">Negocios locales</button>
           </div>
           <article class="pq-window" aria-labelledby="pq-caso-ag" data-nav="dark">
             <div class="pq-window__tag" aria-hidden="true"><span>Trabajo selecto</span><span>Productora · Madrid</span></div>
@@ -235,6 +238,10 @@
           <div class="pq-talk">
             <div class="pq-talk__pro"><small>El problema</small><p data-type="10">Te buscan en Google y encuentran a tu competencia.</p></div>
             <div class="pq-talk__ans"><small>Lo que hacemos</small><p data-type="10" data-start=".8">Una web rápida que te pone primero y apps que convierten visitas en reservas.</p></div>
+          </div>
+          <div class="pq-seg" role="radiogroup" aria-label="Elige tu caso" data-on="ag">
+            <button class="pq-seg__b" type="button" role="radio" aria-checked="true" tabindex="0" data-for="ag">Agencias creativas</button>
+            <button class="pq-seg__b" type="button" role="radio" aria-checked="false" tabindex="-1" data-for="nl">Negocios locales</button>
           </div>
           <article class="pq-window pq-window--app" aria-labelledby="pq-caso-nl" data-nav="dark">
             <div class="pq-window__tag" aria-hidden="true"><span>Lo que construimos</span><span>App propia · iOS y web</span></div>
@@ -328,7 +335,7 @@
         <h2 class="display contacto__titulo" id="h-contacto" data-c="inicio.contacto.titulo">¿Hacemos que se te vea?</h2>
         <p class="contacto__intro">Cuéntanos qué necesitas. Te respondemos con una propuesta clara.</p>
         <!-- Ancla de las ondas: debajo del texto, en la columna izquierda (nunca encima del formulario). -->
-        <div class="ondas-ancla ondas-ancla--contacto" data-ondas="firma" aria-hidden="true"></div>
+        <div class="ondas-ancla ondas-ancla--contacto" data-ondas="helice" aria-hidden="true"></div>
         <p class="contacto__directo" data-directo hidden>
           <a data-whatsapp href="#" target="_blank" rel="noopener" hidden>WhatsApp</a>
           <a data-email href="#" hidden></a>

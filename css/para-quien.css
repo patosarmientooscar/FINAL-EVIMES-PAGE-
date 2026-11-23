@@ -156,12 +156,21 @@
    Pin de una pantalla + 60vh de scroll. #planes va justo detrás (css/home.css: margin-top −100lvh, el alto
    del pin): lo que deja ver el gris al cerrarse YA es #planes, sobre los cuadros (sin fondo: se ve la red), y
    al acabar su titular está en pantalla. El pin va por encima (z 1) y no se pulsa. */
-.pq-fin { position: relative; height: var(--pq-fin); margin: clamp(90px, 14vh, 150px) calc(-1 * var(--pq-g)) 0; pointer-events: none; }
+/* Desde backup-pre-ajustes-ondas el cierre empieza cuando el CTA final (.pq-cta) llega a la mitad de la pantalla:
+   .pq-fin sube media pantalla + medio CTA por debajo del contenido. El contenido (.pq-auds, z 2) queda por encima
+   del pin (z 1), cuyo gris es el mismo del fondo, y se desvanece al empezar a cerrarse (js/para-quien.js). */
+.pq-fin { position: relative; height: var(--pq-fin); margin: calc(-50vh - clamp(19px, 2.7vw, 50px)) calc(-1 * var(--pq-g)) 0; pointer-events: none; }
+.pq-vivo .pq-auds { z-index: 2; }
+.pq-cerrando .pq-auds { pointer-events: none; }
+/* el grano (.grano, fijo, z 1) queda por debajo del pin y del contenido: lo llevan ellos (el mismo, a .2) */
+.pq-fin__gris::after, .pq-vivo .pq-window::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .2; background: url("../assets/onda/grano.png") 0 0 / 200px 200px repeat; }
 .pq-fin__pin { position: sticky; top: 0; z-index: 1; height: 100vh; height: 100lvh; overflow: hidden; overflow: clip; }
 .pq-fin__gris { position: absolute; inset: 0; background: var(--gris); will-change: clip-path, opacity; }
 /* sin animación (movimiento reducido, versión fija, sin JS): corte limpio del gris al negro */
 .pq:not(.pq-vivo) { --pq-fin: 0px; }
-.pq:not(.pq-vivo) .pq-fin { height: 0; margin-bottom: 0; }
+.pq:not(.pq-vivo) { padding-bottom: 10vh; }      /* sin cierre (movimiento reducido): 10vh de gris tras el CTA */
+.pq:not(.pq-vivo) .pq-fin { height: 0; margin: 0; }
+.pq:not(.pq-vivo) .pq-fin__pin { visibility: hidden; }   /* sin cierre: corte limpio a #planes */
 .pq:not(.pq-vivo) ~ #planes { margin-top: 0; }
 .pq:not(.pq-vivo) { padding-bottom: clamp(90px, 14vh, 150px); }
 
@@ -192,6 +201,44 @@
 }
 .pq-talk p { font-size: clamp(22px, 2.5vw, 42px); line-height: 1.02; text-wrap: balance; }
 .pq-talk__pro p { color: rgb(18 19 23 / .52); }      /* el problema, apagado (3,3:1, texto grande) */
+
+/* ---------- el interruptor pequeño, encima de la ventana (desde backup-pre-ajustes-ondas) ----------
+   Uno en cada panel, en el mismo sitio (los .pq-talk se igualan de alto): al cambiar de público no se mueve.
+   Sincronizado con la frase (js/para-quien.js). El relleno se desliza .35 s. */
+.pq-seg {
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  min-height: 34px;
+  margin-top: clamp(80px, 14vh, 150px);
+  border: 1px solid rgb(18 19 23 / .2);
+  border-radius: 2px;
+}
+.pq-seg::before { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 50%; background: #121317; transition: transform .35s var(--pq-ease); }
+.pq-seg[data-on="nl"]::before { transform: translateX(100%); }
+.pq-seg__b {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  padding: 0 18px;
+  border: 0;
+  background: none;
+  font: 500 11px / 1.15 var(--font-text);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: rgb(18 19 23 / .6);
+  cursor: pointer;
+  transition: color .35s var(--pq-ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.pq-seg__b[aria-checked="true"] { color: var(--pq-claro); cursor: default; }
+@media (hover: hover) { .pq-seg__b[aria-checked="false"]:hover { color: rgb(18 19 23 / .85); } }
+.pq-seg__b:focus-visible { outline-offset: 3px; }
+.pq-seg + .pq-window { margin-top: 14px; }
+/* sin JS no hay interruptor (los dos públicos se ven uno debajo del otro) */
+.pq:not(.pq-viva) .pq-seg { display: none; }
+.pq:not(.pq-viva) .pq-seg + .pq-window { margin-top: clamp(80px, 14vh, 150px); }
 
 /* ---------- la ventana del caso ---------- */
 .pq-window {
@@ -352,12 +399,14 @@
   .pq-ondas { top: calc(100% + 4px); right: 0; width: 56vw; height: clamp(84px, 16vh, 120px); }
   .pq-talk { grid-template-columns: minmax(0, 1fr); gap: 40px; }
   .pq-window { grid-template-columns: minmax(0, 1fr); min-height: 0; padding: 64px 20px 32px; }
+  .pq-seg { display: grid; width: 100%; }
+  .pq-seg__b { padding: 6px 8px; white-space: normal; }
   .pq-window__tag { left: 20px; right: 20px; flex-wrap: wrap; row-gap: 6px; font-size: 11px; letter-spacing: .12em; }
   .pq-movil { flex-direction: column-reverse; }
   .pq-psi { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 22px; max-width: 320px; }
   .pq-psi__g svg { max-width: 112px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .pq-aud, .pq-aud::after, .pq-cta::after, .pq-cta__arr, .pq-info__links a, .pq-tip, .pq-tip__f path { transition: none !important; }
+  .pq-aud, .pq-aud::after, .pq-seg::before, .pq-seg__b, .pq-cta::after, .pq-cta__arr, .pq-info__links a, .pq-tip, .pq-tip__f path { transition: none !important; }
   .pq-tip__f path { stroke-dashoffset: 0; }
 }
