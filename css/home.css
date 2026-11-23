@@ -116,7 +116,9 @@
    el negro de la apertura de #lateral, #planes, herramientas, contacto…). Canvas fijo a
    pantalla completa, justo encima de .bg-grid (z -2) y detrás de todo. En reposo es la misma cuadrícula al
    píxel; con el canvas vivo, la de CSS se oculta. Las secciones grises la tapan. */
-.portada[data-red] { touch-action: pan-y pinch-zoom; }   /* en el hero, arrastrar en horizontal mueve la red; en vertical, scroll */
+/* donde se ven los cuadros (el hero, la apertura de #lateral, #planes), arrastrar en horizontal mueve la red;
+   en vertical, scroll */
+.portada[data-red], .inicio #lateral, .inicio #planes { touch-action: pan-y pinch-zoom; }
 .red-canvas { position: fixed; inset: 0; z-index: -2; display: block; width: 100%; height: 100%; pointer-events: none; opacity: 0; }
 .red-viva .red-canvas { opacity: 1; }
 .red-viva .bg-grid { visibility: hidden; }
