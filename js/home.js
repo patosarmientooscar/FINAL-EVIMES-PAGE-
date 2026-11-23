@@ -40,6 +40,8 @@
     var y = scrollY();
     // Secciones grises normales (#para-quien). #lateral avisa ella (EV.cabeceraClara, js/recorrido.js): su gris se mueve.
     lay.grises = $$('.panel, [data-nav="light"]').map(function (n) { var r = n.getBoundingClientRect(); return { top: r.top + y, bottom: r.bottom + y }; });
+    // islas oscuras dentro del gris (la ventana del caso de #para-quien): ahí, cristal oscuro. Las de un público oculto no cuentan.
+    lay.oscuras = $$('[data-nav="dark"]').map(function (n) { var r = n.getBoundingClientRect(); return { n: n, top: r.top + y, bottom: r.bottom + y }; });
     var c = el.cab.getBoundingClientRect();
     lay.cabTop = c.top; lay.cabBottom = c.bottom;
     ultimaY = -1;
@@ -189,6 +191,10 @@
     for (var i = 0; i < lay.grises.length; i++) {
       var t = lay.grises[i].top - y, b = lay.grises[i].bottom - y;
       if (t < mid && b > mid) dentro = true;
+    }
+    for (i = 0; i < lay.oscuras.length; i++) {
+      var o = lay.oscuras[i];
+      if (o.top - y < mid && o.bottom - y > mid && !o.n.closest('[hidden]')) dentro = false;
     }
     var clara = (dentro || !!EV.cabeceraClara) && !EV.cabeceraOscura;
     if (clara !== cabClara) { cabClara = clara; el.cab.classList.toggle('is-clara', clara); }

@@ -1,8 +1,8 @@
 /* ==========================================================================
    trabajo-selecto.css — lo que queda de "Trabajo selecto" (desde
-   backup-pre-fusion la sección ya no existe: su caso vive en la tarjeta negra
-   de #para-quien, css/para-quien.css). Aquí, la escena 3D de los casos
-   (portátil de Disco y móvil de Leon's) y los anillos de PageSpeed.
+   backup-pre-fusion la sección ya no existe: su caso vive en la ventana negra
+   de #para-quien, css/para-quien.css, que lleva también los anillos de
+   PageSpeed). Aquí, la escena 3D del portátil de Disco y su captura fija.
    ========================================================================== */
 .ts-card__escena { position: relative; aspect-ratio: 16 / 11; }
 .ts-card__escena > img, .ts-card__escena > canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
@@ -10,14 +10,5 @@
 .ts-card__escena > canvas { opacity: 0; transition: opacity 0.6s var(--ease); }
 .ts-card__escena.is-viva > canvas { opacity: 1; }
 .ts-card__escena.is-viva > img { opacity: 0; }
-
-/* los 4 datos reales de PageSpeed (js/data/pagespeed.js): anillo fino, el cian solo en el trazo */
-.ts-psi { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(10px, 1.2vw, 18px); }
-.ts-psi__g { position: relative; display: grid; align-content: start; justify-items: center; text-align: center; gap: 10px; }
-.ts-psi__g svg { width: 100%; max-width: 76px; aspect-ratio: 1; transform: rotate(-90deg); grid-area: 1 / 1; }
-.ts-psi__g b { grid-area: 1 / 1; align-self: center; font: 600 clamp(17px, 1.45vw, 21px) / 1 var(--font-text); color: var(--stone); letter-spacing: -0.02em; }
-.ts-psi__g span { font-size: 12px; line-height: 1.25; color: var(--ink-faint); }
-.ts-psi__base { fill: none; stroke: rgb(233 227 216 / 0.1); stroke-width: 1.2; }
-.ts-psi__arco { fill: none; stroke: var(--cyan); stroke-width: 1.2; stroke-linecap: round; stroke-dasharray: 182.2; stroke-dashoffset: calc(182.2 * (1 - var(--v) / 100)); }
 
 @media (prefers-reduced-motion: reduce) { .ts-card__escena > * { transition: none; } }

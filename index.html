@@ -172,73 +172,97 @@
       </div>
     </section>
 
-    <!-- ===== Con quién trabajamos y nuestro trabajo (desde backup-pre-fusion) =====
-         La persiana naranja de #lateral la descubre (data-tras-persiana: js/lateral.js la sube detrás de la
-         persiana y la deja quieta mientras baja). Después, una sección normal: sin scroll secuestrado.
-         Dos pestañas (Agencias creativas | Negocios locales), cada una con su titular, su párrafo, sus
-         puntos, su caso real y su cierre. Las dos están en el HTML (la que no toca, con hidden) y ocupan
-         el mismo sitio: cambiar no mueve nada. Estilos: css/para-quien.css + css/trabajo-selecto.css ·
-         JS: js/para-quien.js, js/trabajo-selecto.js (el portátil de Disco), js/caso-leons.js (el móvil de Leon's) -->
-    <section class="pq" id="para-quien" aria-labelledby="pq-h" data-tras-persiana data-nav="light" data-pq>
-      <h2 class="sr-only" id="pq-h">Con quién trabajamos y nuestro trabajo</h2>
-      <div class="pq-pestanas" role="tablist" aria-label="Con quién trabajamos" data-v="0">
-        <span class="pq-pestanas__relleno" aria-hidden="true"></span>
-        <button class="pq-pestanas__b" type="button" role="tab" id="pq-tab-0" aria-selected="true" aria-controls="pq-op-0">Agencias creativas</button>
-        <button class="pq-pestanas__b" type="button" role="tab" id="pq-tab-1" aria-selected="false" aria-controls="pq-op-1" tabindex="-1">Negocios locales</button>
-      </div>
-      <div class="pq-cuerpo">
-        <!-- Ancla de las ondas: en el hueco a la derecha del titular (en móvil, encima de él). -->
+    <!-- ===== Con quién trabajamos y nuestro trabajo (desde backup-pre-para-quien; prototipo aprobado Downloads/evimes-para-quien) =====
+         La persiana naranja de #lateral la descubre (data-tras-persiana: js/lateral.js la sube detrás de la persiana
+         y la deja quieta mientras baja). Después, una sección vertical normal: sin scroll secuestrado.
+         LA FRASE ES EL INTERRUPTOR: los dos públicos son <button aria-pressed>. Cada público (data-aud) lleva su
+         problema, lo que hacemos, la ventana de su caso y su cierre; los dos están en el HTML (el que no toca, con
+         hidden) y ocupan el mismo sitio: cambiar no mueve el scroll.
+         Estilos: css/para-quien.css + css/trabajo-selecto.css · JS: js/para-quien.js y js/trabajo-selecto.js (el portátil de Disco) -->
+    <section class="pq" id="para-quien" aria-labelledby="pq-t" data-tras-persiana data-nav="light" data-pq data-active="ag">
+      <h2 class="sr-only" id="pq-t">Con quién trabajamos y nuestro trabajo</h2>
+      <div class="pq-cabeza">
+        <p class="pq-switch" role="group" aria-label="Elige tu caso">
+          <span class="pq-switch__lead">Somos el estudio de</span>
+          <button class="pq-aud" type="button" data-for="ag" aria-pressed="true" aria-controls="pq-ag">agencias creativas</button>
+          <span class="pq-switch__lead">y de</span>
+          <button class="pq-aud" type="button" data-for="nl" aria-pressed="false" aria-controls="pq-nl">negocios locales.</button>
+          <span class="pq-hint">Pulsa el que eres</span>
+        </p>
+        <!-- Ancla de las ondas: junto a la frase, en el aire que deja a su derecha (en móvil, debajo de "Pulsa el que eres"). -->
         <div class="pq-ondas" data-ondas="intercambio" data-ondas-scale=".6" aria-hidden="true"></div>
-        <div class="pq-paneles">
-          <div class="pq-panel" role="tabpanel" id="pq-op-0" aria-labelledby="pq-tab-0" data-op="0" tabindex="0">
-            <h3 class="pq-h">Tu agencia pone la idea. <br>Nosotros la construimos.</h3>
-            <p class="pq-p">Somos el equipo técnico de agencias creativas y estudios de diseño. Programamos lo que diseñáis, desde webs 3D y WebGL hasta interacción y automatizaciones, con vuestra marca, vuestros plazos y sin aparecer en la foto.</p>
-            <ul class="pq-puntos" role="list"><li><span class="pq-puntos__linea" aria-hidden="true"></span><span class="pq-puntos__t">Marca blanca</span></li><li><span class="pq-puntos__linea" aria-hidden="true"></span><span class="pq-puntos__t">3D y WebGL</span></li><li><span class="pq-puntos__linea" aria-hidden="true"></span><span class="pq-puntos__t">Plazos claros</span></li><li><span class="pq-puntos__linea" aria-hidden="true"></span><span class="pq-puntos__t">Código limpio</span></li></ul>
-            <article class="pq-caso" aria-labelledby="pq-caso-0">
-              <div class="pq-caso__visual">
-                <div class="ts-card__escena" data-ts-escena>
-                  <img class="ts-card__fija" src="assets/img/trabajo-portatil.jpg" alt="Un portátil negro abierto sobre un bloque de hormigón oscuro, con la portada de la web de Disco Producción en la pantalla." width="1450" height="998" loading="lazy" decoding="async">
-                  <canvas aria-hidden="true"></canvas>
-                </div>
-              </div>
-              <div class="pq-caso__texto">
-                <h4 class="pq-caso__nombre" id="pq-caso-0">Disco Producción</h4>
-                <p class="pq-caso__linea">Productora audiovisual en Madrid. Su web ya da que hablar.</p>
-                <div class="pq-caso__datos">
-                  <ul class="ts-psi" data-ts-psi role="list" aria-label="PageSpeed Insights de discoproduccion.com">
-                    <li class="ts-psi__g" data-k="rendimiento"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="ts-psi__base" cx="32" cy="32" r="29"/><circle class="ts-psi__arco" cx="32" cy="32" r="29" style="--v:99"/></svg><b>99</b><span>Rendimiento</span></li>
-                    <li class="ts-psi__g" data-k="accesibilidad"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="ts-psi__base" cx="32" cy="32" r="29"/><circle class="ts-psi__arco" cx="32" cy="32" r="29" style="--v:100"/></svg><b>100</b><span>Accesibilidad</span></li>
-                    <li class="ts-psi__g" data-k="buenasPracticas"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="ts-psi__base" cx="32" cy="32" r="29"/><circle class="ts-psi__arco" cx="32" cy="32" r="29" style="--v:100"/></svg><b>100</b><span>Buenas prácticas</span></li>
-                    <li class="ts-psi__g" data-k="seo"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="ts-psi__base" cx="32" cy="32" r="29"/><circle class="ts-psi__arco" cx="32" cy="32" r="29" style="--v:100"/></svg><b>100</b><span>SEO</span></li>
-                  </ul>
-                  <p class="pq-caso__fuente">PageSpeed Insights · noviembre 2026</p>
-                </div>
-                <a class="enlace pq-caso__enlace" href="https://discoproduccion.com" target="_blank" rel="noopener" data-scramble><span class="sl">Ver la web de Disco</span><span class="sr-only"> (se abre en otra pestaña)</span></a>
-              </div>
-              <span class="pq-barrido" aria-hidden="true"><i></i><i></i><i></i></span>
-            </article>
-            <div class="pq-cierre"><a class="pq-boton" href="#contacto" data-perfil="Agencia creativa" data-scramble><span class="sl">¿Qué idea tenéis?</span><svg viewBox="0 0 100 100" aria-hidden="true" focusable="false"><path d="M4 50H92M58 14L94 50L58 86"/></svg></a></div>
+      </div>
+
+      <div class="pq-auds">
+        <!-- AGENCIAS -->
+        <div class="pq-aud-panel" id="pq-ag" data-aud="ag">
+          <div class="pq-talk">
+            <div class="pq-talk__pro"><small>El problema</small><p data-type="10">Tenéis el diseño. Os falta quien lo programe como lo habéis imaginado.</p></div>
+            <div class="pq-talk__ans"><small>Lo que hacemos</small><p data-type="10" data-start=".8">Lo construimos con vuestra marca, en vuestros plazos y sin aparecer en la foto.</p></div>
           </div>
-          <div class="pq-panel" role="tabpanel" id="pq-op-1" aria-labelledby="pq-tab-1" data-op="1" tabindex="0" hidden>
-            <h3 class="pq-h">Más visitas. <br>Más reservas. <br>Más ventas.</h3>
-            <p class="pq-p">Restaurantes, barberías y comercios de Madrid con una web que trabaja por ellos, también cuando está cerrado: rápida, fácil de encontrar en Google y con reservas por WhatsApp.</p>
-            <ul class="pq-puntos" role="list"><li><span class="pq-puntos__linea" aria-hidden="true"></span><span class="pq-puntos__t">Web rápida</span></li><li><span class="pq-puntos__linea" aria-hidden="true"></span><span class="pq-puntos__t">Google y Maps</span></li><li><span class="pq-puntos__linea" aria-hidden="true"></span><span class="pq-puntos__t">Reservas por WhatsApp</span></li><li><span class="pq-puntos__linea" aria-hidden="true"></span><span class="pq-puntos__t">Desde 150&nbsp;€</span></li></ul>
-            <article class="pq-caso" aria-labelledby="pq-caso-1">
-              <div class="pq-caso__visual">
-                <div class="ts-card__escena pq-caso__movil" data-leons-escena>
-                  <div class="pq-movil-fijo"><picture><source srcset="assets/img/leons-hero.avif" type="image/avif"><img src="assets/img/leons-hero.webp" alt="La portada de la web de Leon's Peluqueros en un móvil: un barbero recortando una barba y el titular «Más que un corte. Un ritual.»" width="780" height="1688" loading="lazy" decoding="async"></picture></div>
-                  <canvas aria-hidden="true"></canvas>
+          <article class="pq-window" aria-labelledby="pq-caso-ag" data-nav="dark">
+            <div class="pq-window__tag" aria-hidden="true"><span>Trabajo selecto</span><span>Productora · Madrid</span></div>
+            <div class="pq-stage">
+              <div class="ts-card__escena" data-ts-escena>
+                <img class="ts-card__fija" src="assets/img/trabajo-portatil.jpg" alt="Un portátil negro abierto sobre un bloque de hormigón oscuro, con la portada de la web de Disco Producción en la pantalla." width="1450" height="998" loading="lazy" decoding="async">
+                <canvas aria-hidden="true"></canvas>
+              </div>
+            </div>
+            <div class="pq-info">
+              <h3 class="pq-info__h" id="pq-caso-ag">Disco Producción</h3>
+              <ul class="pq-psi" data-ts-psi role="list" aria-label="PageSpeed Insights de discoproduccion.com">
+                <li class="pq-psi__g" data-k="rendimiento" data-v="99" style="--v:99"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="pq-psi__pista" cx="60" cy="60" r="54"/><circle class="pq-psi__arco" cx="60" cy="60" r="54"/></svg><b>99</b><span>Rendimiento</span></li>
+                <li class="pq-psi__g" data-k="accesibilidad" data-v="100" style="--v:100"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="pq-psi__pista" cx="60" cy="60" r="54"/><circle class="pq-psi__arco" cx="60" cy="60" r="54"/></svg><b>100</b><span>Accesibilidad</span></li>
+                <li class="pq-psi__g" data-k="buenasPracticas" data-v="100" style="--v:100"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="pq-psi__pista" cx="60" cy="60" r="54"/><circle class="pq-psi__arco" cx="60" cy="60" r="54"/></svg><b>100</b><span>Buenas prácticas</span></li>
+                <li class="pq-psi__g" data-k="seo" data-v="100" style="--v:100"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="pq-psi__pista" cx="60" cy="60" r="54"/><circle class="pq-psi__arco" cx="60" cy="60" r="54"/></svg><b>100</b><span>SEO</span></li>
+              </ul>
+              <p class="pq-info__src">PageSpeed Insights · discoproduccion.com · noviembre 2026</p>
+              <div class="pq-info__links"><a href="https://discoproduccion.com" target="_blank" rel="noopener">Ver la web<span class="sr-only"> de Disco Producción (se abre en otra pestaña)</span></a></div>
+            </div>
+          </article>
+          <a class="pq-cta" href="#contacto" data-perfil="Agencia creativa"><span class="pq-cta__t" data-type="6">¿Qué idea tenéis?</span><span class="pq-cta__arr"><svg viewBox="0 0 100 100" aria-hidden="true" focusable="false"><path d="M4 50H92M58 14L94 50L58 86"/></svg></span></a>
+        </div>
+
+        <!-- NEGOCIOS LOCALES -->
+        <div class="pq-aud-panel" id="pq-nl" data-aud="nl" hidden>
+          <div class="pq-talk">
+            <div class="pq-talk__pro"><small>El problema</small><p data-type="10">Te buscan en Google y encuentran a tu competencia.</p></div>
+            <div class="pq-talk__ans"><small>Lo que hacemos</small><p data-type="10" data-start=".8">Una web rápida que te pone primero y apps que convierten visitas en reservas.</p></div>
+          </div>
+          <article class="pq-window pq-window--app" aria-labelledby="pq-caso-nl" data-nav="dark">
+            <div class="pq-window__tag" aria-hidden="true"><span>Lo que construimos</span><span>App propia · iOS y web</span></div>
+            <div class="pq-stage">
+              <div class="pq-movil">
+                <div class="pq-icono"><div class="pq-appicon" role="img" aria-label="Icono de la app EVIMES Reservas"></div><span>Reservas</span></div>
+                <!-- La pantalla es una demostración de la interfaz (datos de ejemplo, no de un cliente). -->
+                <div class="pq-phone" role="img" aria-label="La app EVIMES Reservas abierta en un iPhone: la sala en directo con las mesas libres y ocupadas y las próximas reservas">
+                  <div class="pq-phone__isla"></div>
+                  <div class="pq-app" aria-hidden="true">
+                    <div class="pq-app__sb"><span>9:41</span><span class="pq-app__ic"><svg viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".8"/><rect x="4.6" y="4.7" width="3" height="6.3" rx=".8"/><rect x="9.2" y="2.4" width="3" height="8.6" rx=".8"/><rect x="13.8" y="0" width="3" height="11" rx=".8"/></svg><svg viewBox="0 0 26 12"><rect x=".6" y=".6" width="21.8" height="10.8" rx="3.2" fill="none" stroke="currentColor" stroke-width="1.1" opacity=".4"/><rect x="2.3" y="2.3" width="16.4" height="7.4" rx="1.8"/><path d="M24 4.2v3.6c.9-.3 1.5-1 1.5-1.8s-.6-1.5-1.5-1.8z" opacity=".4"/></svg></span></div>
+                    <div class="pq-app__hd"><i></i><div><b>Hoy</b><span>Lunes 23 · Sala principal</span></div></div>
+                    <div class="pq-app__chips"><span><em class="libre"></em>5 libres</span><span><em class="ocupada"></em>3 ocupadas</span><span>21:00</span></div>
+                    <div class="pq-app__sala"><small>Sala en directo</small>
+                      <span class="m">1</span><span class="m o r">2</span><span class="m">3</span><span class="m r">4</span>
+                      <span class="m o">5</span><span class="m r">6</span><span class="m o">7</span><span class="m">8</span>
+                    </div>
+                    <div class="pq-app__lista"><small>Próximas</small>
+                      <div class="pq-app__fila"><b>21:00</b><span>Mesa 4 · 2 personas</span><em>WhatsApp</em></div>
+                      <div class="pq-app__fila"><b>21:30</b><span>Mesa 6 · 4 personas</span><em>Web</em></div>
+                      <div class="pq-app__fila"><b>22:00</b><span>Mesa 1 · 3 personas</span><em>WhatsApp</em></div>
+                    </div>
+                    <div class="pq-app__tab"><span class="on">Inicio</span><span>Reservas</span><span>Ajustes</span></div>
+                  </div>
                 </div>
               </div>
-              <div class="pq-caso__texto">
-                <h4 class="pq-caso__nombre" id="pq-caso-1">Leon's Peluqueros</h4>
-                <p class="pq-caso__linea">Barbería de oficio en Madrid, en la avenida de Betanzos. Su web: reservar cita y escribir por WhatsApp, a un toque.</p>
-                <a class="enlace pq-caso__enlace" href="https://patosarmientooscar.github.io/leon-s/" target="_blank" rel="noopener" data-scramble><span class="sl">Ver la web de Leon's</span><span class="sr-only"> (se abre en otra pestaña)</span></a>
-              </div>
-              <span class="pq-barrido" aria-hidden="true"><i></i><i></i><i></i></span>
-            </article>
-            <div class="pq-cierre"><a class="pq-boton" href="#contacto" data-perfil="Negocio local" data-scramble><span class="sl">¿Qué necesita tu negocio?</span><svg viewBox="0 0 100 100" aria-hidden="true" focusable="false"><path d="M4 50H92M58 14L94 50L58 86"/></svg></a></div>
-          </div>
+            </div>
+            <div class="pq-info">
+              <h3 class="pq-info__h" id="pq-caso-nl">EVIMES Reservas</h3>
+              <p>La app de reservas que hemos diseñado y programado para restaurantes: la sala en directo, todas las reservas en un sitio y confirmaciones automáticas por WhatsApp.</p>
+              <p>Así construimos para negocios locales: no solo una web, la herramienta con la que trabajan cada día.</p>
+              <div class="pq-info__links"><a href="#contacto" data-perfil="Negocio local">Quiero algo así</a></div>
+            </div>
+          </article>
+          <a class="pq-cta" href="#contacto" data-perfil="Negocio local"><span class="pq-cta__t" data-type="6">¿Qué necesita tu negocio?</span><span class="pq-cta__arr"><svg viewBox="0 0 100 100" aria-hidden="true" focusable="false"><path d="M4 50H92M58 14L94 50L58 86"/></svg></span></a>
         </div>
       </div>
     </section>
@@ -382,9 +406,8 @@
   <script defer src="js/recorrido.js"></script>
   <script defer src="js/lateral.js"></script>
   <script defer src="js/para-quien.js"></script>
-  <!-- Los casos de #para-quien: el portátil de Disco y el móvil de Leon's (Three.js 0.160.0, el mismo import map), al entrar en pantalla. -->
+  <!-- El caso de Disco en #para-quien: el portátil 3D (Three.js 0.160.0, el mismo import map), al entrar en pantalla. -->
   <script type="module" src="js/trabajo-selecto.js"></script>
-  <script type="module" src="js/caso-leons.js"></script>
   <script type="module" src="js/ui/scramble.js"></script>
 </body>
 </html>
