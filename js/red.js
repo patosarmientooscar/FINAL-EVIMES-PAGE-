@@ -1,17 +1,22 @@
 /* ==========================================================================
-   red.js — la red del hero de la home (desde backup-pre-red). Parte del
+   red.js — la red de la home (desde backup-pre-red; desde backup-pre-ajustes-red,
+   el fondo de TODA la home donde se ve la cuadrícula, no solo el hero). Parte del
    prototipo Downloads/evimes-hero-red/js/red.js, con la física afinada que
    fijó Oscar: R 170, PUSH 40, DRAG .2, K 60, amortiguación .32, T 160,
    paso 1/120, y cada nudo con su rigidez, su fuerza, su dirección y su
    respuesta en x/y (semilla fija por nudo). Solo se colorean los hilos
    estirados por encima de UMBRAL.
    · En reposo es la cuadrícula de css/fondo.css al píxel: mismos 24 px,
-     mismo color, misma máscara y, como ella, fija a la ventana (.red-capa la
-     recorta al hero). Por eso el paso a la siguiente sección no se nota y
-     el contexto WebGL puede esperar al primer gesto sobre el hero.
-   · gsap.ticker. Duerme en reposo; no calcula fuera de pantalla ni con la
-     pestaña oculta. pixelRatio ≤ 2. Con movimiento reducido o sin WebGL
-     queda la cuadrícula CSS, quieta.
+     mismo color, misma máscara y, como ella, fija a la ventana: un canvas
+     fijo a pantalla completa justo encima de .bg-grid, detrás de todo (con
+     él vivo, la de CSS se oculta: <html class="red-viva">). El contexto WebGL
+     espera al primer gesto sobre una zona negra.
+   · Coordenadas de la ventana. Solo calcula si queda algo de negro con
+     cuadrícula en pantalla: se duerme cuando lo tapa todo el gris (#lateral
+     abierta: EV.lateralCubre; de #lateral suelta a #para-quien) o #planes.
+   · gsap.ticker. Duerme en reposo; no calcula con la pestaña oculta.
+     pixelRatio ≤ 2. Con movimiento reducido o sin WebGL queda la
+     cuadrícula CSS, quieta.
    ========================================================================== */
 import * as THREE from 'three';
 
@@ -26,9 +31,9 @@ const GRIS = [71, 85, 105, .18 * 255];             // la línea de .bg-grid
 const BASE = new THREE.Color('#16191f');           // esa línea, ya compuesta sobre #0b0c0f
 const PAL = ['#ffd84a', '#ffab2e', '#ff7a22', '#ff4f3a', '#ff3d7f'].map(c => new THREE.Color(c));
 
-const host = document.querySelector('[data-red]');
-const capa = host && host.querySelector('.red-capa');
-if (capa && window.gsap && !matchMedia('(prefers-reduced-motion: reduce)').matches) iniciar();
+const host = document.querySelector('[data-red]');         // solo en la home
+const rejilla = document.querySelector('.bg-grid');
+if (host && rejilla && window.gsap && !matchMedia('(prefers-reduced-motion: reduce)').matches) iniciar();
 
 // azar con semilla fija: el mismo nudo (i, j) sale igual en cada carga y tras un resize
 function azar(i, j, canal) {
@@ -45,13 +50,26 @@ function iniciar() {
   let renderer = null, scene, cam, material, malla = null, cv;
   let estado = 'espera';                           // espera → creando → viva | sin
   let nx, ny, N, rest, disp, vel, fade, rig, amo, fx, fy, cos, sin, segs, pos, col, geo;
-  let pie = 0, despierta = false, visible = true, presencia = 0, t = 0, acc = 0, maxV = 0, maxD = 0;
+  let finPlanes = 0, despierta = false, presencia = 0, t = 0, acc = 0, maxV = 0, maxD = 0;
 
-  function medir() { pie = host.offsetTop + host.offsetHeight; }
+  const arriba = el => { let y = 0; for (let n = el; n; n = n.offsetParent) y += n.offsetTop; return y; };
+  const planes = document.getElementById('planes');
+  function medir() { finPlanes = planes ? arriba(planes) + planes.offsetHeight : 0; }
   medir();
+  if (window.ResizeObserver) new ResizeObserver(medir).observe(document.body);
 
-  /* ---------- puntero (coordenadas de ventana, las de la capa fija) ---------- */
-  function dentro() { return m.dentro && m.y + scrollY() <= pie; }
+  // ¿lo tapa todo algo opaco? #lateral abierta (la avisa ella), o de #lateral suelta al final de #planes
+  // (#para-quien, su cierre y #planes van pegados: gris, gris y negro liso)
+  function tapada() {
+    if (EV.lateralCubre) return true;
+    const L = EV.lateralRelevo && EV.lateralRelevo();
+    if (!L || !finPlanes) return false;
+    const y = scrollY();
+    return y >= L.suelta && y + innerHeight <= finPlanes;
+  }
+
+  /* ---------- puntero (coordenadas de la ventana: el canvas es fijo) ---------- */
+  function dentro() { return m.dentro && !tapada(); }
   function mueve(e) {
     const x = e.clientX, y = e.clientY, antes = m.on;
     m.dentro = true;
@@ -177,13 +195,13 @@ function iniciar() {
     renderer.render(scene, cam);
   }
 
-  /* ---------- se crea con el primer gesto sobre el hero ---------- */
+  /* ---------- se crea con el primer gesto sobre una zona negra ---------- */
   async function crear() {
     estado = 'creando';
     cv = document.createElement('canvas');
     cv.className = 'red-canvas';
     cv.setAttribute('aria-hidden', 'true');
-    capa.appendChild(cv);
+    rejilla.after(cv);                             // justo encima de la cuadrícula CSS, detrás de todo
     try {
       renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: false });
       renderer.debug.checkShaderErrors = false;
@@ -205,16 +223,18 @@ function iniciar() {
       console.warn('[red] sin WebGL: se queda la cuadrícula', e);
       return;
     }
-    cv.addEventListener('webglcontextlost', () => capa.classList.remove('is-viva'));
-    cv.addEventListener('webglcontextrestored', () => { pintar(); capa.classList.add('is-viva'); });
-    capa.classList.add('is-viva');
+    const raiz = document.documentElement;
+    cv.addEventListener('webglcontextlost', () => raiz.classList.remove('red-viva'));
+    cv.addEventListener('webglcontextrestored', () => { pintar(); raiz.classList.add('red-viva'); });
+    raiz.classList.add('red-viva');
     estado = 'viva';
     gsap.ticker.add(fotograma);
   }
 
   function fotograma(tiempo, dms) {
-    if (!despierta || !visible || document.hidden) return;
-    m.on = dentro();                               // también si lo que se mueve es la página
+    if (!despierta || document.hidden) return;
+    if (tapada()) { m.on = false; acc = 0; return; }   // no se ve: dormida (sigue donde estaba al volver)
+    m.on = m.dentro;                               // también si lo que se mueve es la página
     acc += Math.min(.05, dms / 1000);
     let n = 0;
     while (acc >= H && n < 4) { paso(); acc -= H; n++; }
@@ -228,7 +248,6 @@ function iniciar() {
     pintar();
   }
 
-  new IntersectionObserver(es => { visible = es[es.length - 1].isIntersecting; }).observe(host);
   addEventListener('resize', () => {
     medir();
     if (estado === 'viva') { construir(); pintar(); }

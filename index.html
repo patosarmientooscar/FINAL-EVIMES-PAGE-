@@ -92,6 +92,8 @@
 <body class="inicio inicio--ondas">
   <!-- Las dos ondas (js/ondas.js): un solo canvas fijo sobre la página; las piezas viven en las anclas [data-ondas]. -->
   <canvas id="ondas" aria-hidden="true"></canvas>
+  <!-- La cuadrícula. En la home, js/red.js pone su canvas justo detrás (.red-canvas, fijo y a pantalla completa) con el
+       primer gesto sobre una zona negra: la misma cuadrícula, pero reacciona al ratón. -->
   <div class="bg-grid" aria-hidden="true"></div>
   <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
@@ -118,8 +120,6 @@
          de las ondas (js/ondas.js): forman la firma al cargar y a los 2,6 s pasan a la hélice (js/home.js).
          Las cifras de Disco son las REALES de PageSpeed (js/data/pagespeed.js). Estilos: css/home.css -->
     <section class="portada" id="inicio" aria-labelledby="h1" data-red>
-      <!-- La red (js/red.js mete aquí su canvas). Hasta el primer gesto, o sin WebGL, la misma cuadrícula en CSS. -->
-      <div class="red-capa" aria-hidden="true"><div class="bg-grid"></div></div>
       <p class="portada__meta portada__entra"><span>Estudio de diseño web<span class="lg"> · Madrid</span></span><span>Agencias creativas y negocios locales</span><span><span class="lg">Webs </span>desde 150&nbsp;€</span></p>
       <h1 class="portada__h1" id="h1"><span>Diseño web</span><span class="r">en Madrid<span class="punto">.</span></span></h1>
       <div class="portada__escena" id="heroStage" data-ondas="firma" data-ondas-scale="1.05" aria-hidden="true"></div>

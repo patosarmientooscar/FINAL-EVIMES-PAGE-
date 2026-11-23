@@ -86,6 +86,7 @@
       var arriba = 0;
 
       // 1) la línea y la apertura
+      var cubre = s >= 0;                          // la ventana gris llena la pantalla (para js/red.js)
       if (quieto) ponClip('inset(0 0 0 0)');
       else {
         var linea = suaviza(tramo(v / h, LINEA[0], LINEA[1]));
@@ -96,7 +97,9 @@
                       : 'inset(50% 100% 50% 0)');
         ponTitular('translate3d(0,' + (24 * (1 - abre)).toFixed(2) + 'px,0)');
         if (linea === 0) arriba = Infinity;
+        cubre = linea >= 1 && abre >= 1 && baja <= 0;
       }
+      window.EV.lateralCubre = cubre && s <= r.fin + r.cola;
       ponHint((1 - cl(r.p * 8)).toFixed(3));
       ponParrafo(retener ? 'translate3d(' + Math.min(retener, Math.max(0, x - pInicio)).toFixed(1) + 'px,0,0)' : 'none');
 

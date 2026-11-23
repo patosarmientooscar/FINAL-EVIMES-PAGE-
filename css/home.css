@@ -112,18 +112,14 @@
   overflow: clip;
   color: var(--h-ink);
 }
-/* La red (js/red.js), al fondo del hero: z-index 0, bajo el H1 (2), las ondas (5) y los textos (6).
-   Es fija a la ventana, como .bg-grid, y .red-capa la recorta al hero (clip-path sí recorta lo fijo;
-   overflow no): la costura con la cuadrícula de la página coincide a cualquier altura de scroll.
-   Tapa la cuadrícula global con el negro y hasta el primer gesto enseña una copia idéntica. */
-.portada[data-red] {
-  background: #0b0c0f;
-  touch-action: pan-y pinch-zoom;               /* arrastrar en horizontal mueve la red; en vertical, scroll */
-}
-.red-capa { position: absolute; inset: 0; z-index: 0; clip-path: inset(0); pointer-events: none; }
-.red-canvas { position: fixed; inset: 0; z-index: 0; display: block; width: 100%; height: 100%; opacity: 0; }
-.red-capa.is-viva .red-canvas { opacity: 1; }
-.red-capa.is-viva .bg-grid { visibility: hidden; }
+/* La red (js/red.js, desde backup-pre-ajustes-red): el fondo de toda la home donde se ve la cuadrícula (el hero,
+   el negro de la apertura de #lateral, herramientas, contacto…; en #planes no: su fondo es liso). Canvas fijo a
+   pantalla completa, justo encima de .bg-grid (z -2) y detrás de todo. En reposo es la misma cuadrícula al
+   píxel; con el canvas vivo, la de CSS se oculta. Las secciones grises y #planes la tapan. */
+.portada[data-red] { touch-action: pan-y pinch-zoom; }   /* en el hero, arrastrar en horizontal mueve la red; en vertical, scroll */
+.red-canvas { position: fixed; inset: 0; z-index: -2; display: block; width: 100%; height: 100%; pointer-events: none; opacity: 0; }
+.red-viva .red-canvas { opacity: 1; }
+.red-viva .bg-grid { visibility: hidden; }
 .portada__meta {
   position: absolute;
   z-index: 6;
@@ -328,8 +324,11 @@ html:not(.cinta-viva) .cinta__lista { flex-wrap: wrap; gap: 8px 40px; padding: 0
    Planes
    ========================================================================== */
 .planes { padding: clamp(100px, 18vh, 200px) var(--g) clamp(80px, 14vh, 160px); }
-/* en la home, negro liso (sin la cuadrícula de .bg-grid): sale del cierre del gris de #para-quien */
-.inicio #planes { position: relative; background: #0b0c0f; }
+/* en la home, negro liso (sin la cuadrícula ni la red): está justo detrás del cierre del gris de #para-quien
+   (margin-top −100lvh = el pin del cierre, css/para-quien.css); padding-top 12vh: al acabar, el titular ya se ve */
+.inicio #planes { position: relative; background: #0b0c0f; margin-top: -100vh; margin-top: -100lvh; padding-top: 12vh; }
+/* las franjas del titular sobre negro: la del medio, en blanco roto (la tinta no se vería) */
+.planes__titulo .sc .s2 { color: var(--stone); }
 .planes__cab { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 24px; }
 .planes__titulo { font-size: clamp(38px, 5vw, 80px); max-width: 9.5ch; }
 .planes__intro { font-size: 16px; color: var(--texto-2); }

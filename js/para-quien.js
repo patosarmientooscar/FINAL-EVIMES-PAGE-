@@ -210,15 +210,18 @@
     var caja = sec.querySelector('.pq-relevo'), fin = sec.querySelector('.pq-fin');
     if (!caja || !fin) return { medir: function () {} };
     var grande = caja.querySelector('.pq-relevo__g'), chico = caja.querySelector('.pq-relevo__t'), banda = caja.querySelector('.pq-relevo__banda');
-    var gris = fin.querySelector('.pq-fin__gris');
+    var gris = fin.querySelector('.pq-fin__gris'), pin = fin.querySelector('.pq-fin__pin');
+    // el titular de #planes: sus letras se escriben mientras el gris se cierra (las franjas de #lateral)
+    var titPlanes = document.querySelector('.planes__titulo'), letrasPlanes = null;
     var pon = {
       g: escritor(grande, 'transform'), gO: escritor(grande, 'opacity'), cO: escritor(chico, 'opacity'),
       bO: escritor(banda, 'opacity'), cajaO: escritor(caja, 'opacity'), clip: escritor(gris, 'clipPath'), grisO: escritor(gris, 'opacity')
     };
-    var F = { top: 0, alto: 0, cx: 0, cy: 0, fs: 0 }, L = null, ponLat = null, k = 0, c = 0, visible = null, gr = null, os = null, ultima = null;
+    var F = { top: 0, alto: 0, pin: 0, cx: 0, cy: 0, fs: 0 }, L = null, ponLat = null, k = 0, c = 0, visible = null, gr = null, os = null, ultima = null;
     function medir() {
       L = EV.lateralRelevo ? EV.lateralRelevo() : null;
-      F.top = arriba(fin); F.alto = fin.offsetHeight;
+      F.top = arriba(fin); F.alto = fin.offsetHeight; F.pin = pin.offsetHeight;
+      if (letrasPlanes) letrasPlanes.ordenar();
       var r = chico.getBoundingClientRect();
       F.cx = r.left; F.cy = r.top;                       // el título discreto (position: fixed: ya está en coordenadas de pantalla)
       if (L) {
@@ -243,7 +246,7 @@
       // 1) el relevo: 0 = la grande donde la deja #lateral · 1 = el título discreto
       var meta = d <= 0 ? 0 : quieto ? 1 : cl(d / (vh * .7));
       // 2) el cierre: 0 = gris a pantalla completa · 1 = negro
-      var cm = quieto ? (y >= F.top ? 1 : 0) : cl((y - F.top) / Math.max(1, F.alto - vh));
+      var cm = quieto ? (y >= F.top ? 1 : 0) : cl((y - F.top) / Math.max(1, F.alto - F.pin));   // lo que dura el pin (60vh)
       if (y === ultima && k === meta && c === cm) return;  // quieto y asentado: nada que escribir
       ultima = y;
       k = quieto ? meta : k + (meta - k) * (1 - Math.exp(-dt * 9));
@@ -274,12 +277,21 @@
       var v = (a * 50).toFixed(2), px = (a * .5).toFixed(2), lados = (b * 50).toFixed(2);
       pon.clip(c <= 0 ? 'none' : 'inset(calc(' + v + '% - ' + px + 'px) ' + lados + '% calc(' + v + '% - ' + px + 'px) ' + lados + '%)');
       pon.grisO(c <= 0 ? '' : (1 - b).toFixed(3));
+      if (letrasPlanes) letrasPlanes.escribir(cl((c - .15) / .75));
       // la cabecera: oscura en cuanto el negro llega a su línea central, y mientras el cierre (ya negro) siga bajo ella
       bandera('cabeceraOscura', y >= F.top && y < F.top + F.alto && a * vh / 2 > 32);
     }
     if (window.gsap) gsap.ticker.add(function (t, dms) { if (!document.hidden) paso(Math.min(.1, (dms || 16.7) / 1000)); });
     else (function f() { requestAnimationFrame(f); paso(1 / 60); })();
-    return { medir: medir };
+    // las letras del titular de #planes, con las demás (en reposo)
+    function montarPlanes() {
+      if (quieto || letrasPlanes || !titPlanes || !R.Bloque) return;
+      letrasPlanes = new R.Bloque({ el: titPlanes, W: 6 });
+      letrasPlanes.partir();
+      letrasPlanes.ordenar();
+      ultima = null;
+    }
+    return { medir: medir, montarPlanes: montarPlanes };
   })();
 
   /* ---------- medidas (solo al cambiar el tamaño) ---------- */
@@ -316,6 +328,7 @@
     Object.keys(auds).forEach(function (k) {
       var A = auds[k];
       A.bloques.forEach(function (b) { b.b.partir(); });
+      relevo.montarPlanes && relevo.montarPlanes();
       // los anillos, desde 0 (js/trabajo-selecto.js ya puso los valores reales en data-v)
       A.anillos.forEach(function (d) {
         d.v = parseFloat(d.li.dataset.v) || parseFloat(d.b.textContent) || 0;

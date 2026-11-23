@@ -149,12 +149,16 @@
   opacity: 0;
 }
 
-/* ---------- el cierre: el gris se estrecha hasta una línea y se recoge (js/para-quien.js) ---------- */
-.pq-fin { position: relative; height: 180vh; height: 180lvh; margin: clamp(90px, 14vh, 150px) calc(-1 * var(--pq-g)) 0; background: #0b0c0f; }
-.pq-fin__pin { position: sticky; top: 0; height: 100vh; height: 100lvh; overflow: hidden; overflow: clip; }
+/* ---------- el cierre: el gris se estrecha hasta una línea y se recoge (js/para-quien.js) ----------
+   Pin de una pantalla + 60vh de scroll. #planes va justo detrás (css/home.css: margin-top −100lvh, el alto
+   del pin): lo que deja ver el gris al cerrarse YA es #planes, y al acabar su titular está en pantalla. El pin
+   va por encima (z 1) y no se pulsa. */
+.pq-fin { position: relative; height: calc(100vh + 60vh); height: calc(100lvh + 60vh); margin: clamp(90px, 14vh, 150px) calc(-1 * var(--pq-g)) 0; background: #0b0c0f; pointer-events: none; }
+.pq-fin__pin { position: sticky; top: 0; z-index: 1; height: 100vh; height: 100lvh; overflow: hidden; overflow: clip; }
 .pq-fin__gris { position: absolute; inset: 0; background: var(--gris); will-change: clip-path, opacity; }
 /* sin animación (movimiento reducido, versión fija, sin JS): corte limpio del gris al negro */
 .pq:not(.pq-vivo) .pq-fin { height: 0; margin-bottom: 0; }
+.pq:not(.pq-vivo) ~ #planes { margin-top: 0; }
 .pq:not(.pq-vivo) { padding-bottom: clamp(90px, 14vh, 150px); }
 
 /* las ondas: en el aire de debajo de la frase, a la derecha (la frase ocupa casi todo el ancho) */
