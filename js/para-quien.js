@@ -56,8 +56,22 @@
   var C = 339.292;                                // el perímetro de los anillos (r 54)
 
   var botones = $$('.pq-aud'), frase = sec.querySelector('.pq-switch');
-  // el interruptor pequeño encima de cada ventana (uno por panel, sincronizados con la frase)
-  var segs = $$('.pq-seg'), radios = $$('.pq-seg__b');
+  // la pestaña pegada a cada ventana (una por panel, sincronizadas con la frase)
+  var tabs = $$('.pq-tab').map(function (el) {
+    return { el: el, l: el.querySelector('.pq-tab__l'), bs: $$('.pq-tab__b', el), op: escritor(el, 'opacity'), tr: escritor(el, 'transform'), letras: {} };
+  });
+  var radios = [].concat.apply([], tabs.map(function (t) { return t.bs; }));
+  var tabAnim = null;                             // { n, t }: las letras del nombre que pasa a activo (.5 s)
+  // la línea naranja, bajo la opción activa (del punto al final del nombre)
+  function linea(t, n) {
+    var b = t.bs.filter(function (b) { return b.dataset.for === n; })[0];
+    if (!b) return;
+    // medido sobre el texto (un Range): si el nombre se parte en dos líneas (móvil estrecho), la línea va bajo él
+    var p = b.querySelector('.pq-tab__p'), rg = document.createRange();
+    rg.selectNodeContents(b.querySelector('.pq-tab__t'));
+    var tb = t.el.getBoundingClientRect(), a = p.getBoundingClientRect().left - tb.left, w = rg.getBoundingClientRect().right - tb.left - a;
+    if (w > 0) t.l.style.transform = 'translate3d(' + a.toFixed(2) + 'px,0,0) scaleX(' + (w / 100).toFixed(4) + ')';
+  }
   var panelDe = function (el) { return el.closest('[data-aud]'); };
   var aud = 'ag', pendiente = null;
 
@@ -99,25 +113,30 @@
   }
   function elegir(n, foco) {
     botones.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.for === n)); });
-    segs.forEach(function (s) { s.dataset.on = n; });
+    tabs.forEach(function (t) { t.el.dataset.on = n; linea(t, n); });
     radios.forEach(function (r) { var si = r.dataset.for === n; r.setAttribute('aria-checked', String(si)); r.tabIndex = si ? 0 : -1; });
-    if (foco === 'seg') {
+    if (foco === 'tab') {
       var r = radios.filter(function (r) { return !panelDe(r).hidden && r.dataset.for === n; })[0];
       if (r) r.focus({ preventScroll: true });
     } else if (foco) botones.filter(function (b) { return b.dataset.for === n; })[0].focus({ preventScroll: true });
     if (n === (pendiente || aud)) return;
     tip.cambio();
+    // el nombre que pasa a activo se escribe otra vez con las franjas
+    if (!quieto && tabs.some(function (t) { return t.letras[n]; })) {
+      tabAnim = { n: n, t: 0 };
+      tabs.forEach(function (t) { if (t.letras[n]) t.letras[n].escribir(0); });
+    }
     if (quieto) { aplicar(n); return; }
     if (n === aud) { pendiente = null; meta = 1; return; }    // vuelve antes de que dé tiempo a cambiar
     pendiente = n; meta = 0;
   }
   botones.forEach(function (b) { b.addEventListener('click', function () { elegir(b.dataset.for); }); });
   radios.forEach(function (r) { r.addEventListener('click', function () { elegir(r.dataset.for); }); });
-  segs.forEach(function (s) {
-    s.addEventListener('keydown', function (e) {
+  tabs.forEach(function (t) {
+    t.el.addEventListener('keydown', function (e) {
       if (['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp'].indexOf(e.key) < 0) return;
       e.preventDefault();
-      elegir((pendiente || aud) === 'ag' ? 'nl' : 'ag', 'seg');
+      elegir((pendiente || aud) === 'ag' ? 'nl' : 'ag', 'tab');
     });
   });
   frase.addEventListener('keydown', function (e) {
@@ -346,6 +365,10 @@
     M.vh = window.innerHeight;
     posiciones();
     if (listas) Object.keys(auds).forEach(function (k) { auds[k].bloques.forEach(function (b) { b.b.ordenar(); }); });
+    tabs.forEach(function (t) {
+      Object.keys(t.letras).forEach(function (k) { t.letras[k].ordenar(); if (!tabAnim || tabAnim.n !== k) t.letras[k].escribir(1); });
+      linea(t, pendiente || aud);
+    });
   }
 
   /* ---------- montar las letras (en reposo) ---------- */
@@ -366,16 +389,23 @@
         d.ponB('0'); d.ponArco(C + 'px');
       });
     });
+    tabs.forEach(function (t) {
+      $$('.pq-tab__t', t.el).forEach(function (el) {
+        var b = new R.Bloque({ el: el, W: 3 });
+        b.partir(); b.ordenar(); b.escribir(1);
+        t.letras[el.parentNode.dataset.for] = b;
+      });
+    });
     medir();
   }
 
   /* ---------- el bucle ---------- */
-  var sucio = true, ultimaY = null, o = 0, oMeta = 0, abierta = false, contados = false, cuenta = null;
+  var sucio = true, ultimaY = null, o = 0, oMeta = 0, ot = 0, otMeta = 0, abierta = false, contados = false, cuenta = null;
   function vuelta(t, dms) {
     if (document.hidden || quieto || !listas) return;
     var dt = Math.min(.1, (dms || 16.7) / 1000);
     var y = scrollY();
-    var anima = pendiente !== null || swap !== meta || cuenta !== null || Math.abs(oMeta - o) > 1e-4;
+    var anima = pendiente !== null || swap !== meta || cuenta !== null || tabAnim !== null || Math.abs(oMeta - o) > 1e-4 || Math.abs(otMeta - ot) > 1e-4;
     var cerca = M.top - y < M.vh * 1.2 && M.top + M.alto - y > -M.vh * .2;
     if (!cerca && !anima && !sucio) return;
     if (!sucio && !anima && y === ultimaY) return;
@@ -411,6 +441,20 @@
     A.stage(lb >= 1 ? 'none' : 'translate3d(0,' + ((1 - lb) * 30).toFixed(2) + 'px,0) scale(' + (.96 + .04 * lb).toFixed(4) + ')');
     A.info(lb >= 1 ? 'none' : 'translate3d(0,' + ((1 - lb) * 20).toFixed(2) + 'px,0)');
     abierta = lb > .97;
+
+    // la pestaña: aparece al terminar de abrirse la ventana (por el scroll, no por el cambio: mientras la
+    // ventana se cierra para cambiar de caso, se queda)
+    otMeta = cl((tope - M.vh * .08 - enPantalla(A.winTop)) / (M.vh * .55));
+    ot += (otMeta - ot) * (1 - Math.exp(-dt * 8));
+    if (Math.abs(otMeta - ot) <= 1e-4) ot = otMeta;
+    var rv = cl((ot - .9) / .1); rv = rv * rv * (3 - 2 * rv);
+    tabs.forEach(function (t) { t.op(rv.toFixed(3)); t.tr(rv >= 1 ? 'none' : 'translate3d(0,' + ((1 - rv) * 6).toFixed(2) + 'px,0)'); });
+    if (tabAnim) {
+      tabAnim.t += dt;
+      var tp = cl(tabAnim.t / .5);
+      tabs.forEach(function (t) { var b = t.letras[tabAnim.n]; if (b) b.escribir(tp); });
+      if (tp >= 1) tabAnim = null;
+    }
 
     // los anillos: la primera vez que la ventana de Disco termina de abrirse
     if (!contados && abierta && A.anillos.length) { contados = true; cuenta = { t: 0, A: A }; }

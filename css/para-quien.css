@@ -202,43 +202,60 @@
 .pq-talk p { font-size: clamp(22px, 2.5vw, 42px); line-height: 1.02; text-wrap: balance; }
 .pq-talk__pro p { color: rgb(18 19 23 / .52); }      /* el problema, apagado (3,3:1, texto grande) */
 
-/* ---------- el interruptor pequeño, encima de la ventana (desde backup-pre-ajustes-ondas) ----------
-   Uno en cada panel, en el mismo sitio (los .pq-talk se igualan de alto): al cambiar de público no se mueve.
-   Sincronizado con la frase (js/para-quien.js). El relleno se desliza .35 s. */
-.pq-seg {
+/* ---------- la pestaña del caso (desde backup-pre-pestana; sustituye al interruptor pequeño) ----------
+   Una solapa negra pegada al borde de arriba de la ventana, a su izquierda: las dos son una sola forma. Una en
+   cada panel, en el mismo sitio (los .pq-talk se igualan de alto): al cambiar de público no se mueve.
+   Sincronizada con la frase (js/para-quien.js): punto naranja en la activa, línea naranja de 1 px que se desliza
+   (.45 s) y las letras del nombre que pasa a activo con las franjas de los titulares (.5 s). Se revela al
+   terminar de abrirse la ventana (fundido + 6 px) y se queda mientras la ventana se cierra para cambiar. */
+.pq-tab {
   position: relative;
-  display: inline-grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  min-height: 34px;
+  display: flex;
+  align-items: stretch;
+  width: fit-content;
+  height: 44px;
   margin-top: clamp(80px, 14vh, 150px);
-  border: 1px solid rgb(18 19 23 / .2);
-  border-radius: 2px;
-}
-.pq-seg::before { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 50%; background: #121317; transition: transform .35s var(--pq-ease); }
-.pq-seg[data-on="nl"]::before { transform: translateX(100%); }
-.pq-seg__b {
-  position: relative;
-  z-index: 1;
-  margin: 0;
   padding: 0 18px;
+  background: var(--pq-negro);                  /* el negro de la ventana (#141518): sin costura */
+  font: 600 12px / 1.2 var(--font-text);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.pq-tab__b {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
   border: 0;
   background: none;
-  font: 500 11px / 1.15 var(--font-text);
-  letter-spacing: .14em;
-  text-transform: uppercase;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
   white-space: nowrap;
-  color: rgb(18 19 23 / .6);
+  color: rgb(236 235 231 / .38);
   cursor: pointer;
   transition: color .35s var(--pq-ease);
   -webkit-tap-highlight-color: transparent;
 }
-.pq-seg__b[aria-checked="true"] { color: var(--pq-claro); cursor: default; }
-@media (hover: hover) { .pq-seg__b[aria-checked="false"]:hover { color: rgb(18 19 23 / .85); } }
-.pq-seg__b:focus-visible { outline-offset: 3px; }
-.pq-seg + .pq-window { margin-top: 14px; }
-/* sin JS no hay interruptor (los dos públicos se ven uno debajo del otro) */
-.pq:not(.pq-viva) .pq-seg { display: none; }
-.pq:not(.pq-viva) .pq-seg + .pq-window { margin-top: clamp(80px, 14vh, 150px); }
+.pq-tab__b[aria-checked="true"] { color: var(--pq-claro); cursor: default; }
+@media (hover: hover) { .pq-tab__b[aria-checked="false"]:hover { color: rgb(236 235 231 / .7); } }
+.pq .pq-tab__b:focus-visible { outline: 1px solid #ecebe7; outline-offset: 3px; }
+.pq-tab__p { flex: none; width: 6px; height: 6px; border-radius: 50%; background: #ff7a22; opacity: 0; transform: scale(.4); transition: opacity .35s var(--pq-ease), transform .35s var(--pq-ease); }
+.pq-tab__b[aria-checked="true"] .pq-tab__p { opacity: 1; transform: none; }
+.pq-tab__t { display: inline-block; }
+.pq-tab__sep { display: flex; align-items: center; margin: 0 14px; color: rgb(236 235 231 / .2); }
+/* la línea: 100 px escalados al ancho de la opción activa (solo transform) */
+.pq-tab__l { position: absolute; z-index: 1; left: 0; bottom: 0; width: 100px; height: 1px; background: #ff7a22; transform-origin: 0 0; transform: scaleX(0); transition: transform .45s var(--pq-ease); pointer-events: none; }
+.pq-tab::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .2; background: url("../assets/onda/grano.png") 0 0 / 200px 200px repeat; }
+.pq-tab .sc .s2 { color: var(--pq-claro); }   /* la franja del medio, clara (la tinta no se vería en el negro) */
+/* las letras ya escritas llevan visibility: visible en línea: en el panel oculto no deben verse */
+.pq .pq-aud-panel[hidden] .pq-tab .sc > * { visibility: hidden !important; }
+.pq-tab + .pq-window { margin-top: 0; }
+.pq-vivo .pq-tab { opacity: 0; transform: translate3d(0, 6px, 0); }
+/* sin JS no hay pestaña (los dos públicos se ven uno debajo del otro) */
+.pq:not(.pq-viva) .pq-tab { display: none; }
+.pq:not(.pq-viva) .pq-tab + .pq-window { margin-top: clamp(80px, 14vh, 150px); }
 
 /* ---------- la ventana del caso ---------- */
 .pq-window {
@@ -399,14 +416,16 @@
   .pq-ondas { top: calc(100% + 4px); right: 0; width: 56vw; height: clamp(84px, 16vh, 120px); }
   .pq-talk { grid-template-columns: minmax(0, 1fr); gap: 40px; }
   .pq-window { grid-template-columns: minmax(0, 1fr); min-height: 0; padding: 64px 20px 32px; }
-  .pq-seg { display: grid; width: 100%; }
-  .pq-seg__b { padding: 6px 8px; white-space: normal; }
+  /* la pestaña, a todo el ancho de la ventana: las dos opciones a partes iguales */
+  .pq-tab { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); width: 100%; padding: 0 10px; font-size: 11px; letter-spacing: .1em; }
+  .pq-tab__b { justify-content: center; gap: 6px; white-space: normal; text-align: center; }
+  .pq-tab__sep { margin: 0 6px; }
   .pq-window__tag { left: 20px; right: 20px; flex-wrap: wrap; row-gap: 6px; font-size: 11px; letter-spacing: .12em; }
   .pq-movil { flex-direction: column-reverse; }
   .pq-psi { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 22px; max-width: 320px; }
   .pq-psi__g svg { max-width: 112px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .pq-aud, .pq-aud::after, .pq-seg::before, .pq-seg__b, .pq-cta::after, .pq-cta__arr, .pq-info__links a, .pq-tip, .pq-tip__f path { transition: none !important; }
+  .pq-aud, .pq-aud::after, .pq-tab__b, .pq-tab__p, .pq-tab__l, .pq-cta::after, .pq-cta__arr, .pq-info__links a, .pq-tip, .pq-tip__f path { transition: none !important; }
   .pq-tip__f path { stroke-dashoffset: 0; }
 }
