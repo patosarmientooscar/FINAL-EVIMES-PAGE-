@@ -6,9 +6,11 @@
       se abre en gris (clip-path inset, ease-in-out); el titular sube 24 px.
    2) Cuándo se escribe cada bloque: el titular, con la apertura; los demás,
       según su posición en la pantalla.
-   3) La salida hacia #con-quien: la franja naranja se ensancha hasta llenar
-      la pantalla y baja como una persiana. #con-quien ya está detrás, fija:
-      se solapa con el final de esta sección (r.solape, lo lee js/con-quien.js).
+   3) La salida: la franja naranja se ensancha hasta llenar la pantalla y baja
+      como una persiana. Descubre la sección que lleva [data-tras-persiana]
+      (#para-quien), que se solapa con el final de esta (margin-top: −r.solape) y
+      mientras baja el naranja se queda quieta en su sitio (un translateY que
+      compensa el scroll, solo durante la persiana). Después scrollea normal.
    · Movimiento reducido / versión fija: sin apertura ni persiana (corte
      limpio: una sección detrás de otra).
    ========================================================================== */
@@ -24,7 +26,9 @@
   var $ = function (s) { return sec.querySelector(s); };
   var win = $('.lat-window'), band = $('.p-band'), h2 = $('.lat-h'), parrafo = $('.lat-p'), pText = $('.p-text');
   var kick = $('.lat-kick'), lista = $('.lat-list'), pList = $('.p-list'), cortina = $('.lat-cortina');
-  var sale = !quieto && !!cortina && !!document.querySelector('#con-quien .lat-pin');
+  var tras = document.querySelector('[data-tras-persiana]');
+  var sale = !quieto && !!cortina && !!tras;
+  var ponTras = tras && escritor(tras, 'transform');
 
   var ponClip = escritor(win, 'clipPath'), ponTitular = escritor(h2, 'transform'), ponParrafo = escritor(parrafo, 'transform');
   var ponHint = escritor($('.lat-hint'), 'opacity'), ponUI = escritor($('.lat-ui'), 'opacity');
@@ -40,6 +44,7 @@
 
   R.crear({
     sec: sec,
+    tras: tras && tras.id,                                 // su ancla la abre ya descubierta (EV.recorrido.destino)
     sentido: -1,
     alCargar: true,
     bloques: [
@@ -58,7 +63,8 @@
       r.despues = ensancha + persiana;
       r.cola = sale ? Math.round(r.h * COLA) : 0;
       r.desde = quieto ? 0 : LINEA[0] * r.h;
-      r.solape = sale ? r.h + persiana + r.cola : 0;        // lo que #con-quien sube para quedar detrás de la persiana
+      r.solape = sale ? r.h + r.cola : 0;                  // lo que sube la sección de detrás: su borde de arriba, donde acaba la persiana
+      if (tras) tras.style.marginTop = sale ? -r.solape + 'px' : '';
     },
     recorrido: function (r) { return band.offsetLeft + band.offsetWidth - r.vw; },
     medir: function (r) {
@@ -121,6 +127,9 @@
         ponUI((1 - cl(e1 * 4)).toFixed(3));
         var b2 = e2 > 0;
         if (b2 !== seBaja) { seBaja = b2; sec.classList.toggle('se-baja', b2); }
+        // la sección de detrás, quieta mientras baja el naranja (con el scroll real: no se mueve ni un píxel)
+        var t = tramo(s, t0 + ensancha, t0 + ensancha + persiana);
+        ponTras(t > 0 && t < 1 ? 'translate3d(0,' + (-(1 - t) * h).toFixed(1) + 'px,0)' : '');
       }
 
       var ve = s > -h && s < r.fin && v < r.apertura + r.run / 8;
@@ -129,7 +138,8 @@
       // 4) qué hay bajo la cabecera
       var medio = R.cabecera.medio, abajo = h + r.fin + r.cola - s;
       if (abajo <= medio) return null;
-      if (e2 > 0) return e2 * h > medio ? null : { clara: false, naranja: true, lisa: true };            // por encima de la persiana ya es #con-quien
+      // bajo el logo, o el naranja o ya el gris de la sección de detrás
+      if (e2 > 0) return e2 * h > medio ? { clara: true, lisa: true } : { clara: false, naranja: true, lisa: true };
       var naranja = e1 > 0 && r.vw - banda - empuje < R.cabecera.marcaX;
       return {
         clara: !naranja && baja + arriba < medio,

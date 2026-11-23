@@ -1,6 +1,6 @@
 /* ==========================================================================
    Panel gris de la oficina (oficina.html, con css/oficina.css). Los grises de
-   la home son lisos y con su propio CSS (css/lateral.css, css/con-quien.css).
+   la home son lisos y con su propio CSS (css/lateral.css, css/para-quien.css).
    ========================================================================== */
 .panel {
   --tinta-2: rgb(11 15 26 / 0.7);               /* secundario sobre el gris ≥ 6:1 */

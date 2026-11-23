@@ -38,7 +38,7 @@
   function measure() {
     vw = window.innerWidth; vh = window.innerHeight;
     var y = scrollY();
-    // Secciones grises normales. #lateral y #con-quien avisan ellas (EV.cabeceraClara, js/recorrido.js): su gris se mueve.
+    // Secciones grises normales (#para-quien). #lateral avisa ella (EV.cabeceraClara, js/recorrido.js): su gris se mueve.
     lay.grises = $$('.panel, [data-nav="light"]').map(function (n) { var r = n.getBoundingClientRect(); return { top: r.top + y, bottom: r.bottom + y }; });
     var c = el.cab.getBoundingClientRect();
     lay.cabTop = c.top; lay.cabBottom = c.bottom;
@@ -67,7 +67,7 @@
     var fin = function () { EV.saltando = false; };
     var off = id === 'inicio' ? 0 : -Math.round((el.cab ? el.cab.getBoundingClientRect().bottom : 80) + 16);
     var yT = 0, m = t; while (m) { yT += m.offsetTop; m = m.offsetParent; }
-    var propio = EV.recorrido ? EV.recorrido.destino(id) : null;   // #lateral y #con-quien: abiertas, no su borde de arriba
+    var propio = EV.recorrido ? EV.recorrido.destino(id) : null;   // #lateral abierta; #para-quien, ya descubierta por la persiana
     var destino = propio !== null ? propio : Math.max(0, yT + off);
     if (lenis) lenis.scrollTo(id === 'inicio' ? 0 : destino, { duration: Math.min(2.2, 0.8 + Math.abs(t.getBoundingClientRect().top) / 4000), onComplete: fin });
     else if (propio !== null) { window.scrollTo({ top: destino, behavior: EV.reducedMotion ? 'auto' : 'smooth' }); setTimeout(fin, 1200); }

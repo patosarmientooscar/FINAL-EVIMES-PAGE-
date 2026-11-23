@@ -4,9 +4,8 @@
    pide el brief: apertura desde una línea de 1 px, sin esquinas redondeadas,
    sin tramo negro al final y el gris liso.
    · Sin JS: los bloques uno debajo de otro, en gris, legibles.
-   · .is-viva (la pone js/recorrido.js): panel fijo + pista horizontal. #con-quien usa esto mismo
-     (.lateral.cq; lo que cambia, en css/con-quien.css).
-   · .lat-cortina: la franja que se ensancha y baja como una persiana hacia #con-quien.
+   · .is-viva (la pone js/recorrido.js): panel fijo + pista horizontal.
+   · .lat-cortina: la franja que se ensancha y baja como una persiana hacia #para-quien.
    La familia "Schibsted Lateral" es el MISMO archivo de Schibsted (no se
    descarga otra vez), con todo su eje de peso (400–900): en css/fonts.css está
    declarada hasta 600 y abrirla allí engordaría las negritas de toda la web.
@@ -27,7 +26,7 @@
   z-index: 1;                                   /* bajo el canvas de las ondas (5) */
   font-family: "Schibsted Lateral", var(--font-text);
 }
-#lateral { z-index: 2; }                       /* la persiana pasa por encima de #con-quien */
+#lateral { z-index: 2; }                       /* la persiana pasa por encima de #para-quien */
 .lateral :where(h2, p, ul) { margin: 0; }
 .lateral:focus { outline: none; }               /* el destino de #lateral no es un control */
 .lat-window { background: var(--gris); color: var(--lat-tinta); }
@@ -158,7 +157,7 @@
 .lat-cifra { display: inline-block; height: 18px; overflow: hidden; vertical-align: top; }
 .lat-cifra > span { display: block; white-space: pre; }
 
-/* ---------- la persiana hacia #con-quien ---------- */
+/* ---------- la persiana hacia #para-quien ---------- */
 .is-viva .lat-cortina {
   position: absolute;
   inset: 0;
@@ -182,7 +181,7 @@
   color: #0b0c0f;
 }
 .en-pantalla .lat-cortina, .en-pantalla .lat-cortina i { will-change: transform; }
-/* bajando: por encima del naranja ya se ve (y se pulsa) #con-quien */
+/* bajando: por encima del naranja ya se ve (y se pulsa) #para-quien */
 #lateral.se-baja { pointer-events: none; }
 #lateral.se-baja .lat-window { background: none; }
 #lateral.se-baja .lat-track, #lateral.se-baja .lat-ui { opacity: 0 !important; }

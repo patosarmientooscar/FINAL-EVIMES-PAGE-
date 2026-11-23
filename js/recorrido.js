@@ -1,10 +1,10 @@
 /* ==========================================================================
    recorrido.js — el motor de las secciones con recorrido lateral de la home
    (desde backup-pre-conquien-lateral; lo común que estaba en js/lateral.js).
-   Lo usan js/lateral.js (hacia la izquierda) y js/con-quien.js (hacia la derecha).
+   Lo usa js/lateral.js; los efectos de texto (Bloque, Lineas), también js/para-quien.js.
    · Pin sticky + pista: alto = pantalla + apertura + recorrido + lo de después.
    · UN scroll suavizado para todas (1 − e^(−9·dt)) en UN callback de gsap.ticker:
-     la persiana de #lateral y lo que descubre de #con-quien van al mismo paso.
+     la pista, las letras y la persiana de #lateral van al mismo paso.
    · Letras: tres franjas por letra, en orden de lectura; la letra i de un bloque
      avanza clamp((P·(N+W) − i)/W). Solo se escribe lo que cambia.
    · Párrafos con fundido línea a línea (Lineas: opacidad + 8 px, en orden de lectura).
@@ -214,6 +214,7 @@
      Una sección
        sec         la sección (.lateral)
        sentido     -1: la pista va a la izquierda · 1: a la derecha
+       tras        opcional: el id de la sección que descubre al final (su ancla salta a ella ya descubierta)
        bloques     [{ el, piezas, W }]
        listas      las <ul> que ondulan
        alCargar    true: las letras se montan en reposo tras la carga · false: desde el primer scroll
@@ -493,6 +494,9 @@
     // a dónde lleva su ancla: abierta y con el titular escrito. null = no es una de estas secciones
     destino: function (id) {
       montarPendientes();
+      for (var i = 0; i < secciones.length; i++) {
+        if (secciones[i].o.tras === id) { secciones[i].medirArriba(); return arribaDe(document.getElementById(id)); }
+      }
       var r = de(id);
       if (!r) return null;
       r.medirArriba();
