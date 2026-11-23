@@ -5,7 +5,9 @@
    sin tramo negro al final y el gris liso.
    · Sin JS: los bloques uno debajo de otro, en gris, legibles.
    · .is-viva (la pone js/recorrido.js): panel fijo + pista horizontal.
-   · .lat-cortina: la franja que se ensancha y baja como una persiana hacia #para-quien.
+   · El final (desde backup-pre-para-quien-planes): la franja naranja fina (6vw,
+     sin texto) y el panel "¿PARA QUIÉN?" (.lat-q, mismo tamaño y peso que el
+     titular). Sin persiana: el gris sigue en #para-quien.
    La familia "Schibsted Lateral" es el MISMO archivo de Schibsted (no se
    descarga otra vez), con todo su eje de peso (400–900): en css/fonts.css está
    declarada hasta 600 y abrirla allí engordaría las negritas de toda la web.
@@ -26,14 +28,14 @@
   z-index: 1;                                   /* bajo el canvas de las ondas (5) */
   font-family: "Schibsted Lateral", var(--font-text);
 }
-#lateral { z-index: 2; }                       /* la persiana pasa por encima de #para-quien */
+#lateral { z-index: 2; }
 .lateral :where(h2, p, ul) { margin: 0; }
 .lateral:focus { outline: none; }               /* el destino de #lateral no es un control */
 .lat-window { background: var(--gris); color: var(--lat-tinta); }
 .lat-panel { position: relative; padding: 64px var(--lat-g); }
 
 /* ---------- los textos ---------- */
-.lat-h {
+.lat-h, .lat-q {
   font-family: inherit;
   font-weight: 800;
   text-transform: uppercase;
@@ -78,8 +80,10 @@
   justify-content: center;
   background: linear-gradient(90deg, #ff7a22 0%, #ff4f3a 55%, #ff3d7f 100%);
 }
-.p-band span { font-weight: 800; text-transform: uppercase; letter-spacing: .02em; line-height: 1; font-size: clamp(28px, 3.4vw, 58px); color: #0b0c0f; }
-.lat-ui, .lat-cortina { display: none; }
+.p-band { min-height: 24px; }
+/* sin kerning: las letras van una a una (inline-block) y su relevo (.pq-relevo) es texto seguido: así miden igual */
+.lat-q { font-kerning: none; }
+.lat-ui { display: none; }
 
 /* ---------- el recorrido ---------- */
 .lateral.is-viva .lat-pin {
@@ -110,7 +114,7 @@
   padding: 0 var(--lat-g) var(--barra);
 }
 .is-viva .p-head { padding-right: 16vw; }
-.is-viva .lat-h {
+.is-viva .lat-h, .is-viva .lat-q {
   width: max-content;
   font-size: min(clamp(64px, 11.2vw, 200px), (100svh - 230px) / 4);   /* el del prototipo; baja solo si la pantalla es baja */
 }
@@ -132,8 +136,8 @@
 .is-viva .p-list { width: max(100vw, 1040px); padding-left: 14vw; }
 .is-viva .lat-list li { font-size: max(19px, min(clamp(30px, 4.6vw, 78px), (100svh - 150px) / 11)); }
 .is-viva .lat-ondas { display: block; position: absolute; right: 6vw; top: 26%; width: 34vw; height: 42%; pointer-events: none; }
-.is-viva .p-band { width: 34vw; min-width: 280px; padding: 0 0 var(--barra); align-items: center; }
-.is-viva .p-band span { writing-mode: vertical-rl; transform: rotate(180deg); }
+.is-viva .p-band { width: 6vw; min-height: 0; padding: 0; }   /* solo un acento de color, sin texto */
+.is-viva .p-quien { width: 100vw; }
 .is-viva .lat-ui {
   position: absolute;
   left: var(--lat-g);
@@ -157,35 +161,6 @@
 .lat-cifra { display: inline-block; height: 18px; overflow: hidden; vertical-align: top; }
 .lat-cifra > span { display: block; white-space: pre; }
 
-/* ---------- la persiana hacia #para-quien ---------- */
-.is-viva .lat-cortina {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding-bottom: var(--barra);
-  opacity: 0;
-  pointer-events: none;
-}
-.lat-cortina i { position: absolute; inset: 0; background: linear-gradient(90deg, #ff7a22 0%, #ff4f3a 55%, #ff3d7f 100%); transform-origin: right; }
-.lat-cortina b { position: relative; display: flex; font-weight: inherit; }
-.lat-cortina span {
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: .02em;
-  line-height: 1;
-  font-size: clamp(28px, 3.4vw, 58px);
-  color: #0b0c0f;
-}
-.en-pantalla .lat-cortina, .en-pantalla .lat-cortina i { will-change: transform; }
-/* bajando: por encima del naranja ya se ve (y se pulsa) #para-quien */
-#lateral.se-baja { pointer-events: none; }
-#lateral.se-baja .lat-window { background: none; }
-#lateral.se-baja .lat-track, #lateral.se-baja .lat-ui { opacity: 0 !important; }
-
 /* ---------- las letras: tres franjas las cruzan mientras se enfocan (js/recorrido.js las escribe) ---------- */
 .sw { display: inline-block; white-space: nowrap; visibility: hidden; }   /* solo se ve la letra ya escrita */
 /* las palabras de un párrafo con fundido por líneas (js/recorrido.js → Lineas) */
@@ -208,6 +183,7 @@
 .sc .s2 { clip-path: polygon(0 35%, 100% 35%, 100% 65%, 0 65%); color: #121317; }
 .sc .s3 { clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%); color: #ff7a22; }
 
+
 @media (max-width: 860px) {
   .is-viva .p-head { padding-right: 30vw; }
   .is-viva .lat-h { font-size: min(17vw, (100svh - 190px) / 4); }
@@ -217,8 +193,9 @@
   .is-viva .p-list { width: 160vw; }
   .is-viva .lat-list li { font-size: max(19px, min(10vw, (100svh - 150px) / 11)); }   /* 19 px en negrita: el gris sigue siendo AA */
   .is-viva .lat-ondas { left: 40vw; right: auto; top: 68px; width: 60vw; height: max(48px, (100svh - 100vw) / 2 - 130px); }
-  .is-viva .p-band { width: 60vw; min-width: 0; }
-  .is-viva .p-band span, .lat-cortina span { font-size: max(28px, 3.4vw); }
+  .is-viva .p-band { width: 6vw; }
+  /* la pregunta a 15vw: "¿PARA / QUIÉN?" en dos líneas, en el ancho de la pantalla */
+  .is-viva .lat-q { width: auto; max-width: calc(100vw - 2 * var(--lat-g)); font-size: 15vw; }
 }
 
 @media (max-height: 500px) {
@@ -226,10 +203,9 @@
 }
 
 /* ---------- la cabecera sobre la sección ----------
-   Con la sección fija no sube nada por debajo del logo: sin fundido. Al soltarse, el fundido gris no pisa la franja. */
+   Con la sección fija no sube nada por debajo del logo: sin fundido. */
 .cabecera.is-lisa::before,
 .cabecera.is-lisa::after { opacity: 0 !important; transition: none; }
-.cabecera.is-franja::after { clip-path: inset(0 var(--franja, 0px) 0 0); }
 
 /* sobre el naranja el logo va claro y el cristal oscurece lo de detrás, como sobre el gris (sin esto, 4,4:1) */
 .cabecera.is-naranja .cabecera__nav,

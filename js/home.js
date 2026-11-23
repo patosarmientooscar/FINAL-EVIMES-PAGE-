@@ -194,9 +194,10 @@
     }
     for (i = 0; i < lay.oscuras.length; i++) {
       var o = lay.oscuras[i];
-      if (o.top - y < mid && o.bottom - y > mid && !o.n.closest('[hidden]')) dentro = false;
+      if (!EV.cabeceraGris && o.top - y < mid && o.bottom - y > mid && !o.n.closest('[hidden]')) dentro = false;
     }
-    var clara = (dentro || !!EV.cabeceraClara) && !EV.cabeceraOscura;
+    // EV.cabeceraGris: la franja gris del título fijo de #para-quien está debajo (js/para-quien.js)
+    var clara = (dentro || !!EV.cabeceraClara || !!EV.cabeceraGris) && !EV.cabeceraOscura;
     if (clara !== cabClara) { cabClara = clara; el.cab.classList.toggle('is-clara', clara); }
 
     var scrolled = y > 40;

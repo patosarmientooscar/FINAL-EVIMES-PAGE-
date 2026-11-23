@@ -164,23 +164,28 @@
               </ul>
               <div class="lat-ondas" data-ondas="helice" data-ondas-scale=".7" data-ondas-tempo=".25" aria-hidden="true"></div>
             </div>
-            <div class="lat-panel p-band" aria-hidden="true"><span>Hecho a medida</span></div>
+            <div class="lat-panel p-band" aria-hidden="true"></div>
+            <!-- La pregunta: al acabar el recorrido no se va; js/para-quien.js la releva (.pq-relevo) y la encoge hasta el título fijo de #para-quien. -->
+            <div class="lat-panel p-quien"><p class="lat-q">¿Para quién?</p></div>
           </div>
-          <div class="lat-cortina" aria-hidden="true"><i></i><b><span>Hecho a medida</span></b></div>
           <div class="lat-ui" aria-hidden="true"><span class="lat-bar"><i></i></span><span class="lat-count"><b>00</b> / 100</span></div>
         </div>
       </div>
     </section>
 
     <!-- ===== Con quién trabajamos y nuestro trabajo (desde backup-pre-para-quien; prototipo aprobado Downloads/evimes-para-quien) =====
-         La persiana naranja de #lateral la descubre (data-tras-persiana: js/lateral.js la sube detrás de la persiana
-         y la deja quieta mientras baja). Después, una sección vertical normal: sin scroll secuestrado.
+         Sigue al gris de #lateral sin cortes (sin persiana desde backup-pre-para-quien-planes). Su título fijo es la
+         pregunta de #lateral, relevada y encogida (.pq-relevo). Al final, el gris se cierra en una línea (.pq-fin)
+         y debajo queda #planes en negro. Una sección vertical normal: sin scroll secuestrado.
          LA FRASE ES EL INTERRUPTOR: los dos públicos son <button aria-pressed>. Cada público (data-aud) lleva su
          problema, lo que hacemos, la ventana de su caso y su cierre; los dos están en el HTML (el que no toca, con
          hidden) y ocupan el mismo sitio: cambiar no mueve el scroll.
          Estilos: css/para-quien.css + css/trabajo-selecto.css · JS: js/para-quien.js y js/trabajo-selecto.js (el portátil de Disco) -->
-    <section class="pq" id="para-quien" aria-labelledby="pq-t" data-tras-persiana data-nav="light" data-pq data-active="ag">
+    <section class="pq" id="para-quien" aria-labelledby="pq-t" data-nav="light" data-pq data-active="ag">
       <h2 class="sr-only" id="pq-t">Con quién trabajamos y nuestro trabajo</h2>
+      <!-- El relevo de "¿Para quién?" (fijo a la pantalla; js/para-quien.js): la grande, en el sitio donde la deja
+           #lateral, se encoge hasta el título discreto, que se queda arriba sobre una franja gris mientras dura la sección. -->
+      <div class="pq-relevo" aria-hidden="true"><span class="pq-relevo__banda"></span><span class="pq-relevo__g">¿Para quién?</span><span class="pq-relevo__t">¿Para quién?</span></div>
       <div class="pq-cabeza">
         <p class="pq-switch" role="group" aria-label="Elige tu caso">
           <span class="pq-switch__lead">Somos el estudio de</span>
@@ -267,9 +272,21 @@
           <a class="pq-cta" href="#contacto" data-perfil="Negocio local"><span class="pq-cta__t" data-type="6">¿Qué necesita tu negocio?</span><span class="pq-cta__arr"><svg viewBox="0 0 100 100" aria-hidden="true" focusable="false"><path d="M4 50H92M58 14L94 50L58 86"/></svg></span></a>
         </div>
       </div>
+      <!-- El cierre: el gris, fijo a la pantalla, se estrecha de arriba y abajo hasta una línea de 1 px, que se recoge
+           hacia el centro y se desvanece. Debajo, negro: #planes. Espejo de la apertura de #lateral. -->
+      <div class="pq-fin" aria-hidden="true"><div class="pq-fin__pin"><div class="pq-fin__gris"></div></div></div>
     </section>
 
-    <!-- ===== Herramientas ===== -->
+    <!-- ===== Planes ===== -->
+    <section class="planes" id="planes" aria-labelledby="h-planes">
+      <div class="planes__cab">
+        <h2 class="display planes__titulo" id="h-planes" data-c="inicio.planes.titulo">Un plan para cada negocio.</h2>
+      </div>
+      <ol class="planes__lista" data-planes></ol>
+      <p class="planes__mas"><a class="enlace" href="planes.html" data-scramble><span class="sl" data-c="inicio.planes.verTodo">Ver qué incluye cada plan</span> →</a></p>
+    </section>
+
+    <!-- ===== Herramientas (desde backup-pre-para-quien-planes, detrás de los planes: el gris de #para-quien se cierra sobre #planes) ===== -->
     <section class="herramientas" id="herramientas" aria-labelledby="h-herramientas">
       <h2 class="etiqueta" id="h-herramientas" data-c="inicio.herramientas">Herramientas con las que trabajamos</h2>
       <!-- Cromo de la cinta: degradado en el espacio del icono (viewBox 24). -->
@@ -303,15 +320,6 @@
           </ul>
         </div>
       </div>
-    </section>
-
-    <!-- ===== Planes ===== -->
-    <section class="planes" id="planes" aria-labelledby="h-planes">
-      <div class="planes__cab">
-        <h2 class="display planes__titulo" id="h-planes" data-c="inicio.planes.titulo">Un plan para cada negocio.</h2>
-      </div>
-      <ol class="planes__lista" data-planes></ol>
-      <p class="planes__mas"><a class="enlace" href="planes.html" data-scramble><span class="sl" data-c="inicio.planes.verTodo">Ver qué incluye cada plan</span> →</a></p>
     </section>
 
     <!-- ===== Contacto: formulario (Web3Forms; la clave va en js/config.js → WEB3FORMS_KEY). JS: js/contacto/form.js · CSS: css/contacto.css ===== -->

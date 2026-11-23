@@ -328,6 +328,8 @@ html:not(.cinta-viva) .cinta__lista { flex-wrap: wrap; gap: 8px 40px; padding: 0
    Planes
    ========================================================================== */
 .planes { padding: clamp(100px, 18vh, 200px) var(--g) clamp(80px, 14vh, 160px); }
+/* en la home, negro liso (sin la cuadrícula de .bg-grid): sale del cierre del gris de #para-quien */
+.inicio #planes { position: relative; background: #0b0c0f; }
 .planes__cab { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 24px; }
 .planes__titulo { font-size: clamp(38px, 5vw, 80px); max-width: 9.5ch; }
 .planes__intro { font-size: 16px; color: var(--texto-2); }

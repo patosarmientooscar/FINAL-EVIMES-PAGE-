@@ -28,6 +28,14 @@
    · Al cambiar de público (por tiempo, sin mover el scroll): los textos se
      borran (.35 s) y la ventana se cierra en línea; se cambia el contenido y
      todo vuelve a escribirse y abrirse (.8 s).
+   · El relevo (desde backup-pre-para-quien-planes): cuando se suelta el panel
+     de #lateral, su "¿PARA QUIÉN?" (EV.lateralRelevo) pasa a .pq-relevo, fijo a
+     la pantalla en el mismo sitio, y al bajar se encoge (ligado al scroll, con
+     suavizado) hasta el título discreto, que se queda arriba sobre una franja
+     gris mientras dura la sección (la cabecera, clara: EV.cabeceraGris).
+   · El cierre (.pq-fin): el gris se estrecha de arriba y abajo hasta una línea
+     de 1 px, que se recoge hacia el centro y se desvanece; debajo, el negro de
+     #planes (la cabecera, oscura: EV.cabeceraOscura).
    · Posiciones cacheadas (sin lecturas de layout por fotograma); un callback
      en gsap.ticker que no calcula con la sección lejos ni quieta.
    · Movimiento reducido o versión fija: todo visible desde el principio.
@@ -139,11 +147,12 @@
       var ult = suyas.reduce(function (a, q) { return q.t > a.t + 2 || (Math.abs(q.t - a.t) <= 2 && q.l < a.l) ? q : a; });
       var yT = pri.t + (pri.b - pri.t) * .2;            // a la altura de lo alto de las mayúsculas
       // la frase va 36 px por encima de la punta (o por debajo); se aparta a la derecha de lo que toque y, si hace falta, se estrecha
-      function prueba(T, x, abajo) {
+      function prueba(T, x, abajo, aire) {
+        aire = aire || 36;
         texto.style.maxWidth = '';
         for (var i = 0; i < 5; i++) {
           var w = texto.offsetWidth, h = texto.offsetHeight;
-          var caja = abajo ? { l: x, r: x + w, t: T.y + 36, b: T.y + 36 + h } : { l: x, r: x + w, t: T.y - 36 - h, b: T.y - 36 };
+          var caja = abajo ? { l: x, r: x + w, t: T.y + aire, b: T.y + aire + h } : { l: x, r: x + w, t: T.y - aire - h, b: T.y - aire };
           var m = choca(caja, todo);
           if (m < 0 && caja.r <= W + 1 && caja.t >= -h) return { T: T, x: x, y: caja.t, h: h, abajo: abajo };
           if (m >= 0) x = Math.ceil(m + 14);
@@ -151,8 +160,10 @@
         }
         return null;
       }
-      var P = prueba({ x: pri.r + 3, y: yT }, pri.r + 24) ||                                  // arriba a la derecha
+      // en móvil, siempre encima de la palabra
+      var P = (window.innerWidth > 860 && prueba({ x: pri.r + 3, y: yT }, pri.r + 24)) ||   // arriba a la derecha
               prueba({ x: pri.l + Math.min(28, (pri.r - pri.l) * .2), y: yT }, pri.l) ||      // encima, alineada a su izquierda
+              prueba({ x: pri.l + Math.min(28, (pri.r - pri.l) * .2), y: yT }, pri.l, false, 20) ||   // encima, más pegada (titular grande: no pisa la línea de arriba)
               // pantallas muy estrechas (320 px), donde la línea de encima llena el ancho: debajo, la flecha sube a la palabra
               prueba({ x: ult.l + Math.min(28, (ult.r - ult.l) * .2), y: ult.b - (ult.b - ult.t) * .2 }, ult.l, true);
       if (!P) { el.classList.remove('is-lista'); return; }
@@ -180,20 +191,95 @@
       clearTimeout(salto);
       salto = setTimeout(function () { colocar(); el.classList.remove('is-fuera'); }, 300);
     }
-    // la flecha se dibuja una vez, cuando la frase está a la vista (y no bajo el naranja de la persiana)
+    // la flecha se dibuja una vez, cuando la frase está a la vista
     if (window.IntersectionObserver) {
       var io = new IntersectionObserver(function (es) {
         if (!es[0].isIntersecting) return;
         io.disconnect();
         (function espera() {
-          var cort = sec.__cortina, r = frase.getBoundingClientRect();
-          if (cort != null && cort < r.bottom) { requestAnimationFrame(espera); return; }
           el.classList.add('is-dibuja');
         })();
       }, { threshold: .6 });
       io.observe(frase);
     } else el.classList.add('is-dibuja');
     return { cambio: cambio, colocar: colocar };
+  })();
+
+  /* ---------- el relevo de "¿Para quién?" y el cierre del gris ---------- */
+  var relevo = (function () {
+    var caja = sec.querySelector('.pq-relevo'), fin = sec.querySelector('.pq-fin');
+    if (!caja || !fin) return { medir: function () {} };
+    var grande = caja.querySelector('.pq-relevo__g'), chico = caja.querySelector('.pq-relevo__t'), banda = caja.querySelector('.pq-relevo__banda');
+    var gris = fin.querySelector('.pq-fin__gris');
+    var pon = {
+      g: escritor(grande, 'transform'), gO: escritor(grande, 'opacity'), cO: escritor(chico, 'opacity'),
+      bO: escritor(banda, 'opacity'), cajaO: escritor(caja, 'opacity'), clip: escritor(gris, 'clipPath'), grisO: escritor(gris, 'opacity')
+    };
+    var F = { top: 0, alto: 0, cx: 0, cy: 0, fs: 0 }, L = null, ponLat = null, k = 0, c = 0, visible = null, gr = null, os = null, ultima = null;
+    function medir() {
+      L = EV.lateralRelevo ? EV.lateralRelevo() : null;
+      F.top = arriba(fin); F.alto = fin.offsetHeight;
+      var r = chico.getBoundingClientRect();
+      F.cx = r.left; F.cy = r.top;                       // el título discreto (position: fixed: ya está en coordenadas de pantalla)
+      if (L) {
+        var cs = getComputedStyle(L.el);
+        F.fs = parseFloat(cs.fontSize) || 100;
+        grande.style.fontSize = cs.fontSize;
+        grande.style.width = Math.ceil(L.w + 1) + 'px';
+        if (!ponLat) ponLat = escritor(L.el, 'opacity');
+      }
+      ultima = null;
+    }
+    function bandera(nombre, v) {
+      if (!!EV[nombre] === v) return;
+      EV[nombre] = v;
+      if (EV.home && EV.home.refrescar) EV.home.refrescar();
+    }
+    function paso(dt) {
+      if (!L) { medir(); if (!L) return; }
+      L = EV.lateralRelevo() || L;                       // suelta, x e y, al día (#lateral cambia de alto al montar sus letras)
+      var y = scrollY(), vh = M.vh;
+      var suelta = L.suelta, d = y - suelta;
+      // 1) el relevo: 0 = la grande donde la deja #lateral · 1 = el título discreto
+      var meta = d <= 0 ? 0 : quieto ? 1 : cl(d / (vh * .7));
+      // 2) el cierre: 0 = gris a pantalla completa · 1 = negro
+      var cm = quieto ? (y >= F.top ? 1 : 0) : cl((y - F.top) / Math.max(1, F.alto - vh));
+      if (y === ultima && k === meta && c === cm) return;  // quieto y asentado: nada que escribir
+      ultima = y;
+      k = quieto ? meta : k + (meta - k) * (1 - Math.exp(-dt * 9));
+      if (Math.abs(meta - k) < 1e-4) k = meta;
+      var e = io(k);
+      c = quieto ? cm : c + (cm - c) * (1 - Math.exp(-dt * 9));
+      if (Math.abs(cm - c) < 1e-4) c = cm;
+      // el título se va al empezar a cerrarse el gris
+      var vete = cl((y - (F.top - vh * .35)) / (vh * .3));
+
+      var ve = (d > 0 || k > .002) && vete < 1;
+      if (ve !== visible) { visible = ve; caja.classList.toggle('is-on', ve); }
+      if (ponLat) ponLat(ve ? '0' : '');                 // la de #lateral, oculta mientras la lleva el relevo
+      if (ve) {
+        var s = 1 + (13 / F.fs - 1) * e;
+        var gx = L.x + (F.cx - L.x) * e, gy = L.y + (F.cy - L.y) * e;
+        pon.g('translate3d(' + gx.toFixed(2) + 'px,' + gy.toFixed(2) + 'px,0) scale(' + s.toFixed(5) + ')');
+        var cruce = cl((e - .8) / .2);                    // al final, la grande cede al título (13 px, .16em)
+        pon.gO((1 - cruce).toFixed(3));
+        pon.cO(cruce.toFixed(3));
+        pon.bO(cl((e - .55) / .35).toFixed(3));
+        pon.cajaO((1 - vete).toFixed(3));
+      }
+      bandera('cabeceraGris', ve && e > .75 && vete < .5);
+
+      // el cierre: primero se estrecha de arriba y abajo hasta 1 px; después la línea se recoge al centro y se va
+      var a = io(cl(c / .55)), b = io(cl((c - .5) / .5));
+      var v = (a * 50).toFixed(2), px = (a * .5).toFixed(2), lados = (b * 50).toFixed(2);
+      pon.clip(c <= 0 ? 'none' : 'inset(calc(' + v + '% - ' + px + 'px) ' + lados + '% calc(' + v + '% - ' + px + 'px) ' + lados + '%)');
+      pon.grisO(c <= 0 ? '' : (1 - b).toFixed(3));
+      // la cabecera: oscura en cuanto el negro llega a su línea central, y mientras el cierre (ya negro) siga bajo ella
+      bandera('cabeceraOscura', y >= F.top && y < F.top + F.alto && a * vh / 2 > 32);
+    }
+    if (window.gsap) gsap.ticker.add(function (t, dms) { if (!document.hidden) paso(Math.min(.1, (dms || 16.7) / 1000)); });
+    else (function f() { requestAnimationFrame(f); paso(1 / 60); })();
+    return { medir: medir };
   })();
 
   /* ---------- medidas (solo al cambiar el tamaño) ---------- */
@@ -206,6 +292,7 @@
   }
   function posiciones() {
     M.top = arriba(sec); M.alto = sec.offsetHeight;
+    relevo.medir();
     Object.keys(auds).forEach(function (k) {
       var A = auds[k];
       A.winTop = arriba(A.win);
@@ -242,16 +329,16 @@
   }
 
   /* ---------- el bucle ---------- */
-  var sucio = true, ultimaY = null, ultimaDy = null, o = 0, oMeta = 0, abierta = false, contados = false, cuenta = null;
+  var sucio = true, ultimaY = null, o = 0, oMeta = 0, abierta = false, contados = false, cuenta = null;
   function vuelta(t, dms) {
     if (document.hidden || quieto || !listas) return;
     var dt = Math.min(.1, (dms || 16.7) / 1000);
-    var y = scrollY(), dy = sec.__dy || 0, cort = sec.__cortina;
+    var y = scrollY();
     var anima = pendiente !== null || swap !== meta || cuenta !== null || Math.abs(oMeta - o) > 1e-4;
-    var cerca = M.top + dy - y < M.vh * 1.2 && M.top + M.alto + dy - y > -M.vh * .2;
+    var cerca = M.top - y < M.vh * 1.2 && M.top + M.alto - y > -M.vh * .2;
     if (!cerca && !anima && !sucio) return;
-    if (!sucio && !anima && y === ultimaY && dy === ultimaDy && cort == null) return;
-    ultimaY = y; ultimaDy = dy; sucio = false;
+    if (!sucio && !anima && y === ultimaY) return;
+    ultimaY = y; sucio = false;
 
     // el cambio de público: borrar deprisa (.35 s), cambiar, escribir otra vez (.8 s)
     if (swap > meta) swap = Math.max(meta, swap - dt / .35);
@@ -263,9 +350,8 @@
     }
 
     var A = auds[aud];
-    // lo que se ve: hasta abajo de la pantalla o, mientras baja la persiana, hasta su borde
-    var tope = cort != null ? cort : M.vh;
-    var enPantalla = function (docTop) { return docTop - y + dy; };
+    var tope = M.vh;
+    var enPantalla = function (docTop) { return docTop - y; };
 
     // los textos se escriben a medida que suben desde abajo de la pantalla
     A.bloques.forEach(function (b) {

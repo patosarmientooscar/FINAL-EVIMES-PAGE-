@@ -27,7 +27,7 @@
   --pq-claro: #ecebe7;
   --pq-ease: cubic-bezier(.2, .75, .15, 1);
   position: relative;                           /* sin z-index: el contenido, bajo #lateral (2) y las ondas (5) */
-  padding: clamp(110px, 16vh, 170px) var(--pq-g) clamp(90px, 14vh, 150px);
+  padding: clamp(150px, 22vh, 230px) var(--pq-g) 0;   /* arriba, el aire del título fijo; abajo, el cierre (.pq-fin) */
   background: var(--gris);
   color: var(--pq-tinta);
   font-family: "Schibsted Lateral", var(--font-text);
@@ -38,7 +38,8 @@
 
 /* ---------- la frase es el interruptor ---------- */
 .pq-cabeza { position: relative; }
-.pq-switch { max-width: 13em; font-size: clamp(40px, 6.6vw, 118px); line-height: .98; }
+/* la misma escala que el titular de #lateral (css/lateral.css: .is-viva .lat-h) */
+.pq-switch { font-size: min(clamp(64px, 11.2vw, 200px), (100svh - 230px) / 4); line-height: .98; }
 .pq-aud {
   position: relative;
   margin: 0;
@@ -107,6 +108,54 @@
 .pq-tip__f path { stroke-dasharray: 1 3; stroke-dashoffset: 1.02; }
 .pq-tip.is-dibuja .pq-tip__c { stroke-dashoffset: 0; transition: stroke-dashoffset .45s cubic-bezier(.65, 0, .35, 1); }
 .pq-tip.is-dibuja .pq-tip__p { stroke-dashoffset: 0; transition: stroke-dashoffset .15s cubic-bezier(.2, .75, .15, 1) .45s; }
+
+/* ---------- el relevo de "¿Para quién?" (fijo a la pantalla; js/para-quien.js lo mueve) ---------- */
+.pq-relevo { position: fixed; top: 0; left: 0; right: 0; z-index: 6; height: 0; pointer-events: none; visibility: hidden; }
+.pq-relevo.is-on { visibility: visible; }
+.pq-relevo__banda {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(64px + env(safe-area-inset-top, 0px) + 44px);
+  background: var(--gris);
+  box-shadow: 0 1px 0 rgb(18 19 23 / .08);
+  opacity: 0;
+}
+/* la grande: el mismo tipo que .lat-q (tamaño y ancho, desde js); sin kerning, como sus letras sueltas */
+.pq-relevo__g {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-family: "Schibsted Lateral", var(--font-text);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -.045em;
+  line-height: 1;
+  font-kerning: none;
+  color: var(--pq-tinta);
+  transform-origin: 0 0;
+  will-change: transform;
+}
+.pq-relevo__t {
+  position: absolute;
+  top: calc(64px + env(safe-area-inset-top, 0px) + 14px);
+  left: var(--pq-g);
+  font: 500 13px / 1 var(--font-text);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: rgb(18 19 23 / .55);
+  opacity: 0;
+}
+
+/* ---------- el cierre: el gris se estrecha hasta una línea y se recoge (js/para-quien.js) ---------- */
+.pq-fin { position: relative; height: 180vh; height: 180lvh; margin: clamp(90px, 14vh, 150px) calc(-1 * var(--pq-g)) 0; background: #0b0c0f; }
+.pq-fin__pin { position: sticky; top: 0; height: 100vh; height: 100lvh; overflow: hidden; overflow: clip; }
+.pq-fin__gris { position: absolute; inset: 0; background: var(--gris); will-change: clip-path, opacity; }
+/* sin animación (movimiento reducido, versión fija, sin JS): corte limpio del gris al negro */
+.pq:not(.pq-vivo) .pq-fin { height: 0; margin-bottom: 0; }
+.pq:not(.pq-vivo) { padding-bottom: clamp(90px, 14vh, 150px); }
 
 /* las ondas: en el aire de debajo de la frase, a la derecha (la frase ocupa casi todo el ancho) */
 .pq-ondas { position: absolute; top: calc(100% + 8px); right: 0; width: min(30vw, 460px); height: clamp(90px, 16vh, 170px); pointer-events: none; }
@@ -288,6 +337,9 @@
 .pq-vivo .pq-cta__arr svg { opacity: 0; }
 
 @media (max-width: 860px) {
+  .pq { padding-top: clamp(130px, 20vh, 180px); }
+  /* la escala del titular de #lateral en móvil, sin que "CREATIVAS" (5,7 em) se salga */
+  .pq-switch { font-size: min(17vw, (100svh - 190px) / 4, (100vw - 2 * var(--pq-g)) / 5.8); }
   .pq-tip__t { font-size: 11px; }
   .pq-ondas { top: calc(100% + 4px); right: 0; width: 56vw; height: clamp(84px, 16vh, 120px); }
   .pq-talk { grid-template-columns: minmax(0, 1fr); gap: 40px; }
