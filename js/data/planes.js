@@ -24,7 +24,7 @@ window.EVIMES_PLANES = [
   {
     id: 'inmersion',
     nombre: 'Inmersión',
-    precio: '500 €',
+    precio: '499 €',
     para: 'Para destacar y captar clientes.',
     incluye: ['Diseño web a medida', 'Animaciones y experiencia inmersiva', 'Pensada para convertir', 'SEO completo'],   // BORRADOR
     hereda: 'fundamento',
