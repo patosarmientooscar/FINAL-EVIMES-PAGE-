@@ -4,11 +4,13 @@
    Script clásico, después de js/recorrido.js.
    · LA FRASE ES EL INTERRUPTOR: los dos públicos son <button aria-pressed>;
      clic o flechas izquierda/derecha. Por defecto, agencias. La frase no se anima.
-   · La anotación "pulsa" (.pq-nudge): pegada al público en gris (a su derecha
-     en escritorio, debajo en móvil), recolocada al cambiar el tamaño y al
-     cargar las fuentes; al cambiar de público salta al otro con un fundido.
-     Al entrar la sección en pantalla, la flecha da dos empujones (.8 s, una
-     vez). Tras el primer cambio se va y no vuelve en la visita (sessionStorage).
+   · La anotación del público en gris (.pq-tip): "¿Tienes un negocio? Toca
+     aquí" / "¿Eres una agencia? Toca aquí" y una flecha que baja hasta la
+     esquina de arriba a la derecha de la palabra (si no cabe, encima de ella,
+     alineada a su izquierda; nunca sobre el texto de la frase). Se recoloca al
+     cambiar el tamaño y al cargar las fuentes; al cambiar de público salta a la
+     otra palabra con un fundido (.3 s). La flecha se dibuja una vez al entrar
+     la sección en pantalla. Pulsar su frase es pulsar la palabra.
    · Los dos públicos están en el HTML (el que no toca, con hidden, maquetado
      encima y fuera del flujo: css/para-quien.css): cambiar no mueve el scroll.
      Se iguala el alto de sus dos columnas, para que las ventanas empiecen a la
@@ -82,7 +84,7 @@
     botones.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.for === n)); });
     if (foco) botones.filter(function (b) { return b.dataset.for === n; })[0].focus({ preventScroll: true });
     if (n === (pendiente || aud)) return;
-    nudge.cambio();
+    tip.cambio();
     if (quieto) { aplicar(n); return; }
     if (n === aud) { pendiente = null; meta = 1; return; }    // vuelve antes de que dé tiempo a cambiar
     pendiente = n; meta = 0;
@@ -94,46 +96,103 @@
     elegir((pendiente || aud) === 'ag' ? 'nl' : 'ag', true);
   });
 
-  /* ---------- la anotación "pulsa" ---------- */
-  var nudge = (function () {
-    var el = sec.querySelector('.pq-nudge'), cabeza = sec.querySelector('.pq-cabeza');
-    var CLAVE = 'evimes-pq-pulsado', visto = false, salto = null;
+  /* ---------- la anotación del público en gris ---------- */
+  var tip = (function () {
+    var el = sec.querySelector('.pq-tip'), cabeza = sec.querySelector('.pq-cabeza');
     var nada = { cambio: function () {}, colocar: function () {} };
     if (!el || !cabeza) return nada;
-    try { visto = sessionStorage.getItem(CLAVE) === '1'; } catch (e) {}
-    if (visto) { el.remove(); return nada; }
+    var texto = el.querySelector('.pq-tip__t'), svg = el.querySelector('.pq-tip__f');
+    var cuerpo = svg.querySelector('.pq-tip__c'), punta = svg.querySelector('.pq-tip__p');
+    var TEXTOS = { nl: '¿Tienes un negocio?<br>Toca aquí', ag: '¿Eres una agencia?<br>Toca aquí' };
+    var para = null, salto = null;
+    texto.addEventListener('click', function () { if (para) elegir(para); });
+
+    // los rectángulos de cada línea de texto de un nodo, relativos a la cabeza. Solo los nodos de texto: un
+    // Range sobre el elemento devuelve también la caja entera de cada botón (en móvil, todo el ancho)
+    function lineas(nodo, c) {
+      var out = [], r = document.createRange(), tw = document.createTreeWalker(nodo, NodeFilter.SHOW_TEXT), t;
+      while ((t = tw.nextNode())) {
+        if (!t.textContent.trim()) continue;
+        r.selectNodeContents(t);
+        [].forEach.call(r.getClientRects(), function (q) {
+          if (q.width > 1 && q.height > 1) out.push({ l: q.left - c.left, t: q.top - c.top, r: q.right - c.left, b: q.bottom - c.top });
+        });
+      }
+      return out;
+    }
+    // -1 si la caja no toca el texto de la frase; si lo toca, el borde derecho de lo que toca
+    function choca(caja, texto) {
+      var m = -1;
+      texto.forEach(function (q) { if (caja.l < q.r + 10 && caja.r > q.l - 10 && caja.t < q.b && caja.b > q.t) m = Math.max(m, q.r); });
+      return m;
+    }
     function colocar() {
       var b = botones.filter(function (k) { return k.getAttribute('aria-pressed') === 'false'; })[0];
       if (!b) return;
-      var c = cabeza.getBoundingClientRect(), r = b.getBoundingClientRect();
-      var ancho = el.offsetWidth || 96, cabe = r.right - c.left + 14 + ancho <= c.width;
-      var abajo = window.innerWidth <= 860 || !cabe;
-      el.classList.toggle('is-abajo', abajo);
-      var x = abajo ? r.left - c.left + Math.min(40, r.width * .15) : r.right - c.left + 14;
-      var y = abajo ? r.bottom - c.top + 2 : r.top - c.top + r.height * .52 - 14;
-      el.style.transform = 'translate3d(' + Math.round(x) + 'px,' + Math.round(y) + 'px,0)';
+      para = b.dataset.for;
+      texto.innerHTML = TEXTOS[para] || '';
+      var c = cabeza.getBoundingClientRect(), W = c.width;
+      var todo = lineas(frase, c), suyas = lineas(b, c);
+      if (!suyas.length) return;
+      // la primera línea de la palabra (arriba y, en ella, la de la izquierda)
+      var pri = suyas.reduce(function (a, q) { return q.t < a.t - 2 || (Math.abs(q.t - a.t) <= 2 && q.l < a.l) ? q : a; });
+      var ult = suyas.reduce(function (a, q) { return q.t > a.t + 2 || (Math.abs(q.t - a.t) <= 2 && q.l < a.l) ? q : a; });
+      var yT = pri.t + (pri.b - pri.t) * .2;            // a la altura de lo alto de las mayúsculas
+      // la frase va 36 px por encima de la punta (o por debajo); se aparta a la derecha de lo que toque y, si hace falta, se estrecha
+      function prueba(T, x, abajo) {
+        texto.style.maxWidth = '';
+        for (var i = 0; i < 5; i++) {
+          var w = texto.offsetWidth, h = texto.offsetHeight;
+          var caja = abajo ? { l: x, r: x + w, t: T.y + 36, b: T.y + 36 + h } : { l: x, r: x + w, t: T.y - 36 - h, b: T.y - 36 };
+          var m = choca(caja, todo);
+          if (m < 0 && caja.r <= W + 1 && caja.t >= -h) return { T: T, x: x, y: caja.t, h: h, abajo: abajo };
+          if (m >= 0) x = Math.ceil(m + 14);
+          if (x + w > W + 1) { if (W - x < 96) return null; texto.style.maxWidth = Math.floor(W - x) + 'px'; }
+        }
+        return null;
+      }
+      var P = prueba({ x: pri.r + 3, y: yT }, pri.r + 24) ||                                  // arriba a la derecha
+              prueba({ x: pri.l + Math.min(28, (pri.r - pri.l) * .2), y: yT }, pri.l) ||      // encima, alineada a su izquierda
+              // pantallas muy estrechas (320 px), donde la línea de encima llena el ancho: debajo, la flecha sube a la palabra
+              prueba({ x: ult.l + Math.min(28, (ult.r - ult.l) * .2), y: ult.b - (ult.b - ult.t) * .2 }, ult.l, true);
+      if (!P) { el.classList.remove('is-lista'); return; }
+      texto.style.transform = 'translate3d(' + Math.round(P.x) + 'px,' + Math.round(P.y) + 'px,0)';
+
+      // la flecha: sale de la frase (por debajo o, si va debajo de la palabra, por encima) y entra en la palabra
+      var S = { x: P.x + 14, y: P.abajo ? P.y - 4 : P.y + P.h + 4 }, T = P.T;
+      var c1 = { x: S.x, y: S.y + (T.y - S.y) * .75 }, c2 = { x: T.x + (S.x - T.x) * .5, y: T.y };
+      var ox = Math.min(S.x, T.x) - 10, oy = Math.min(S.y, T.y) - 8, an = Math.abs(S.x - T.x) + 20, al = Math.abs(T.y - S.y) + 16;
+      var p = function (q) { return (q.x - ox).toFixed(1) + ' ' + (q.y - oy).toFixed(1); };
+      cuerpo.setAttribute('d', 'M' + p(S) + 'C' + p(c1) + ' ' + p(c2) + ' ' + p(T));
+      var dx = T.x - c2.x, dy = T.y - c2.y;
+      if (Math.abs(dx) + Math.abs(dy) < 1) { dx = T.x - c1.x; dy = T.y - c1.y; }
+      var L = Math.hypot(dx, dy) || 1, ux = -dx / L, uy = -dy / L, k = Math.cos(.6), s = Math.sin(.6), n = 6.5;
+      var a1 = { x: T.x + n * (ux * k - uy * s), y: T.y + n * (ux * s + uy * k) }, a2 = { x: T.x + n * (ux * k + uy * s), y: T.y + n * (-ux * s + uy * k) };
+      punta.setAttribute('d', 'M' + p(a1) + 'L' + p(T) + 'L' + p(a2));
+      svg.setAttribute('viewBox', '0 0 ' + an.toFixed(1) + ' ' + al.toFixed(1));
+      svg.setAttribute('width', an.toFixed(1)); svg.setAttribute('height', al.toFixed(1));
+      svg.style.transform = 'translate3d(' + Math.round(ox) + 'px,' + Math.round(oy) + 'px,0)';
       el.classList.add('is-lista');
     }
     function cambio() {
-      if (!visto) { visto = true; try { sessionStorage.setItem(CLAVE, '1'); } catch (e) {} }
-      // salta al otro botón con un fundido; tras el primer cambio ya no vuelve a aparecer
+      // salta a la otra palabra con un fundido (.3 s) y cambia su texto
       el.classList.add('is-fuera');
       clearTimeout(salto);
-      salto = setTimeout(function () { colocar(); if (!visto) el.classList.remove('is-fuera'); }, 300);
+      salto = setTimeout(function () { colocar(); el.classList.remove('is-fuera'); }, 300);
     }
-    // los dos empujones, una vez, cuando la frase está a la vista (y no bajo el naranja de la persiana)
+    // la flecha se dibuja una vez, cuando la frase está a la vista (y no bajo el naranja de la persiana)
     if (window.IntersectionObserver) {
       var io = new IntersectionObserver(function (es) {
         if (!es[0].isIntersecting) return;
         io.disconnect();
         (function espera() {
-          var c = sec.__cortina, r = el.getBoundingClientRect();
-          if (c != null && c < r.bottom) { requestAnimationFrame(espera); return; }
-          el.classList.add('is-empuja');
+          var cort = sec.__cortina, r = frase.getBoundingClientRect();
+          if (cort != null && cort < r.bottom) { requestAnimationFrame(espera); return; }
+          el.classList.add('is-dibuja');
         })();
-      }, { threshold: .9 });
-      io.observe(el);
-    }
+      }, { threshold: .6 });
+      io.observe(frase);
+    } else el.classList.add('is-dibuja');
     return { cambio: cambio, colocar: colocar };
   })();
 
@@ -156,7 +215,7 @@
   }
   function medir() {
     igualar();
-    nudge.colocar();
+    tip.colocar();
     M.vh = window.innerHeight;
     posiciones();
     if (listas) Object.keys(auds).forEach(function (k) { auds[k].bloques.forEach(function (b) { b.b.ordenar(); }); });

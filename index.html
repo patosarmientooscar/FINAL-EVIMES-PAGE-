@@ -188,8 +188,9 @@
           <span class="pq-switch__lead">y de</span>
           <button class="pq-aud" type="button" data-for="nl" aria-pressed="false" aria-controls="pq-nl">negocios locales.</button>
         </p>
-        <!-- La anotación del público en gris (js/para-quien.js la pega a su botón: a la derecha en escritorio, debajo en móvil). -->
-        <div class="pq-nudge" aria-hidden="true"><span class="pq-nudge__f"><svg viewBox="0 0 46 28" focusable="false"><g class="pq-nudge__g"><path d="M44 24C34 6 18 4 5 10"/><path d="M8.5 3.9L5 10l6.9 1.25"/></g></svg></span><span class="pq-nudge__t">pulsa</span></div>
+        <!-- La anotación del público en gris: en la esquina de arriba a la derecha de su palabra (o encima, alineada a su
+             izquierda, si no cabe). js/para-quien.js la coloca, le pone el texto y dibuja la flecha. -->
+        <div class="pq-tip" aria-hidden="true"><span class="pq-tip__t">¿Tienes un negocio?<br>Toca aquí</span><svg class="pq-tip__f" focusable="false"><path class="pq-tip__c" pathLength="1"/><path class="pq-tip__p" pathLength="1"/></svg></div>
         <!-- Ancla de las ondas: en el aire de debajo de la frase, a la derecha. -->
         <div class="pq-ondas" data-ondas="intercambio" data-ondas-scale=".6" aria-hidden="true"></div>
       </div>
