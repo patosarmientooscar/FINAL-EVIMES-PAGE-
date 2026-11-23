@@ -4,6 +4,11 @@
    Script clásico, después de js/recorrido.js.
    · LA FRASE ES EL INTERRUPTOR: los dos públicos son <button aria-pressed>;
      clic o flechas izquierda/derecha. Por defecto, agencias. La frase no se anima.
+   · La anotación "pulsa" (.pq-nudge): pegada al público en gris (a su derecha
+     en escritorio, debajo en móvil), recolocada al cambiar el tamaño y al
+     cargar las fuentes; al cambiar de público salta al otro con un fundido.
+     Al entrar la sección en pantalla, la flecha da dos empujones (.8 s, una
+     vez). Tras el primer cambio se va y no vuelve en la visita (sessionStorage).
    · Los dos públicos están en el HTML (el que no toca, con hidden, maquetado
      encima y fuera del flujo: css/para-quien.css): cambiar no mueve el scroll.
      Se iguala el alto de sus dos columnas, para que las ventanas empiecen a la
@@ -77,6 +82,7 @@
     botones.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.for === n)); });
     if (foco) botones.filter(function (b) { return b.dataset.for === n; })[0].focus({ preventScroll: true });
     if (n === (pendiente || aud)) return;
+    nudge.cambio();
     if (quieto) { aplicar(n); return; }
     if (n === aud) { pendiente = null; meta = 1; return; }    // vuelve antes de que dé tiempo a cambiar
     pendiente = n; meta = 0;
@@ -87,6 +93,49 @@
     e.preventDefault();
     elegir((pendiente || aud) === 'ag' ? 'nl' : 'ag', true);
   });
+
+  /* ---------- la anotación "pulsa" ---------- */
+  var nudge = (function () {
+    var el = sec.querySelector('.pq-nudge'), cabeza = sec.querySelector('.pq-cabeza');
+    var CLAVE = 'evimes-pq-pulsado', visto = false, salto = null;
+    var nada = { cambio: function () {}, colocar: function () {} };
+    if (!el || !cabeza) return nada;
+    try { visto = sessionStorage.getItem(CLAVE) === '1'; } catch (e) {}
+    if (visto) { el.remove(); return nada; }
+    function colocar() {
+      var b = botones.filter(function (k) { return k.getAttribute('aria-pressed') === 'false'; })[0];
+      if (!b) return;
+      var c = cabeza.getBoundingClientRect(), r = b.getBoundingClientRect();
+      var ancho = el.offsetWidth || 96, cabe = r.right - c.left + 14 + ancho <= c.width;
+      var abajo = window.innerWidth <= 860 || !cabe;
+      el.classList.toggle('is-abajo', abajo);
+      var x = abajo ? r.left - c.left + Math.min(40, r.width * .15) : r.right - c.left + 14;
+      var y = abajo ? r.bottom - c.top + 2 : r.top - c.top + r.height * .52 - 14;
+      el.style.transform = 'translate3d(' + Math.round(x) + 'px,' + Math.round(y) + 'px,0)';
+      el.classList.add('is-lista');
+    }
+    function cambio() {
+      if (!visto) { visto = true; try { sessionStorage.setItem(CLAVE, '1'); } catch (e) {} }
+      // salta al otro botón con un fundido; tras el primer cambio ya no vuelve a aparecer
+      el.classList.add('is-fuera');
+      clearTimeout(salto);
+      salto = setTimeout(function () { colocar(); if (!visto) el.classList.remove('is-fuera'); }, 300);
+    }
+    // los dos empujones, una vez, cuando la frase está a la vista (y no bajo el naranja de la persiana)
+    if (window.IntersectionObserver) {
+      var io = new IntersectionObserver(function (es) {
+        if (!es[0].isIntersecting) return;
+        io.disconnect();
+        (function espera() {
+          var c = sec.__cortina, r = el.getBoundingClientRect();
+          if (c != null && c < r.bottom) { requestAnimationFrame(espera); return; }
+          el.classList.add('is-empuja');
+        })();
+      }, { threshold: .9 });
+      io.observe(el);
+    }
+    return { cambio: cambio, colocar: colocar };
+  })();
 
   /* ---------- medidas (solo al cambiar el tamaño) ---------- */
   var M = { vh: 0, top: 0, alto: 0 };
@@ -107,6 +156,7 @@
   }
   function medir() {
     igualar();
+    nudge.colocar();
     M.vh = window.innerHeight;
     posiciones();
     if (listas) Object.keys(auds).forEach(function (k) { auds[k].bloques.forEach(function (b) { b.b.ordenar(); }); });

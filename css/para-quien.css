@@ -73,7 +73,32 @@
   .pq-aud[aria-pressed="false"]:hover::after { transform: scaleX(1); }
 }
 .pq-aud:focus-visible { outline-offset: 6px; }
-.pq-hint { display: block; margin-top: 22px; font: 500 12px / 1.2 var(--font-text); letter-spacing: .16em; text-transform: uppercase; color: var(--pq-2); }
+/* la anotación "pulsa": pegada al público en gris (js/para-quien.js la coloca); se va tras el primer cambio */
+.pq-nudge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #ff7a22;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .3s var(--pq-ease);
+}
+.pq-nudge.is-lista { opacity: 1; }
+.pq-nudge.is-fuera { opacity: 0; }
+.pq-nudge__f { position: relative; flex: none; width: 46px; height: 28px; }
+.pq-nudge__f svg { position: absolute; top: 0; left: 0; width: 46px; height: 28px; overflow: visible; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.pq-nudge__t { font: 500 11px / 1 var(--font-text); letter-spacing: .16em; text-transform: uppercase; white-space: nowrap; }
+/* debajo de la palabra (móvil, o sin sitio a la derecha): la flecha gira para apuntar hacia arriba */
+.pq-nudge.is-abajo { flex-direction: column; align-items: flex-start; gap: 4px; }
+.pq-nudge.is-abajo .pq-nudge__f { width: 28px; height: 46px; }
+.pq-nudge.is-abajo .pq-nudge__f svg { top: 9px; left: -9px; transform: rotate(90deg); }
+/* al entrar la sección en pantalla: dos empujones hacia la palabra, una sola vez */
+.pq-nudge.is-empuja .pq-nudge__g { animation: pq-empuja .8s cubic-bezier(.45, 0, .55, 1) 1; }
+@keyframes pq-empuja { 0%, 50%, 100% { transform: none; } 25%, 75% { transform: translateX(-4px); } }
 
 /* las ondas: en el aire de debajo de la frase, a la derecha (la frase ocupa casi todo el ancho) */
 .pq-ondas { position: absolute; top: calc(100% + 8px); right: 0; width: min(30vw, 460px); height: clamp(90px, 16vh, 170px); pointer-events: none; }
@@ -87,7 +112,6 @@
 .pq .pq-aud-panel[hidden] { display: block !important; position: absolute; top: 0; left: 0; right: 0; visibility: hidden; }
 /* sin JS no hay interruptor: los dos, uno debajo del otro */
 .pq:not(.pq-viva) .pq-aud-panel[hidden] { position: static; visibility: visible; }
-.pq:not(.pq-viva) .pq-hint { display: none; }
 
 /* ---------- el problema y lo que hacemos ---------- */
 .pq-talk { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(28px, 5vw, 96px); margin-top: clamp(90px, 16vh, 170px); }
@@ -265,5 +289,6 @@
   .pq-psi__g svg { max-width: 112px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .pq-aud, .pq-aud::after, .pq-cta::after, .pq-cta__arr, .pq-info__links a { transition: none; }
+  .pq-aud, .pq-aud::after, .pq-cta::after, .pq-cta__arr, .pq-info__links a, .pq-nudge { transition: none; }
+  .pq-nudge.is-empuja .pq-nudge__g { animation: none; }
 }
