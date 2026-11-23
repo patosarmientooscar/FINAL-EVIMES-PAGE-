@@ -26,12 +26,15 @@
   --pq-negro: #141518;                          /* el de la escena 3D del portátil: la ventana y el render, sin costura */
   --pq-claro: #ecebe7;
   --pq-ease: cubic-bezier(.2, .75, .15, 1);
+  --pq-fin: calc(100vh + 60vh);                 /* el tramo del cierre (.pq-fin): pin de una pantalla + 60vh */
   position: relative;                           /* sin z-index: el contenido, bajo #lateral (2) y las ondas (5) */
   padding: clamp(150px, 22vh, 230px) var(--pq-g) 0;   /* arriba, el aire del título fijo; abajo, el cierre (.pq-fin) */
-  background: var(--gris);
+  /* el gris acaba donde empieza el cierre: debajo de .pq-fin no hay fondo (se ven los cuadros de #planes) */
+  background: linear-gradient(var(--gris), var(--gris)) top / 100% calc(100% - var(--pq-fin)) no-repeat;
   color: var(--pq-tinta);
   font-family: "Schibsted Lateral", var(--font-text);
 }
+@supports (height: 100lvh) { .pq { --pq-fin: calc(100lvh + 60vh); } }
 .pq :where(h3, p, ul, small) { margin: 0; }
 .pq :focus-visible { outline: 2px solid var(--pq-tinta); outline-offset: 4px; }
 .pq-switch, .pq-talk p, .pq-info__h, .pq-cta { font-weight: 800; letter-spacing: -.04em; text-transform: uppercase; }
@@ -151,12 +154,13 @@
 
 /* ---------- el cierre: el gris se estrecha hasta una línea y se recoge (js/para-quien.js) ----------
    Pin de una pantalla + 60vh de scroll. #planes va justo detrás (css/home.css: margin-top −100lvh, el alto
-   del pin): lo que deja ver el gris al cerrarse YA es #planes, y al acabar su titular está en pantalla. El pin
-   va por encima (z 1) y no se pulsa. */
-.pq-fin { position: relative; height: calc(100vh + 60vh); height: calc(100lvh + 60vh); margin: clamp(90px, 14vh, 150px) calc(-1 * var(--pq-g)) 0; background: #0b0c0f; pointer-events: none; }
+   del pin): lo que deja ver el gris al cerrarse YA es #planes, sobre los cuadros (sin fondo: se ve la red), y
+   al acabar su titular está en pantalla. El pin va por encima (z 1) y no se pulsa. */
+.pq-fin { position: relative; height: var(--pq-fin); margin: clamp(90px, 14vh, 150px) calc(-1 * var(--pq-g)) 0; pointer-events: none; }
 .pq-fin__pin { position: sticky; top: 0; z-index: 1; height: 100vh; height: 100lvh; overflow: hidden; overflow: clip; }
 .pq-fin__gris { position: absolute; inset: 0; background: var(--gris); will-change: clip-path, opacity; }
 /* sin animación (movimiento reducido, versión fija, sin JS): corte limpio del gris al negro */
+.pq:not(.pq-vivo) { --pq-fin: 0px; }
 .pq:not(.pq-vivo) .pq-fin { height: 0; margin-bottom: 0; }
 .pq:not(.pq-vivo) ~ #planes { margin-top: 0; }
 .pq:not(.pq-vivo) { padding-bottom: clamp(90px, 14vh, 150px); }

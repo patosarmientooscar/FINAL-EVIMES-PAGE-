@@ -13,7 +13,7 @@
      espera al primer gesto sobre una zona negra.
    · Coordenadas de la ventana. Solo calcula si queda algo de negro con
      cuadrícula en pantalla: se duerme cuando lo tapa todo el gris (#lateral
-     abierta: EV.lateralCubre; de #lateral suelta a #para-quien) o #planes.
+     abierta: EV.lateralCubre; de #lateral suelta al cierre de #para-quien).
    · gsap.ticker. Duerme en reposo; no calcula con la pestaña oculta.
      pixelRatio ≤ 2. Con movimiento reducido o sin WebGL queda la
      cuadrícula CSS, quieta.
@@ -50,22 +50,22 @@ function iniciar() {
   let renderer = null, scene, cam, material, malla = null, cv;
   let estado = 'espera';                           // espera → creando → viva | sin
   let nx, ny, N, rest, disp, vel, fade, rig, amo, fx, fy, cos, sin, segs, pos, col, geo;
-  let finPlanes = 0, despierta = false, presencia = 0, t = 0, acc = 0, maxV = 0, maxD = 0;
+  let finGris = 0, despierta = false, presencia = 0, t = 0, acc = 0, maxV = 0, maxD = 0;
 
   const arriba = el => { let y = 0; for (let n = el; n; n = n.offsetParent) y += n.offsetTop; return y; };
-  const planes = document.getElementById('planes');
-  function medir() { finPlanes = planes ? arriba(planes) + planes.offsetHeight : 0; }
+  const cierre = document.querySelector('.pq-fin');
+  function medir() { finGris = cierre ? arriba(cierre) : 0; }
   medir();
   if (window.ResizeObserver) new ResizeObserver(medir).observe(document.body);
 
-  // ¿lo tapa todo algo opaco? #lateral abierta (la avisa ella), o de #lateral suelta al final de #planes
-  // (#para-quien, su cierre y #planes van pegados: gris, gris y negro liso)
+  // ¿lo tapa todo el gris? #lateral abierta (la avisa ella), o de #lateral suelta hasta que empieza el cierre
+  // de #para-quien (que deja ver ya los cuadros de #planes)
   function tapada() {
     if (EV.lateralCubre) return true;
     const L = EV.lateralRelevo && EV.lateralRelevo();
-    if (!L || !finPlanes) return false;
+    if (!L || !finGris) return false;
     const y = scrollY();
-    return y >= L.suelta && y + innerHeight <= finPlanes;
+    return y >= L.suelta && y <= finGris;
   }
 
   /* ---------- puntero (coordenadas de la ventana: el canvas es fijo) ---------- */
