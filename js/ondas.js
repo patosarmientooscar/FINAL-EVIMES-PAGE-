@@ -5,7 +5,8 @@
    (#ondas) sobre la página. La geometría, los materiales y los movimientos son
    los del prototipo, sin tocar.
    · Anclas: cada sección marca dónde viven las piezas con un elemento vacío
-     [data-ondas="<movimiento>"] (+ data-ondas-scale opcional). Movimientos:
+     [data-ondas="<movimiento>"] (+ data-ondas-scale y data-ondas-tempo opcionales:
+     tempo .25 = el movimiento a un cuarto de velocidad). Movimientos:
      firma, orbita, espejo, tijera, persecucion, intercambio, apilar, helice,
      encaje, giroscopio. Un ancla puede cambiar el suyo con
      window.EvimesOndas.setStepMotion(el, nombre).
@@ -224,13 +225,17 @@ async function montar() {
   }
 
   /* ---------- loop ---------- */
-  let T = 0, lastFirma = false, sweepT = 1;
+  let T = 0, tempo = 1, lastFirma = false, sweepT = 1;
   let scale = 1, center = V(0, 0, 0), shadowOn = 0, primero = true, sucio = true, ultima = '';
   function size() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); sucio = true; }
   size(); addEventListener('resize', () => { size(); collect(); });
   function step(dt) {
-    T += dt; forceFirma = Math.max(0, forceFirma - dt);
+    forceFirma = Math.max(0, forceFirma - dt);
     const el = activeAnchor();
+    // el ritmo del ancla (data-ondas-tempo), cambiado sin saltos: los muelles siguen a su velocidad
+    const ritmo = (el && parseFloat(el.dataset.ondasTempo)) || 1;
+    tempo += (ritmo - tempo) * (1 - Math.exp(-dt * 3));
+    T += dt * tempo;
     let name = (stepEl && el === stepEl && stepMotion) ? stepMotion : (el ? el.dataset.ondas : 'firma');
     if (forceFirma > 0) name = 'firma';
     if (reduce) name = 'firma';

@@ -189,6 +189,8 @@
 
 /* ---------- las letras: tres franjas las cruzan mientras se enfocan (js/recorrido.js las escribe) ---------- */
 .sw { display: inline-block; white-space: nowrap; visibility: hidden; }   /* solo se ve la letra ya escrita */
+/* las palabras de un párrafo con fundido por líneas (js/recorrido.js → Lineas) */
+.pl { display: inline-block; opacity: 0; transform: translate3d(0, 8px, 0); }
 .sc {
   position: relative;
   display: inline-block;

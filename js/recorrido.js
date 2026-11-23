@@ -7,6 +7,7 @@
      la persiana de #lateral y lo que descubre de #con-quien van al mismo paso.
    · Letras: tres franjas por letra, en orden de lectura; la letra i de un bloque
      avanza clamp((P·(N+W) − i)/W). Solo se escribe lo que cambia.
+   · Párrafos con fundido línea a línea (Lineas: opacidad + 8 px, en orden de lectura).
    · Listas ondulantes (un muelle por línea), barra y contador por transform.
    · La cabecera: cada sección dice qué hay bajo la línea del logo; manda la
      primera que lo sabe (van en el orden de la página, la de arriba tapa).
@@ -133,6 +134,63 @@
     for (var i = 0; i < N; i++) pintar(this.orden[i], cl((v - i) / this.W));
   };
 
+  /* ==========================================================================
+     Un párrafo que aparece línea a línea (opacidad + 8 px), en orden de lectura
+     { el, tipo: 'lineas', W: cuántas líneas a la vez }. Las palabras son
+     inline-block: el texto sigue siendo el mismo para el lector (sin aria-label).
+     ========================================================================== */
+  function Lineas(o) {
+    this.el = o.el;
+    this.W = o.W || 1.3;
+    this.palabras = null;                     // así lo trata el montaje en reposo: un solo paso
+    this.trozos = [];
+    this.lineas = [];
+    this.P = -1;
+    this.hecho = quieto;
+  }
+  Lineas.prototype.empezar = function () {
+    if (this.hecho) return;
+    var el = this.el, fr = document.createDocumentFragment(), t = this.trozos;
+    [].forEach.call(el.childNodes, function (nodo) {
+      if (nodo.nodeName === 'BR') { fr.appendChild(document.createElement('br')); return; }
+      nodo.textContent.split(/([ \t\n\r]+)/).forEach(function (p) {
+        if (!p) return;
+        if (/^[ \t\n\r]+$/.test(p)) { fr.appendChild(document.createTextNode(' ')); return; }
+        var w = document.createElement('span');
+        w.className = 'pl';
+        w.textContent = p;
+        t.push({ w: w, op: escritor(w, 'opacity'), tr: escritor(w, 'transform') });
+        fr.appendChild(w);
+      });
+    });
+    el.textContent = '';
+    el.appendChild(fr);
+    this.hecho = true;
+  };
+  Lineas.prototype.montar = function () { this.empezar(); };
+  Lineas.prototype.partir = function () { this.empezar(); };
+  Lineas.prototype.ordenar = function () {
+    if (!this.trozos.length) return;
+    var lineas = [], ant = null;
+    this.trozos.forEach(function (t) {
+      var y = t.w.offsetTop;
+      if (ant === null || Math.abs(y - ant) > 2) { lineas.push([]); ant = y; }
+      lineas[lineas.length - 1].push(t);
+    });
+    this.lineas = lineas;
+    this.P = -1;
+  };
+  Lineas.prototype.escribir = function (P) {
+    if (P === this.P || !this.lineas.length) return;
+    this.P = P;
+    var N = this.lineas.length, v = P * (N + this.W);
+    for (var i = 0; i < N; i++) {
+      var q = cl((v - i) / this.W), e = q * q * (3 - 2 * q);
+      var op = e.toFixed(3), tr = e === 1 ? 'none' : 'translate3d(0,' + (8 * (1 - e)).toFixed(2) + 'px,0)';
+      this.lineas[i].forEach(function (t) { t.op(op); t.tr(tr); });
+    }
+  };
+
   function pintar(l, q) {
     if (q === l.q || (q > 0 && q < 1 && Math.abs(q - l.q) < .004)) return;
     l.q = q;
@@ -166,6 +224,7 @@
        dibujar(r)  con r.v (scroll suavizado en la sección), r.s (el real), r.x (px de pista) y r.p (0–1).
                    Devuelve lo que hay bajo la cabecera: { clara, naranja, lisa, franja: 'izq' | 'der' } o null.
        empuje(r)   opcional: px de más que se aparta la pista
+       amplitud    opcional: la ondulación de las listas (1 = la del prototipo)
      ========================================================================== */
   var secciones = [];
   var cabEl = document.querySelector('.cabecera'), marca = document.querySelector('.cabecera__marca');
@@ -187,7 +246,7 @@
     this.track = q('.lat-track');
     this.ponPista = escritor(this.track, 'transform');
     this.ponBarra = escritor(q('.lat-bar i'), 'transform');
-    this.bloques = o.bloques.map(function (b) { return new Bloque(b); });
+    this.bloques = o.bloques.map(function (b) { return b.tipo === 'lineas' ? new Lineas(b) : new Bloque(b); });
 
     // la ondulación: cada lista, sus fases
     var items = this.items = [];
@@ -229,7 +288,7 @@
     this.h = this.pin.offsetHeight;
     this.alto = window.innerHeight;
     this.centro = Math.round(this.alto / 2);
-    this.amp = Math.min(this.vw * .11, 150);
+    this.amp = Math.min(this.vw * .11, 150) * (o.amplitud || 1);
     o.tramos(this);
     this.run = Math.max(0, o.recorrido(this));
     this.fin = this.apertura + this.run + this.despues;
@@ -412,6 +471,9 @@
     quieto: quieto,
     cabecera: cabecera,
     util: { cl: cl, tramo: tramo, suaviza: suaviza, escritor: escritor, scrollY: scrollY, irA: irA },
+    // los efectos de texto, para las secciones que no son un recorrido (js/para-quien.js)
+    Bloque: Bloque,
+    Lineas: Lineas,
     de: de,
     crear: function (o) {
       var r = new Seccion(o);

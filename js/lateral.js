@@ -44,11 +44,12 @@
     alCargar: true,
     bloques: [
       { el: h2, W: 7 },
-      { el: parrafo, W: 16 },
+      { el: parrafo, tipo: 'lineas', W: 1.3 },          // fundido suave por líneas (las franjas, solo en titular y lista)
       { el: kick, W: 6 },
       { el: lista, piezas: [].slice.call(lista.children), W: 6 }
     ],
     listas: [lista],
+    amplitud: .5,                                        // la ondulación, a la mitad
 
     tramos: function (r) {
       ensancha = sale ? Math.round(r.h * ENSANCHA) : 0;
