@@ -57,7 +57,9 @@ function iniciar() {
       creada = true;
       crear().then(a => { api = a; api.visible(visible); }).catch(err => { console.warn('[trabajo selecto] sin 3D, captura fija', err); });
     }
-  }, { rootMargin: '100% 0px' }).observe(raiz);   // a menos de un viewport
+  // a menos de un viewport. Se observa el panel de su público y no la escena: la ventana de #para-quien
+  // empieza cerrada (clip-path) y el observador no daría la escena por visible hasta abrirse.
+  }, { rootMargin: '100% 0px' }).observe(raiz.closest('[data-aud]') || raiz);
 }
 
 async function crear() {
