@@ -18,8 +18,7 @@
   --pq-2: rgb(18 19 23 / .64);
   --pq-linea: rgb(18 19 23 / .15);
   --pq-ease: cubic-bezier(.2, .75, .15, 1);
-  position: relative;
-  z-index: 1;                                   /* bajo #lateral (la persiana) y bajo el canvas de las ondas (5) */
+  position: relative;                           /* sin z-index: el contenido, bajo #lateral (2) y las ondas (5); las pestañas, encima de las ondas (6) */
   padding-top: calc(64px + env(safe-area-inset-top, 0px));   /* la franja de la cabecera: las pestañas van justo debajo */
   background: var(--gris);
   color: var(--pq-tinta);
@@ -33,7 +32,7 @@
 .pq-pestanas {
   position: sticky;
   top: calc(64px + env(safe-area-inset-top, 0px));
-  z-index: 3;
+  z-index: 6;
   display: grid;
   grid-template-columns: 1fr 1fr;
   height: 52px;
@@ -71,6 +70,8 @@
 .pq-pestanas__b[aria-selected="true"] { color: #ecebe7; }
 .pq-pestanas__b:focus-visible { outline-offset: -4px; }
 .pq-pestanas__b[aria-selected="true"]:focus-visible { outline-color: #ecebe7; }
+/* mientras el naranja de #lateral aún las tapa (están por encima de él), no se ven */
+.pq-pestanas.bajo-persiana { visibility: hidden; }
 /* sin JS no hay pestañas: se ven las dos opciones, una debajo de otra */
 .pq:not(.pq-viva) .pq-pestanas { display: none; }
 
@@ -199,7 +200,7 @@
 .pq-ondas { position: absolute; top: calc(clamp(72px, 12vh, 136px) + clamp(52px, 7.6vw, 128px) * .55); right: var(--pq-g); width: 26vw; height: calc(clamp(52px, 7.6vw, 128px) * 2.2); pointer-events: none; }
 
 /* ---------- la cabecera sobre la sección: con las pestañas fijas, la franja de arriba es gris y lisa ---------- */
-.cabecera.is-pestanas::after { height: calc(var(--cab-h) + var(--cab-sat)); background: rgb(230 228 223); }
+.cabecera.is-pestanas::after { height: calc(var(--cab-h) + var(--cab-sat)); background: rgb(230 228 223); opacity: 1 !important; visibility: visible; transition: none; }
 
 /* ---------- las animaciones (solo con .pq-vivo; js/para-quien.js) ---------- */
 .pq-vivo .pq-puntos__linea { transform: scaleX(0); }

@@ -130,6 +130,9 @@
         // la sección de detrás, quieta mientras baja el naranja (con el scroll real: no se mueve ni un píxel)
         var t = tramo(s, t0 + ensancha, t0 + ensancha + persiana);
         ponTras(t > 0 && t < 1 ? 'translate3d(0,' + (-(1 - t) * h).toFixed(1) + 'px,0)' : '');
+        // para js/para-quien.js: cuánto se ha corrido (dy) y hasta dónde se ve ya, bajo el naranja (cortina, px)
+        tras.__dy = t > 0 && t < 1 ? -(1 - t) * h : 0;
+        tras.__cortina = e2 < 1 && s > t0 ? e2 * h : null;
       }
 
       var ve = s > -h && s < r.fin && v < r.apertura + r.run / 8;
@@ -139,6 +142,7 @@
       var medio = R.cabecera.medio, abajo = h + r.fin + r.cola - s;
       if (abajo <= medio) return null;
       // bajo el logo, o el naranja o ya el gris de la sección de detrás
+      if (e2 >= 1) return null;                          // bajada del todo: manda la sección de detrás (js/home.js)
       if (e2 > 0) return e2 * h > medio ? { clara: true, lisa: true } : { clara: false, naranja: true, lisa: true };
       var naranja = e1 > 0 && r.vw - banda - empuje < R.cabecera.marcaX;
       return {
