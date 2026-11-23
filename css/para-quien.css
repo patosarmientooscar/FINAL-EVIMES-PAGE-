@@ -210,13 +210,17 @@
 @media (max-width: 860px) {
   .pq-pestanas__b { padding: 0 8px; font-size: 12px; letter-spacing: .1em; }
   .pq-cuerpo { padding-top: 132px; }
-  /* 13vw, salvo que la palabra más larga ("CONSTRUIMOS.", 7,8 em) no quepa: nunca se corta */
-  .pq-h { font-size: min(13vw, (100vw - 2 * var(--pq-g)) / 7.8); max-width: none; }
+  /* 13vw, salvo que la palabra más larga ("CONSTRUIMOS.", 7,8 em) no quepa (nunca se corta); en tableta y
+     en apaisado, sin pasar de 88 px ni de lo que cabe en el alto de la pantalla */
+  .pq-h { font-size: min(13vw, (100vw - 2 * var(--pq-g)) / 7.8, 88px, (100svh - 180px) / 4.2); max-width: none; }
   .pq-puntos { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 20px; }
   .pq-caso { grid-template-columns: minmax(0, 1fr); gap: 24px; padding: 12px 12px 28px; }
   .pq-caso__texto { padding: 0 12px; }
   .pq-caso .ts-psi { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .pq-ondas { top: 40px; right: auto; left: 18vw; width: 64vw; height: 84px; }
+}
+@media (max-width: 400px) {
+  .pq-caso .ts-psi { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 18px; max-width: 240px; }   /* las etiquetas no se pisan */
 }
 @media (max-width: 370px) {
   .pq-pestanas__b { letter-spacing: .06em; font-size: 11.5px; }
