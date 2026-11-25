@@ -286,14 +286,68 @@
       </div>
     </section>
 
-    <!-- ===== Planes (desde backup-pre-planes-gris, en el capítulo gris: sigue a #para-quien sin cortes, solo una línea fina) ===== -->
-    <section class="planes pg" id="planes" aria-labelledby="h-planes" data-nav="light">
+    <!-- ===== Planes (desde backup-pre-planes-gris, en el capítulo gris: sigue a #para-quien sin cortes, solo una línea fina) =====
+         Editorial, sin cards: tres columnas separadas por líneas de 1 px. Inmersión, la recomendada (la única línea naranja).
+         Las listas son las de js/data/planes.js (las mismas de planes.html), resumidas. Las dos preguntas salen de
+         js/data/faq-planes.js. "Empezar con este plan" lleva a #contacto, marca el plan y, si el mensaje está vacío,
+         escribe "Me interesa el plan …." (js/planes-gris.js). Estilos: css/planes-gris.css -->
+    <section class="pg" id="planes" aria-labelledby="h-planes" data-nav="light">
       <div class="pg-sep" aria-hidden="true"></div>
-      <div class="planes__cab">
-        <h2 class="display planes__titulo" id="h-planes" data-c="inicio.planes.titulo">Un plan para cada negocio.</h2>
+      <div class="pg-cont">
+        <div class="pg-cab">
+          <h2 class="pg-titulo" id="h-planes">Elige cómo empezar.</h2>
+          <p class="pg-sub">Tres formas de trabajar con nosotros. Precios claros, sin letra pequeña.</p>
+        </div>
+
+        <ol class="pg-lista" role="list">
+          <li class="pg-plan">
+            <h3 class="pg-nombre">Fundamento</h3>
+            <p class="pg-para">Para estar en Google con una web profesional.</p>
+            <p class="pg-precio"><span class="pg-desde">desde</span>150&nbsp;€</p>
+            <ul class="pg-incluye" role="list">
+              <li>Web de una página</li>
+              <li>Formulario y botón de WhatsApp</li>
+              <li>Adaptada a móvil</li>
+              <li>Dominio y SSL</li>
+            </ul>
+            <a class="pg-cta" href="#contacto" data-plan="fundamento" data-plan-nombre="Fundamento">Empezar con este plan<span class="sr-only">: Fundamento</span><span class="pg-cta__f" aria-hidden="true"><svg viewBox="0 0 100 100" focusable="false"><path d="M4 50H92M58 14L94 50L58 86"/></svg></span></a>
+          </li>
+          <li class="pg-plan pg-plan--rec">
+            <h3 class="pg-nombre">Inmersión <span class="pg-rec">Recomendado</span></h3>
+            <p class="pg-para">Para destacar con diseño propio y 3D.</p>
+            <p class="pg-precio">499&nbsp;€</p>
+            <ul class="pg-incluye" role="list">
+              <li>Diseño web a medida</li>
+              <li>Animaciones y experiencia inmersiva</li>
+              <li>Pensada para convertir</li>
+              <li>SEO completo</li>
+            </ul>
+            <a class="pg-cta" href="#contacto" data-plan="inmersion" data-plan-nombre="Inmersión">Empezar con este plan<span class="sr-only">: Inmersión</span><span class="pg-cta__f" aria-hidden="true"><svg viewBox="0 0 100 100" focusable="false"><path d="M4 50H92M58 14L94 50L58 86"/></svg></span></a>
+          </li>
+          <li class="pg-plan">
+            <h3 class="pg-nombre">Impacto</h3>
+            <p class="pg-para">Para proyectos a medida, apps y automatización.</p>
+            <p class="pg-precio">A medida</p>
+            <ul class="pg-incluye" role="list">
+              <li>Todo lo de Inmersión</li>
+              <li>Tienda online</li>
+              <li>SEO, AEO y GEO</li>
+              <li>UX y animaciones avanzadas</li>
+              <li>Lo que tu negocio necesite</li>
+            </ul>
+            <a class="pg-cta" href="#contacto" data-plan="impacto" data-plan-nombre="Impacto">Empezar con este plan<span class="sr-only">: Impacto</span><span class="pg-cta__f" aria-hidden="true"><svg viewBox="0 0 100 100" focusable="false"><path d="M4 50H92M58 14L94 50L58 86"/></svg></span></a>
+          </li>
+        </ol>
+
+        <div class="pg-pie">
+          <a class="pg-ayuda" href="#contacto" data-plan="aun-no"><span>¿No sabes cuál? Te lo decimos en una llamada de 15&nbsp;minutos</span><span class="pg-cta__f" aria-hidden="true"><svg viewBox="0 0 100 100" focusable="false"><path d="M4 50H92M58 14L94 50L58 86"/></svg></span></a>
+          <dl class="pg-faq">
+            <div><dt>¿Y si después quiero cambiar algo?</dt><dd>Nos escribes y lo cambiamos nosotros, sin que toques código.</dd></div>
+            <div><dt>¿Qué necesito para empezar?</dt><dd>Una conversación sobre tu negocio. Si ya tienes logo, fotos o textos, nos sirven.</dd></div>
+          </dl>
+          <a class="pg-todo" href="planes.html">Ver todos los detalles<span aria-hidden="true"> →</span></a>
+        </div>
       </div>
-      <ol class="planes__lista" data-planes></ol>
-      <p class="planes__mas"><a class="enlace" href="planes.html" data-scramble><span class="sl" data-c="inicio.planes.verTodo">Ver qué incluye cada plan</span> →</a></p>
     </section>
 
     <!-- ===== Herramientas (desde backup-pre-para-quien-planes, detrás de los planes: el gris de #para-quien se cierra sobre #planes) ===== -->
@@ -415,7 +469,6 @@
 
   <script defer src="js/config.js"></script>
   <script defer src="js/content.js"></script>
-  <script defer src="js/data/planes.js"></script>
   <script defer src="js/data/pagespeed.js"></script>
   <script defer src="js/brand.js"></script>
   <script defer src="js/engine/util.js"></script>
@@ -426,6 +479,8 @@
   <script defer src="js/recorrido.js"></script>
   <script defer src="js/lateral.js"></script>
   <script defer src="js/para-quien.js"></script>
+  <!-- #planes en el gris: el titular, la entrada de las columnas, el mensaje del formulario y el cierre del gris. -->
+  <script defer src="js/planes-gris.js"></script>
   <!-- El caso de Disco en #para-quien: el portátil 3D (Three.js 0.160.0, el mismo import map), al entrar en pantalla. -->
   <script type="module" src="js/trabajo-selecto.js"></script>
   <script type="module" src="js/ui/scramble.js"></script>

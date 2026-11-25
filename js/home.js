@@ -70,6 +70,8 @@
     var off = id === 'inicio' ? 0 : -Math.round((el.cab ? el.cab.getBoundingClientRect().bottom : 80) + 16);
     var yT = 0, m = t; while (m) { yT += m.offsetTop; m = m.offsetParent; }
     var propio = EV.recorrido ? EV.recorrido.destino(id) : null;   // #lateral abierta; #para-quien, ya descubierta por la persiana
+    // el contacto, con el gris de #planes ya cerrado del todo (js/planes-gris.js)
+    if (propio === null && id === 'contacto' && EV.finGris) propio = EV.finGris();
     var destino = propio !== null ? propio : Math.max(0, yT + off);
     if (lenis) lenis.scrollTo(id === 'inicio' ? 0 : destino, { duration: Math.min(2.2, 0.8 + Math.abs(t.getBoundingClientRect().top) / 4000), onComplete: fin });
     else if (propio !== null) { window.scrollTo({ top: destino, behavior: EV.reducedMotion ? 'auto' : 'smooth' }); setTimeout(fin, 1200); }
@@ -114,58 +116,7 @@
     root.classList.add('cinta-viva');
   }
 
-  /* ---------- planes (js/data/planes.js) ---------- */
-  function planes() {
-    var ol = $('[data-planes]');
-    var txt = U.content('inicio.planes') || {};
-    (window.EVIMES_PLANES || []).forEach(function (p, i) {
-      var li = document.createElement('li');
-      li.className = 'plan' + (p.recomendado ? ' plan--rec' : '');
-      li.style.setProperty('--i', i);
-      var m = /^desde\s+(.*)$/i.exec(p.precio);
-      var precio = m
-        ? '<span class="plan__desde">' + (txt.desde || 'desde') + '</span>' + m[1].replace(' €', '&nbsp;€')
-        : p.precio.replace(' €', '&nbsp;€');
-      li.innerHTML =
-        (p.recomendado ? '<p class="plan__marca">' + (txt.recomendado || 'Recomendado') + '</p>' : '') +
-        '<h3 class="display plan__nombre"></h3>' +
-        '<p class="plan__para"></p>' +
-        '<p class="display plan__precio">' + precio + '</p>' +
-        '<ul class="plan__incluye"></ul>' +
-        (p.unica ? '<p class="plan__unica"></p>' : '') +
-        '<a class="pastilla plan__boton' + (p.recomendado ? '' : ' pastilla--linea') + '" href="#contacto"></a>';
-      $('.plan__nombre', li).textContent = p.nombre;
-      $('.plan__para', li).textContent = p.para;
-      var ul = $('.plan__incluye', li);
-      p.incluye.forEach(function (x) { var it = document.createElement('li'); it.textContent = x; ul.appendChild(it); });
-      if (p.unica) $('.plan__unica', li).textContent = p.unica;
-      var b = $('.plan__boton', li);
-      b.innerHTML = '<span class="sl"></span>';
-      b.firstChild.textContent = p.boton;
-      b.setAttribute('data-scramble', '');
-      b.dataset.plan = p.id;
-      b.setAttribute('aria-label', p.boton + ': plan ' + p.nombre);
-      // Brillo cian que sigue al ratón por el borde.
-      li.addEventListener('pointermove', function (e) {
-        var r = li.getBoundingClientRect();
-        li.style.setProperty('--mx', (e.clientX - r.left) + 'px');
-        li.style.setProperty('--my', (e.clientY - r.top) + 'px');
-      });
-      ol.appendChild(li);
-    });
-    // Entrada escalonada (una vez).
-    var items = $$('.plan', ol);
-    if (!cine || !('IntersectionObserver' in window)) { items.forEach(function (n) { n.classList.add('is-dentro'); }); return; }
-    root.classList.add('planes-vivos');
-    var io = new IntersectionObserver(function (es) {
-      es.forEach(function (e) {
-        if (!e.isIntersecting) return;
-        items.forEach(function (n) { n.classList.add('is-dentro'); });
-        io.disconnect();
-      });
-    }, { threshold: 0.18 });
-    io.observe(ol);
-  }
+  /* (los planes de la home están en el HTML desde backup-pre-planes-gris: js/planes-gris.js) */
 
   /* ---------- contacto ----------
      El formulario es js/contacto/form.js. Aquí solo: el plan elegido en una
@@ -233,7 +184,6 @@
     scrollInit();
     cabecera();
     herramientas();
-    planes();
     contacto();
     measure();
 

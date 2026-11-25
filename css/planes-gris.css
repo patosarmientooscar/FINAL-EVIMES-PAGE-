@@ -3,20 +3,180 @@
    backup-pre-planes-gris). #lateral → #para-quien → #planes son UN solo gris
    (#e6e4df, liso, sin cuadrícula). Entre el CTA de #para-quien y el titular,
    solo una línea de 1 px con 12vh arriba y abajo.
+   · Editorial, sin cards: tres columnas iguales separadas por una línea
+     vertical de 1 px; cada columna con su línea de arriba. Sin cajas, fondos,
+     sombras ni radios. Inmersión, la recomendada: su línea de arriba, naranja
+     (2 px) y la etiqueta "Recomendado"; el único naranja de la sección.
+   · Las filas de las tres columnas van alineadas (subgrid): nombre, para
+     quién, precio, lista y CTA empiezan a la misma altura.
+   · Movimiento: las columnas entran con un fundido y 12 px (120 ms entre una y
+     otra) al llegar a la pantalla; en hover, su línea de arriba se oscurece y
+     las otras dos bajan al 55 % (.4 s). Movimiento reducido: todo visible.
+   · Al final, el cierre del gris (.pg-fin): ver abajo.
    JS: js/planes-gris.js
    ========================================================================== */
 .pg {
   --pg-g: clamp(16px, 4vw, 56px);               /* el margen de #para-quien */
   --pg-tinta: #121317;
+  --pg-2: rgb(18 19 23 / .62);                  /* textos pequeños: 4,7:1 sobre el gris (AA) */
   --pg-linea: rgb(18 19 23 / .14);
+  --pg-naranja: #ff7a22;
+  --pg-ease: cubic-bezier(.2, .75, .15, 1);
+  --pg-in: clamp(16px, 2.4vw, 40px);            /* el aire de cada columna junto a sus líneas verticales */
   position: relative;
-  padding: 0 var(--pg-g) 12vh;
+  /* 1 px por encima de #para-quien: con el borde en medio píxel, el negro de debajo asomaba en una línea */
+  margin-top: -1px;
+  padding: 1px var(--pg-g) 12vh;
   background: var(--gris);
   color: var(--pg-tinta);
   font-family: "Schibsted Lateral", var(--font-text);
 }
 .pg :where(h2, h3, p, ul, ol, dl, dd, dt) { margin: 0; }
+.pg :where(ul, ol) { padding: 0; list-style: none; }
 .pg :focus-visible { outline: 2px solid var(--pg-tinta); outline-offset: 4px; }
 
 /* la línea que la separa de #para-quien (12vh de gris arriba: el padding-bottom de .pq) */
 .pg-sep { height: 1px; margin-bottom: 12vh; background: var(--pg-linea); }
+
+/* ---------- el titular ---------- */
+.pg-titulo {
+  font-family: "Schibsted Lateral", var(--font-text);   /* el h2 global es la display (serif): aquí, la de #lateral */
+  font-variation-settings: normal;
+  font-size: clamp(44px, 7vw, 132px);
+  font-weight: 800;
+  line-height: .95;
+  letter-spacing: -.045em;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+/* las franjas de las letras (js/recorrido.js → Bloque), sin naranja: aquí solo lo lleva el plan recomendado */
+.pg-titulo .sc .s1, .pg-titulo .sc .s3 { color: rgb(18 19 23 / .4); }
+.pg-sub { margin-top: 22px; max-width: 46ch; font: 400 16px / 1.5 var(--font-text); color: var(--pg-2); }
+
+/* ---------- las tres columnas ---------- */
+.pg-lista {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: clamp(64px, 11vh, 128px);
+  container-type: inline-size;                  /* el precio se mide con el ancho de una columna (cqi) */
+}
+/* las filas van alineadas entre columnas: el nombre y "para quién" tienen alto fijo; el CTA, abajo del todo */
+.pg-plan {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 34px var(--pg-in) 0;
+  transition: opacity .4s var(--pg-ease);
+}
+.pg-plan:first-child { padding-left: 0; }
+.pg-plan:last-child { padding-right: 0; }
+.pg-plan + .pg-plan { border-left: 1px solid var(--pg-linea); }
+/* la línea de arriba: la fina (::before) y, encima, la oscura del hover (::after; solo opacidad) */
+.pg-plan::before, .pg-plan::after { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px; pointer-events: none; }
+.pg-plan::before { background: var(--pg-linea); }
+.pg-plan::after { background: rgb(18 19 23 / .6); opacity: 0; transition: opacity .4s var(--pg-ease); }
+.pg-plan--rec::before { height: 2px; background: var(--pg-naranja); }
+.pg-plan--rec::after { height: 2px; background: #f05f00; }   /* el naranja, más intenso */
+
+.pg-nombre {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  min-height: 20px;
+  font: 500 12px / 1.2 var(--font-text);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--pg-2);
+}
+/* "Recomendado": naranja con la tinta encima (7:1; el naranja como texto sobre el gris se quedaría en 2:1) */
+.pg-rec {
+  padding: 4px 6px 3px;
+  background: var(--pg-naranja);
+  font: 600 11px / 1 var(--font-text);
+  letter-spacing: .14em;
+  color: var(--pg-tinta);
+}
+.pg-para { min-height: calc(2 * 1.45em); margin-top: 16px; max-width: 30ch; font: 400 16px / 1.45 var(--font-text); color: rgb(18 19 23 / .7); text-wrap: pretty; }
+.pg-precio {
+  display: flex;
+  align-items: baseline;
+  margin-top: clamp(28px, 4.5vh, 48px);
+  /* las tres al mismo tamaño: el ancho útil de la columna del medio (la más estrecha) × .21 ("A medida", la más ancha, cabe) */
+  font-size: clamp(56px, (100cqi / 3 - 2 * var(--pg-in)) * .22, 104px);
+  font-weight: 800;
+  line-height: .9;
+  letter-spacing: -.05em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.pg-desde { margin-right: 10px; font: 500 15px / 1 var(--font-text); letter-spacing: 0; color: var(--pg-2); }
+.pg-incluye { align-self: stretch; margin-top: clamp(28px, 4.5vh, 44px); font: 400 15px / 1.4 var(--font-text); color: rgb(18 19 23 / .78); }
+.pg-incluye li { padding: 12px 0; }
+.pg-incluye li + li { border-top: 1px solid var(--pg-linea); }
+
+/* el CTA de la web, en pequeño: mayúsculas, 800, subrayado que se dibuja y flecha que avanza */
+.pg-cta, .pg-ayuda {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  align-self: end;
+  color: var(--pg-tinta);
+  font-weight: 800;
+  letter-spacing: -.01em;
+  text-transform: uppercase;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.pg-cta { align-self: flex-start; margin: auto 0 6px; padding: 36px 0 8px; font-size: 15px; line-height: 1.1; }
+.pg-cta::after { bottom: 3px; }
+.pg-cta__f { display: inline-block; margin-left: .45em; transition: transform .5s var(--pg-ease); }
+.pg-cta__f svg { display: block; width: .9em; height: .8em; fill: none; stroke: currentColor; stroke-width: 10; }
+.pg-cta::after, .pg-ayuda::after { content: ""; position: absolute; left: 0; right: 0; bottom: 3px; height: 2px; background: var(--pg-tinta); transform: scaleX(0); transform-origin: left; transition: transform .6s var(--pg-ease); }
+.pg-ayuda::after { bottom: -4px; }
+@media (hover: hover) {
+  .pg-cta:hover::after, .pg-ayuda:hover::after { transform: scaleX(1); }
+  .pg-cta:hover .pg-cta__f, .pg-ayuda:hover .pg-cta__f { transform: translateX(.3em); }
+  /* la columna bajo el ratón: su línea se oscurece; las otras dos, al 55 % */
+  .pg-plan:hover::after { opacity: 1; }
+  .pg-lista:hover > .pg-plan:not(:hover) { opacity: .55; }
+}
+/* con el teclado, lo mismo */
+.pg-plan:focus-within::after { opacity: 1; }
+.pg-lista:has(.pg-cta:focus-visible) > .pg-plan:not(:focus-within) { opacity: .55; }
+.pg-cta:focus-visible::after, .pg-ayuda:focus-visible::after { transform: scaleX(1); }
+
+/* ---------- debajo de los planes ---------- */
+.pg-pie { display: grid; justify-items: center; gap: 34px; margin-top: clamp(72px, 12vh, 140px); text-align: center; }
+.pg-ayuda { justify-self: center; font-size: clamp(18px, 1.7vw, 26px); line-height: 1.15; text-wrap: balance; }
+.pg-faq { display: grid; gap: 10px; font: 400 15px / 1.5 var(--font-text); }
+.pg-faq div { display: flex; flex-wrap: wrap; justify-content: center; gap: 0 .5em; }
+.pg-faq dt { font-weight: 600; color: var(--pg-tinta); }
+.pg-faq dd { color: rgb(18 19 23 / .7); }
+.pg-todo { padding: 6px 0; font: 500 14px / 1.2 var(--font-text); color: var(--pg-2); text-decoration: underline; text-decoration-color: rgb(18 19 23 / .25); text-underline-offset: 5px; transition: color .3s var(--pg-ease), text-decoration-color .3s var(--pg-ease); }
+.pg-todo:hover { color: var(--pg-tinta); text-decoration-color: var(--pg-tinta); }
+
+/* ---------- la entrada de las columnas (solo con .pg-vivo; js/planes-gris.js) ---------- */
+.pg-vivo .pg-plan { opacity: 0; transform: translate3d(0, 12px, 0); }
+.pg-vivo .pg-plan.is-dentro { opacity: 1; transform: none; transition: opacity .9s var(--pg-ease) var(--d, 0ms), transform .9s var(--pg-ease) var(--d, 0ms); }
+.pg-vivo .pg-plan.is-hecho { transition: opacity .4s var(--pg-ease); }
+
+/* ---------- móvil: una columna debajo de otra, Inmersión la primera ---------- */
+@media (max-width: 860px) {
+  .pg-lista { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; margin-top: 56px; }
+  .pg-plan { display: flex; flex-direction: column; align-items: flex-start; grid-row: auto; padding: 30px 0 34px; }
+  .pg-plan + .pg-plan { border-left: 0; }
+  .pg-plan--rec { order: -1; }
+  .pg-precio { font-size: 64px; }
+  .pg-incluye { align-self: stretch; }
+  .pg-para { min-height: 0; }
+  .pg-cta { margin-top: 0; padding-top: 22px; }
+  .pg-pie { margin-top: 56px; gap: 28px; }
+  .pg-faq div { flex-direction: column; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pg-plan, .pg-plan::after, .pg-cta::after, .pg-ayuda::after, .pg-cta__f, .pg-todo { transition: none !important; }
+}
