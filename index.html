@@ -87,6 +87,7 @@
   <link rel="stylesheet" href="css/lateral.css">
   <link rel="stylesheet" href="css/trabajo-selecto.css">
   <link rel="stylesheet" href="css/para-quien.css">
+  <link rel="stylesheet" href="css/planes-gris.css">
   <link rel="stylesheet" href="css/contacto.css">
 </head>
 <body class="inicio inicio--ondas">
@@ -174,8 +175,8 @@
 
     <!-- ===== Con quién trabajamos y nuestro trabajo (desde backup-pre-para-quien; prototipo aprobado Downloads/evimes-para-quien) =====
          Sigue al gris de #lateral sin cortes (sin persiana desde backup-pre-para-quien-planes). Su título fijo es la
-         pregunta de #lateral, relevada y encogida (.pq-relevo). Al final, el gris se cierra en una línea (.pq-fin)
-         y debajo queda #planes en negro. Una sección vertical normal: sin scroll secuestrado.
+         pregunta de #lateral, relevada y encogida (.pq-relevo). El gris sigue sin cortes hasta #planes (una línea
+         fina entre las dos). Una sección vertical normal: sin scroll secuestrado.
          LA FRASE ES EL INTERRUPTOR: los dos públicos son <button aria-pressed>. Cada público (data-aud) lleva su
          problema, lo que hacemos, la ventana de su caso y su cierre; los dos están en el HTML (el que no toca, con
          hidden) y ocupan el mismo sitio: cambiar no mueve el scroll.
@@ -283,13 +284,11 @@
           <a class="pq-cta" href="#contacto" data-perfil="Negocio local"><span class="pq-cta__t" data-type="6">¿Qué necesita tu negocio?</span><span class="pq-cta__arr"><svg viewBox="0 0 100 100" aria-hidden="true" focusable="false"><path d="M4 50H92M58 14L94 50L58 86"/></svg></span></a>
         </div>
       </div>
-      <!-- El cierre: el gris, fijo a la pantalla, se estrecha de arriba y abajo hasta una línea de 1 px, que se recoge
-           hacia el centro y se desvanece. Debajo, negro: #planes. Espejo de la apertura de #lateral. -->
-      <div class="pq-fin" aria-hidden="true"><div class="pq-fin__pin"><div class="pq-fin__gris"></div></div></div>
     </section>
 
-    <!-- ===== Planes ===== -->
-    <section class="planes" id="planes" aria-labelledby="h-planes">
+    <!-- ===== Planes (desde backup-pre-planes-gris, en el capítulo gris: sigue a #para-quien sin cortes, solo una línea fina) ===== -->
+    <section class="planes pg" id="planes" aria-labelledby="h-planes" data-nav="light">
+      <div class="pg-sep" aria-hidden="true"></div>
       <div class="planes__cab">
         <h2 class="display planes__titulo" id="h-planes" data-c="inicio.planes.titulo">Un plan para cada negocio.</h2>
       </div>

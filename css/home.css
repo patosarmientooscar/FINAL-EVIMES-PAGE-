@@ -113,12 +113,13 @@
   color: var(--h-ink);
 }
 /* La red (js/red.js, desde backup-pre-ajustes-red): el fondo de toda la home donde se ve la cuadrícula (el hero,
-   el negro de la apertura de #lateral, #planes, herramientas, contacto…). Canvas fijo a
+   el negro de la apertura de #lateral, contacto, herramientas…). Canvas fijo a
    pantalla completa, justo encima de .bg-grid (z -2) y detrás de todo. En reposo es la misma cuadrícula al
-   píxel; con el canvas vivo, la de CSS se oculta. Las secciones grises la tapan. */
-/* donde se ven los cuadros (el hero, la apertura de #lateral, #planes), arrastrar en horizontal mueve la red;
+   píxel; con el canvas vivo, la de CSS se oculta. Las secciones grises la tapan (#planes es gris desde
+   backup-pre-planes-gris). */
+/* donde se ven los cuadros (el hero, la apertura de #lateral, el contacto), arrastrar en horizontal mueve la red;
    en vertical, scroll */
-.portada[data-red], .inicio #lateral, .inicio #planes { touch-action: pan-y pinch-zoom; }
+.portada[data-red], .inicio #lateral, .inicio #contacto { touch-action: pan-y pinch-zoom; }
 .red-canvas { position: fixed; inset: 0; z-index: -2; display: block; width: 100%; height: 100%; pointer-events: none; opacity: 0; }
 .red-viva .red-canvas { opacity: 1; }
 .red-viva .bg-grid { visibility: hidden; }
@@ -328,12 +329,7 @@ html:not(.cinta-viva) .cinta__lista { flex-wrap: wrap; gap: 8px 40px; padding: 0
    Planes
    ========================================================================== */
 .planes { padding: clamp(100px, 18vh, 200px) var(--g) clamp(80px, 14vh, 160px); }
-/* en la home, sobre los cuadros (la red, js/red.js), como el resto del negro: sin fondo propio. Está justo detrás
-   del cierre del gris de #para-quien (margin-top −100lvh = el pin del cierre, css/para-quien.css): al cerrarse el
-   gris aparecen los planes con los cuadros; padding-top 12vh: al acabar, el titular ya se ve */
-.inicio #planes { position: relative; margin-top: -100vh; margin-top: -100lvh; padding-top: 12vh; }
-/* las franjas del titular sobre negro: la del medio, en blanco roto (la tinta no se vería) */
-.planes__titulo .sc .s2 { color: var(--stone); }
+/* (los planes de la home, en el gris desde backup-pre-planes-gris: css/planes-gris.css; estas reglas son de planes.html) */
 .planes__cab { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 24px; }
 .planes__titulo { font-size: clamp(38px, 5vw, 80px); max-width: 9.5ch; }
 .planes__intro { font-size: 16px; color: var(--texto-2); }

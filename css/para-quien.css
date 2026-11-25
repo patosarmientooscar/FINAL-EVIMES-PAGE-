@@ -26,15 +26,14 @@
   --pq-negro: #141518;                          /* el de la escena 3D del portátil: la ventana y el render, sin costura */
   --pq-claro: #ecebe7;
   --pq-ease: cubic-bezier(.2, .75, .15, 1);
-  --pq-fin: calc(100vh + 60vh);                 /* el tramo del cierre (.pq-fin): pin de una pantalla + 60vh */
   position: relative;                           /* sin z-index: el contenido, bajo #lateral (2) y las ondas (5) */
-  padding: clamp(150px, 22vh, 230px) var(--pq-g) 0;   /* arriba, el aire del título fijo; abajo, el cierre (.pq-fin) */
-  /* el gris acaba donde empieza el cierre: debajo de .pq-fin no hay fondo (se ven los cuadros de #planes) */
-  background: linear-gradient(var(--gris), var(--gris)) top / 100% calc(100% - var(--pq-fin)) no-repeat;
+  /* arriba, el aire del título fijo; abajo, 12vh hasta la línea que la separa de #planes (desde backup-pre-planes-gris
+     el gris no se cierra aquí: #lateral, #para-quien y #planes son un solo capítulo gris; el cierre, al final de #planes) */
+  padding: clamp(150px, 22vh, 230px) var(--pq-g) 12vh;
+  background: var(--gris);
   color: var(--pq-tinta);
   font-family: "Schibsted Lateral", var(--font-text);
 }
-@supports (height: 100lvh) { .pq { --pq-fin: calc(100lvh + 60vh); } }
 .pq :where(h3, p, ul, small) { margin: 0; }
 .pq :focus-visible { outline: 2px solid var(--pq-tinta); outline-offset: 4px; }
 .pq-switch, .pq-talk p, .pq-info__h, .pq-cta { font-weight: 800; letter-spacing: -.04em; text-transform: uppercase; }
@@ -152,27 +151,9 @@
   opacity: 0;
 }
 
-/* ---------- el cierre: el gris se estrecha hasta una línea y se recoge (js/para-quien.js) ----------
-   Pin de una pantalla + 60vh de scroll. #planes va justo detrás (css/home.css: margin-top −100lvh, el alto
-   del pin): lo que deja ver el gris al cerrarse YA es #planes, sobre los cuadros (sin fondo: se ve la red), y
-   al acabar su titular está en pantalla. El pin va por encima (z 1) y no se pulsa. */
-/* Desde backup-pre-ajustes-ondas el cierre empieza cuando el CTA final (.pq-cta) llega a la mitad de la pantalla:
-   .pq-fin sube media pantalla + medio CTA por debajo del contenido. El contenido (.pq-auds, z 2) queda por encima
-   del pin (z 1), cuyo gris es el mismo del fondo, y se desvanece al empezar a cerrarse (js/para-quien.js). */
-.pq-fin { position: relative; height: var(--pq-fin); margin: calc(-50vh - clamp(19px, 2.7vw, 50px)) calc(-1 * var(--pq-g)) 0; pointer-events: none; }
+/* el contenido va por encima del grano fijo (.grano, z 1): la ventana negra lleva el suyo (el mismo, a .2) */
 .pq-vivo .pq-auds { z-index: 2; }
-.pq-cerrando .pq-auds { pointer-events: none; }
-/* el grano (.grano, fijo, z 1) queda por debajo del pin y del contenido: lo llevan ellos (el mismo, a .2) */
-.pq-fin__gris::after, .pq-vivo .pq-window::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .2; background: url("../assets/onda/grano.png") 0 0 / 200px 200px repeat; }
-.pq-fin__pin { position: sticky; top: 0; z-index: 1; height: 100vh; height: 100lvh; overflow: hidden; overflow: clip; }
-.pq-fin__gris { position: absolute; inset: 0; background: var(--gris); will-change: clip-path, opacity; }
-/* sin animación (movimiento reducido, versión fija, sin JS): corte limpio del gris al negro */
-.pq:not(.pq-vivo) { --pq-fin: 0px; }
-.pq:not(.pq-vivo) { padding-bottom: 10vh; }      /* sin cierre (movimiento reducido): 10vh de gris tras el CTA */
-.pq:not(.pq-vivo) .pq-fin { height: 0; margin: 0; }
-.pq:not(.pq-vivo) .pq-fin__pin { visibility: hidden; }   /* sin cierre: corte limpio a #planes */
-.pq:not(.pq-vivo) ~ #planes { margin-top: 0; }
-.pq:not(.pq-vivo) { padding-bottom: clamp(90px, 14vh, 150px); }
+.pq-vivo .pq-window::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .2; background: url("../assets/onda/grano.png") 0 0 / 200px 200px repeat; }
 
 /* las ondas: en el aire de debajo de la frase, a la derecha (la frase ocupa casi todo el ancho) */
 .pq-ondas { position: absolute; top: calc(100% + 8px); right: 0; width: min(30vw, 460px); height: clamp(90px, 16vh, 170px); pointer-events: none; }

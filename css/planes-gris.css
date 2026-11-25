@@ -1,0 +1,22 @@
+/* ==========================================================================
+   planes-gris.css — #planes de la home en el capítulo gris (desde
+   backup-pre-planes-gris). #lateral → #para-quien → #planes son UN solo gris
+   (#e6e4df, liso, sin cuadrícula). Entre el CTA de #para-quien y el titular,
+   solo una línea de 1 px con 12vh arriba y abajo.
+   JS: js/planes-gris.js
+   ========================================================================== */
+.pg {
+  --pg-g: clamp(16px, 4vw, 56px);               /* el margen de #para-quien */
+  --pg-tinta: #121317;
+  --pg-linea: rgb(18 19 23 / .14);
+  position: relative;
+  padding: 0 var(--pg-g) 12vh;
+  background: var(--gris);
+  color: var(--pg-tinta);
+  font-family: "Schibsted Lateral", var(--font-text);
+}
+.pg :where(h2, h3, p, ul, ol, dl, dd, dt) { margin: 0; }
+.pg :focus-visible { outline: 2px solid var(--pg-tinta); outline-offset: 4px; }
+
+/* la línea que la separa de #para-quien (12vh de gris arriba: el padding-bottom de .pq) */
+.pg-sep { height: 1px; margin-bottom: 12vh; background: var(--pg-linea); }
