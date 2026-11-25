@@ -3,15 +3,72 @@
    negro entre #para-quien (gris) y #planes. Fondo transparente sobre la red
    (js/red.js). Con el cierre del gris (.pq-vivo), sube por detrás de todo el
    cierre (margin-top = −el alto de .pq-fin): lo que deja ver el gris al cerrarse
-   YA es #como; su panel (sticky, una pantalla) se queda quieto detrás mientras
-   el gris se cierra y después mientras se escriben las palabras.
+   YA es #como; su panel (sticky, una pantalla) se queda quieto detrás mientras el
+   gris se cierra y después mientras se escriben las palabras (70vh).
+   · ESCUCHAMOS → DISEÑAMOS → CONSTRUIMOS: escalonadas (izquierda, centro,
+     derecha), unidas por flechas finas; debajo de cada una, su línea pequeña.
+   · .como-viva (js/como.js): los estados de partida (línea y flecha ocultas).
+     Sin JS o con movimiento reducido, todo se ve desde el principio.
    JS: js/como.js
    ========================================================================== */
 .como {
+  --como-g: clamp(16px, 4vw, 56px);
+  --como-claro: #ecebe7;
   position: relative;
-  color: #ecebe7;
+  color: var(--como-claro);
   font-family: "Schibsted Lateral", var(--font-text);
 }
+.como :where(ol, p) { margin: 0; padding: 0; }
 /* el pin del cierre + 70vh para escribir las tres palabras con el panel quieto */
 .pq-vivo ~ .como { height: calc(100vh + var(--pq-tramo) + 70vh); margin-top: calc(-1 * var(--pq-fin)); }
 @supports (height: 100lvh) { .pq-vivo ~ .como { height: calc(100lvh + var(--pq-tramo) + 70vh); } }
+
+.como-pin {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: clamp(96px, 14vh, 150px) var(--como-g);
+  box-sizing: border-box;
+}
+.pq-vivo ~ .como .como-pin { position: sticky; top: 0; height: 100vh; height: 100lvh; }
+
+.como-pasos { display: grid; gap: clamp(18px, 3.4vh, 44px); width: 100%; list-style: none; }
+.como-paso { display: flex; flex-direction: column; align-items: flex-start; }
+.como-paso:nth-child(2) { align-items: center; text-align: center; }
+.como-paso:nth-child(3) { align-items: flex-end; text-align: right; }
+.como-palabra {
+  display: flex;
+  align-items: center;
+  font-size: clamp(48px, 8.6vw, 156px);
+  font-weight: 800;
+  line-height: .92;
+  letter-spacing: -.045em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+/* las franjas de las letras (EV.recorrido.Bloque), sobre negro: la del medio, clara (la tinta no se vería) */
+.como-palabra .sc .s2 { color: var(--como-claro); }
+/* la flecha fina que une una palabra con la siguiente */
+.como-f { display: inline-block; flex: none; width: .92em; margin-left: .22em; }
+.como-f svg { display: block; width: 100%; height: auto; overflow: visible; fill: none; stroke: rgb(236 235 231 / .35); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.como-f path { vector-effect: non-scaling-stroke; }
+.como-d { max-width: 62ch; margin-top: 14px; font: 400 15px / 1.5 var(--font-text); color: rgb(236 235 231 / .6); text-wrap: balance; }
+
+/* las ondas: el hueco de abajo a la izquierda, junto a "Construimos" (que va a la derecha) */
+.como-ondas { position: absolute; left: var(--como-g); bottom: 13vh; width: 26vw; height: 22vh; pointer-events: none; }
+
+/* ---------- los estados de partida (solo con .como-viva; js/como.js) ---------- */
+.como-viva .como-d { opacity: 0; transform: translate3d(0, 6px, 0); transition: opacity .6s cubic-bezier(.2, .75, .15, 1), transform .6s cubic-bezier(.2, .75, .15, 1); }
+.como-viva .como-paso.is-escrita .como-d { opacity: 1; transform: none; }
+.como-viva .como-f { clip-path: inset(0 100% 0 0); }        /* se dibuja de izquierda a derecha (js) */
+
+/* ---------- móvil: las tres a la izquierda, una debajo de otra ---------- */
+@media (max-width: 860px) {
+  .como-paso:nth-child(n) { min-width: 0; align-items: flex-start; text-align: left; }
+  /* unos 15vw, con tope para que "ESCUCHAMOS" y su flecha quepan en el ancho */
+  .como-palabra { font-size: min(15vw, (100vw - 2 * var(--como-g) - 16px) / 8.4); }
+  .como-f { width: .62em; margin-left: .16em; }
+  .como-ondas { left: auto; right: var(--como-g); bottom: 7vh; width: 58vw; height: 13vh; }
+}

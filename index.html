@@ -291,8 +291,31 @@
       <div class="pq-fin" aria-hidden="true"><div class="pq-fin__pin"><div class="pq-fin__gris"></div><span class="pq-fin__l"></span></div></div>
     </section>
 
-    <!-- ===== Cómo trabajamos (desde backup-pre-puente): el puente en negro entre #para-quien y #planes ===== -->
+    <!-- ===== Cómo trabajamos (desde backup-pre-puente): el puente en negro entre #para-quien y #planes =====
+         Tres palabras escalonadas unidas por flechas; cada una se escribe con las franjas de #lateral, una tras otra,
+         ligadas al scroll, y su línea entra al terminar. Sube por detrás del cierre del gris: lo que deja ver al
+         cerrarse ya es esto. Los textos (BORRADOR, propuesta) se editan aquí mismo.
+         Estilos: css/como.css · JS: js/como.js -->
     <section class="como" id="como" aria-labelledby="como-t">
+      <h2 class="sr-only" id="como-t">Cómo trabajamos</h2>
+      <div class="como-pin">
+        <ol class="como-pasos" role="list">
+          <li class="como-paso">
+            <p class="como-palabra"><span class="como-w">Escuchamos</span><span class="como-f" aria-hidden="true"><svg viewBox="0 0 120 40" focusable="false"><path d="M2 20H116M101 6L116 20L101 34"/></svg></span></p>
+            <p class="como-d">Nos cuentas tu negocio o tu idea y lo que necesitas.</p>
+          </li>
+          <li class="como-paso">
+            <p class="como-palabra"><span class="como-w">Diseñamos</span><span class="como-f" aria-hidden="true"><svg viewBox="0 0 120 40" focusable="false"><path d="M2 20H116M101 6L116 20L101 34"/></svg></span></p>
+            <p class="como-d">Te enseñamos la propuesta antes de programar nada.</p>
+          </li>
+          <li class="como-paso">
+            <p class="como-palabra"><span class="como-w">Construimos</span></p>
+            <p class="como-d">La programamos, la publicamos y te la dejamos funcionando.</p>
+          </li>
+        </ol>
+        <!-- Ancla de las ondas: el hueco de abajo a la izquierda, junto a "Construimos" (en móvil, debajo de todo). -->
+        <div class="como-ondas" data-ondas="orbita" data-ondas-scale=".6" aria-hidden="true"></div>
+      </div>
     </section>
 
     <!-- ===== Planes (desde backup-pre-planes-gris, en el capítulo gris: sigue a #para-quien sin cortes, solo una línea fina) =====
@@ -488,6 +511,8 @@
   <script defer src="js/recorrido.js"></script>
   <script defer src="js/lateral.js"></script>
   <script defer src="js/para-quien.js"></script>
+  <!-- #como, el puente: las tres palabras, sus flechas y sus líneas, al ritmo del scroll. -->
+  <script defer src="js/como.js"></script>
   <!-- #planes en el gris: el titular, la entrada de las columnas, el mensaje del formulario y el cierre del gris. -->
   <script defer src="js/planes-gris.js"></script>
   <!-- El caso de Disco en #para-quien: el portátil 3D (Three.js 0.160.0, el mismo import map), al entrar en pantalla. -->
