@@ -88,7 +88,7 @@
   <link rel="stylesheet" href="css/trabajo-selecto.css">
   <link rel="stylesheet" href="css/para-quien.css">
   <link rel="stylesheet" href="css/como.css">
-  <link rel="stylesheet" href="css/planes-gris.css">
+  <link rel="stylesheet" href="css/planes-home.css">
   <link rel="stylesheet" href="css/contacto.css">
 </head>
 <body class="inicio inicio--ondas">
@@ -318,13 +318,12 @@
       </div>
     </section>
 
-    <!-- ===== Planes (desde backup-pre-planes-gris, en el capítulo gris: sigue a #para-quien sin cortes, solo una línea fina) =====
+    <!-- ===== Planes (desde backup-pre-puente, en negro sobre la red, detrás de #como; abajo, una línea fina y el contacto) =====
          Editorial, sin cards: tres columnas separadas por líneas de 1 px. Inmersión, la recomendada (la única línea naranja).
          Las listas son las de js/data/planes.js (las mismas de planes.html), resumidas. Las dos preguntas salen de
          js/data/faq-planes.js. "Empezar con este plan" lleva a #contacto, marca el plan y, si el mensaje está vacío,
-         escribe "Me interesa el plan …." (js/planes-gris.js). Estilos: css/planes-gris.css -->
-    <section class="pg" id="planes" aria-labelledby="h-planes" data-nav="light">
-      <div class="pg-sep" aria-hidden="true"></div>
+         escribe "Me interesa el plan …." (js/planes-home.js). Estilos: css/planes-home.css -->
+    <section class="pg" id="planes" aria-labelledby="h-planes">
       <div class="pg-cont">
         <div class="pg-cab">
           <h2 class="pg-titulo" id="h-planes">Elige cómo empezar.</h2>
@@ -380,6 +379,8 @@
           <a class="pg-todo" href="planes.html">Ver todos los detalles<span aria-hidden="true"> →</span></a>
         </div>
       </div>
+      <!-- la línea que la separa del contacto: el mismo capítulo negro (10vh arriba y abajo) -->
+      <div class="pg-sep" aria-hidden="true"></div>
     </section>
 
     <!-- ===== Contacto: formulario (Web3Forms; la clave va en js/config.js → WEB3FORMS_KEY). JS: js/contacto/form.js · CSS: css/contacto.css ===== -->
@@ -445,7 +446,7 @@
       </div>
     </section>
 
-    <!-- ===== Herramientas (desde backup-pre-planes-gris, detrás del contacto: el gris de #planes se cierra descubriendo el contacto) ===== -->
+    <!-- ===== Herramientas (desde backup-pre-planes-gris, detrás del contacto, pegado a los planes) ===== -->
     <section class="herramientas" id="herramientas" aria-labelledby="h-herramientas">
       <h2 class="etiqueta" id="h-herramientas" data-c="inicio.herramientas">Herramientas con las que trabajamos</h2>
       <!-- Cromo de la cinta: degradado en el espacio del icono (viewBox 24). -->
@@ -513,8 +514,8 @@
   <script defer src="js/para-quien.js"></script>
   <!-- #como, el puente: las tres palabras, sus flechas y sus líneas, al ritmo del scroll. -->
   <script defer src="js/como.js"></script>
-  <!-- #planes en el gris: el titular, la entrada de las columnas, el mensaje del formulario y el cierre del gris. -->
-  <script defer src="js/planes-gris.js"></script>
+  <!-- #planes en negro: el titular, la entrada de las columnas y el mensaje del formulario. -->
+  <script defer src="js/planes-home.js"></script>
   <!-- El caso de Disco en #para-quien: el portátil 3D (Three.js 0.160.0, el mismo import map), al entrar en pantalla. -->
   <script type="module" src="js/trabajo-selecto.js"></script>
   <script type="module" src="js/ui/scramble.js"></script>

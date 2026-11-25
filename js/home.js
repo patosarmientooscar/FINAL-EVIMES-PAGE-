@@ -116,7 +116,7 @@
     root.classList.add('cinta-viva');
   }
 
-  /* (los planes de la home están en el HTML desde backup-pre-planes-gris: js/planes-gris.js) */
+  /* (los planes de la home están en el HTML desde backup-pre-planes-gris: js/planes-home.js) */
 
   /* ---------- contacto ----------
      El formulario es js/contacto/form.js. Aquí solo: el plan elegido en una
