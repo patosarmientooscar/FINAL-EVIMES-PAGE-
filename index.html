@@ -164,6 +164,8 @@
                 <li>Único</li>
               </ul>
               <div class="lat-ondas" data-ondas="helice" data-ondas-scale=".7" data-ondas-tempo=".25" aria-hidden="true"></div>
+              <!-- El laboratorio (desde backup-pre-lab): no va en el menú; se llega desde aquí y desde el pie. -->
+              <a class="lat-lab" href="laboratorio.html"><span>Ver lo que podemos hacer</span><svg viewBox="0 0 100 100" aria-hidden="true" focusable="false"><path d="M4 50H92M58 14L94 50L58 86"/></svg></a>
             </div>
             <div class="lat-panel p-band" aria-hidden="true"></div>
             <!-- La pregunta: al acabar el recorrido no se va; js/para-quien.js la releva (.pq-relevo) y la encoge hasta el título fijo de #para-quien. -->
@@ -489,7 +491,10 @@
 
   <!-- ===== Pie ===== -->
   <footer class="pie">
-    <p data-c="inicio.pie.firma">© 2026 Evimes · Madrid</p>
+    <div class="pie__firma">
+      <p data-c="inicio.pie.firma">© 2026 Evimes · Madrid</p>
+      <a class="pie__lab" href="laboratorio.html">Laboratorio</a>
+    </div>
     <nav aria-label="Textos legales">
       <ul class="pie__legales">
         <li><a href="aviso-legal.html">Aviso legal</a></li>

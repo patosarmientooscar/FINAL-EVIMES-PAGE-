@@ -130,4 +130,5 @@
 }
 .doc-footer a { color: var(--ink-muted); text-decoration: none; display: inline-block; padding-block: var(--space-2); }
 .doc-footer a:hover { color: var(--stone); }
+.doc-footer__lab { margin: 0 0 var(--space-2); font-size: var(--step--1); }
 .doc-footer a[aria-current="page"] { color: var(--stone); text-decoration: underline; text-decoration-color: var(--line-strong); }

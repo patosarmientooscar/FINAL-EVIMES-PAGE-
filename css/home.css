@@ -432,6 +432,11 @@ html:not(.cinta-viva) .cinta__lista { flex-wrap: wrap; gap: 8px 40px; padding: 0
 .pie__legales { display: flex; flex-wrap: wrap; gap: 0 20px; margin: 0; padding: 0; list-style: none; }
 .pie__legales a { display: inline-flex; align-items: center; min-height: 44px; text-decoration: none; }
 .pie__legales a:hover { color: var(--stone); }
+/* la firma y el enlace al laboratorio (desde backup-pre-lab: en el pie de todas las páginas, no en el menú) */
+.pie__firma { display: flex; flex-wrap: wrap; align-items: center; gap: 0 20px; }
+.pie__firma p { margin: 0; }
+.pie__lab { display: inline-flex; align-items: center; min-height: 44px; color: inherit; text-decoration: none; }
+.pie__lab:hover { color: var(--stone); }
 
 /* ==========================================================================
    Anclas de las ondas (js/ondas.js) en el resto de la home (desde

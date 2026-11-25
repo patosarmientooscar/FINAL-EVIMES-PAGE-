@@ -1,0 +1,378 @@
+/* ==========================================================================
+   lab.css — el laboratorio (desde backup-pre-lab): laboratorio.html (el
+   índice) y laboratorio/<experimento>.html. El lenguaje de la home: negro con
+   la red, mayúsculas 800 ("Schibsted Lateral", css/lateral.css), las franjas
+   de las letras (EV.recorrido.Bloque) y la línea que se abre. El naranja,
+   solo como acento (las franjas y el punto del movimiento activo).
+   JS: js/lab/indice.js (índice), js/lab/pagina.js (cada experimento).
+   ========================================================================== */
+.lab {
+  --lab-g: clamp(16px, 4vw, 56px);
+  --lab-claro: #ecebe7;
+  --lab-2: rgb(236 235 231 / .66);              /* secundario ~7:1 sobre #0b0c0f */
+  --lab-3: rgb(236 235 231 / .56);              /* etiquetas ~5:1 */
+  --lab-linea: rgb(255 255 255 / .1);
+  --lab-ease: cubic-bezier(.2, .75, .15, 1);
+  color: var(--lab-claro);
+  font-family: "Schibsted Lateral", var(--font-text);
+}
+.lab ::selection { background: #ff7a22; color: #0b0c0f; }
+.lab :where(h1, h2, p, ol, ul, dl, dd) { margin: 0; padding: 0; }
+/* los titulares, en la grotesca 800 de la home (base.css les pone la de display) */
+.lab :is(.lab-h1, .lab-nombre, .lab-cierre h2, .lab-ficha__t) { font-family: "Schibsted Lateral", var(--font-text); font-variation-settings: normal; }
+.lab a { -webkit-tap-highlight-color: transparent; }
+.lab :focus-visible { outline: 2px solid var(--cyan); outline-offset: 4px; }
+/* sobre negro, la franja del medio de las letras va clara (la tinta no se vería) */
+.lab .sc .s2 { color: var(--lab-claro); }
+
+/* la flecha de la web (la del CTA del hero), dibujada */
+.lab-f { display: inline-block; flex: none; width: .72em; height: .64em; fill: none; stroke: currentColor; stroke-width: 11; overflow: visible; }
+.lab-f--izq { transform: scaleX(-1); }
+
+/* ==========================================================================
+   La transición: una línea fina que cruza y se abre.
+   Salida (html.lab-sale, js): la línea cruza (.22 s) y se abre en negro (.3 s); después se navega.
+   Entrada (html.lab-entra, el <head>): la pantalla empieza negra con la línea; se abre desde ella.
+   ========================================================================== */
+.lab-velo { position: fixed; inset: 0; z-index: 60; pointer-events: none; }
+.lab-velo > * { position: absolute; left: 0; right: 0; display: block; background: var(--navy); transform: scaleY(0); }
+.lab-velo__a { top: 0; height: 50%; transform-origin: 50% 0; }
+.lab-velo__b { bottom: 0; height: 50%; transform-origin: 50% 100%; }
+.lab-velo__p { top: 0; bottom: 0; transform-origin: 50% 50%; }
+.lab-velo__l { top: 50%; height: 1px; margin-top: -.5px; background: rgb(236 235 231 / .55); transform: scaleX(0); z-index: 1; }
+
+.lab-entra .lab-velo__a, .lab-entra .lab-velo__b { transform: scaleY(1); animation: lab-abre .72s cubic-bezier(.7, 0, .2, 1) .18s forwards; }
+.lab-entra .lab-velo__l { transform: scaleX(1); animation: lab-linea-fuera .4s ease .55s forwards; }
+@keyframes lab-abre { to { transform: scaleY(0); } }
+@keyframes lab-linea-fuera { to { opacity: 0; } }
+
+.lab-sale .lab-velo { pointer-events: auto; }
+.lab-sale .lab-velo__l { animation: lab-cruza .22s cubic-bezier(.6, 0, .3, 1) forwards; }
+.lab-sale .lab-velo__p { animation: lab-cubre .3s cubic-bezier(.7, 0, .25, 1) .2s forwards; }
+@keyframes lab-cruza { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes lab-cubre { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .lab-velo { display: none; }
+}
+
+/* ==========================================================================
+   El índice (laboratorio.html)
+   ========================================================================== */
+.lab-portada {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: 120px var(--lab-g) clamp(56px, 12vh, 140px);
+  box-sizing: border-box;
+}
+.lab-h1 {
+  font-size: min((100vw - 2 * var(--lab-g)) / 7.3, 34svh);   /* "LABORATORIO" mide 7,23 em: a todo el ancho */
+  font-weight: 800;
+  line-height: .86;
+  letter-spacing: -.045em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  font-kerning: none;
+}
+.lab-lema {
+  max-width: 30ch;
+  margin-top: clamp(20px, 3.4vh, 36px);
+  font-family: var(--font-text);
+  font-size: clamp(18px, 1.7vw, 26px);
+  line-height: 1.3;
+  color: var(--lab-2);
+  text-wrap: balance;
+}
+/* entrada del lema: después de escribirse el titular (solo con las letras vivas) */
+.lab-vivo .lab-lema { opacity: 0; transform: translate3d(0, 10px, 0); transition: opacity .9s var(--lab-ease), transform .9s var(--lab-ease); }
+.lab-vivo .lab-lema.is-visible { opacity: 1; transform: none; }
+
+/* ---------- la lista: un experimento por línea ---------- */
+.lab-indice { padding: clamp(40px, 8vh, 96px) var(--lab-g) 0; }
+.lab-lista { list-style: none; border-top: 1px solid var(--lab-linea); }
+.lab-lista > li { border-bottom: 1px solid var(--lab-linea); }
+.lab-fila {
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 2.4vw, 36px);
+  padding: clamp(18px, 3.2vh, 34px) 0;
+  color: inherit;
+  text-decoration: none;
+  transition: opacity .45s var(--lab-ease);
+}
+.lab-fila:focus-visible { outline-offset: -2px; }
+.lab-nombre {
+  flex: none;
+  font-size: clamp(44px, 8.4vw, 120px);
+  font-weight: 800;
+  line-height: .88;
+  letter-spacing: -.045em;
+  text-transform: uppercase;
+  color: rgb(236 235 231 / .84);
+  transition: color .35s var(--lab-ease);
+}
+.lab-hilo { flex: 1 1 auto; min-width: 24px; height: 1px; background: var(--lab-linea); transform-origin: 0 50%; transition: background-color .35s var(--lab-ease); }
+.lab-tec {
+  flex: none;
+  white-space: nowrap;
+  font-family: var(--font-text);
+  font-size: 14px;
+  line-height: 1.35;
+  text-align: right;
+  color: var(--lab-2);
+}
+/* el foco: el nombre a blanco y las otras líneas al 30 % */
+.lab-lista.is-foco .lab-fila { opacity: .3; }
+.lab-lista.is-foco .lab-fila.is-activa { opacity: 1; }
+.lab-fila.is-activa .lab-nombre { color: #fff; }
+.lab-fila.is-activa .lab-hilo { background: rgb(255 255 255 / .32); }
+
+/* la línea fina se dibuja de izquierda a derecha al entrar la fila (js) */
+.lab-vivo .lab-hilo { transform: scaleX(0); transition: transform 1.1s var(--lab-ease), background-color .35s var(--lab-ease); }
+.lab-vivo .lab-tec { opacity: 0; transition: opacity .8s var(--lab-ease) .35s; }
+.lab-vivo .lab-fila.is-escrita .lab-hilo { transform: scaleX(1); }
+.lab-vivo .lab-fila.is-escrita .lab-tec { opacity: 1; }
+
+/* ---------- la vista previa: un vídeo de 320 × 200 que sigue al cursor ---------- */
+.lab-vista {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 30;
+  width: 320px;
+  height: 200px;
+  pointer-events: none;
+  background: #050506;
+  opacity: 0;
+  clip-path: inset(50% 0 50% 0);
+  transition: opacity .35s ease, clip-path .5s cubic-bezier(.7, 0, .2, 1);
+  will-change: transform;
+}
+.lab-vista.is-visible { opacity: 1; clip-path: inset(0 0 0 0); }
+.lab-vista__v { position: absolute; inset: 0; opacity: 0; transition: opacity .3s ease; }
+.lab-vista__v.is-activa { opacity: 1; }
+.lab-vista video, .lab-vista img { display: block; width: 100%; height: 100%; max-width: none; object-fit: cover; }
+.lab-vista__toca { display: none; }
+
+/* sin cursor (táctil): la vista previa va debajo de la línea tocada; el segundo toque abre el experimento */
+@media (hover: none), (pointer: coarse) {
+  .lab-vista {
+    position: relative;
+    z-index: auto;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    margin: 0 0 18px;
+    transform: none !important;
+    will-change: auto;
+  }
+  .lab-vista[hidden] { display: none; }
+  .lab-vista__toca {
+    display: block;
+    position: absolute;
+    left: 12px;
+    bottom: 10px;
+    padding: 6px 10px;
+    font: 600 12px / 1.2 var(--font-text);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--lab-claro);
+    background: rgb(11 12 15 / .72);
+  }
+  .lab-fila { flex-wrap: wrap; row-gap: 8px; }
+  .lab-hilo { display: none; }
+  .lab-tec { flex-basis: 100%; max-width: none; text-align: left; font-size: 13px; }
+}
+
+/* ---------- el cierre ---------- */
+.lab-cierre { padding: clamp(110px, 22vh, 240px) var(--lab-g) clamp(90px, 16vh, 180px); }
+.lab-cierre h2 {
+  max-width: 11ch;
+  font-size: clamp(40px, 7.2vw, 116px);
+  font-weight: 800;
+  line-height: .9;
+  letter-spacing: -.045em;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+.lab-cierre .portada__cta { margin-top: clamp(32px, 5vh, 56px); }
+
+/* los titulares que se escriben con las franjas: ocultos hasta que js/lab/comun.js los parte (con un tope de 3 s) */
+.lab-vivo :is(.lab-h1, .lab-ficha__t):not(.is-lista) { visibility: hidden; animation: lab-ver 0s 3s forwards; }
+@keyframes lab-ver { to { visibility: visible; } }
+
+/* ==========================================================================
+   Cada experimento (laboratorio/<nombre>.html): a pantalla completa, sobre negro.
+   La primera pantalla es el experimento (fijo detrás) con su ficha; debajo, el pie.
+   ========================================================================== */
+.lab-escena { position: fixed; inset: 0; z-index: 0; }
+.lab-pag--red .lab-escena, .lab-escena--toca { touch-action: pan-y pinch-zoom; }   /* en horizontal, el dedo mueve el experimento */
+.lab-pantalla { position: relative; z-index: 25; height: 100vh; height: 100svh; pointer-events: none; }
+.lab-pantalla :is(a, button, .lab-movs) { pointer-events: auto; }
+.lab-pag .pie { position: relative; z-index: 26; background: var(--navy); }
+.lab-pag--red .lab-pantalla, .lab-pag--red .pie { touch-action: pan-y pinch-zoom; }
+
+.lab-volver, .lab-sig {
+  position: absolute;
+  z-index: 25;
+  display: inline-flex;
+  align-items: center;
+  gap: .55em;
+  min-height: 44px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--lab-claro);
+  text-decoration: none;
+}
+/* "← Índice": en el mismo cristal oscuro que la píldora de la cabecera (se lee sobre el negro y sobre el gris de la oficina) */
+.lab-volver {
+  top: calc(64px + 12px);
+  right: var(--lab-g);
+  padding: 0 16px;
+  border: 1px solid rgb(255 255 255 / .09);
+  border-radius: 999px;
+  background: rgb(18 19 23 / .74);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+          backdrop-filter: blur(16px) saturate(140%);
+  transition: border-color .3s ease;
+}
+.lab-volver:hover { border-color: rgb(255 255 255 / .22); }
+.lab-pag--oficina .lab-volver { position: fixed; }
+.lab-sig { right: var(--lab-g); bottom: max(20px, env(safe-area-inset-bottom)); }
+.lab-volver .lab-f, .lab-sig .lab-f { transition: transform .5s var(--lab-ease); }
+@media (hover: hover) {
+  .lab-volver:hover .lab-f { transform: scaleX(-1) translateX(.2em); }
+  .lab-sig:hover .lab-f { transform: translateX(.2em); }
+}
+
+.lab-ficha {
+  position: absolute;
+  z-index: 25;
+  left: var(--lab-g);
+  bottom: max(20px, env(safe-area-inset-bottom));
+  width: min(360px, calc(100vw - 2 * var(--lab-g)));
+}
+/* la oficina se recorre con el scroll: su ficha y el siguiente van al final, en el flujo */
+.lab-pantalla--fin {
+  height: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 40px;
+  padding: clamp(80px, 14vh, 160px) var(--lab-g) clamp(40px, 8vh, 80px);
+  background: var(--navy);
+  pointer-events: auto;
+}
+.lab-pantalla--fin :is(.lab-ficha, .lab-sig) { position: static; }
+.lab-ficha__t {
+  font-size: clamp(30px, 3vw, 46px);
+  font-weight: 800;
+  line-height: .9;
+  letter-spacing: -.04em;
+  text-transform: uppercase;
+}
+.lab-ficha dl { margin-top: 16px; display: grid; gap: 10px; }
+.lab-ficha dt {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--lab-3);
+}
+.lab-ficha dd { margin-top: 3px; font-family: var(--font-text); font-size: 14px; line-height: 1.45; color: var(--lab-2); }
+.lab-vivo .lab-ficha dl { opacity: 0; transform: translate3d(0, 8px, 0); transition: opacity .8s var(--lab-ease), transform .8s var(--lab-ease); }
+.lab-vivo .lab-ficha.is-visible dl { opacity: 1; transform: none; }
+
+/* ---------- ondas: la lista de movimientos y el modo automático ---------- */
+.lab-ondas-ancla { position: absolute; left: 30%; right: 30%; top: 22%; bottom: 22%; pointer-events: none; }
+.lab-movs[hidden] { display: none; }
+.lab-movs {
+  position: absolute;
+  z-index: 25;
+  right: var(--lab-g);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.lab-movs__l { display: flex; flex-direction: column; align-items: flex-end; list-style: none; }
+.lab-movs button {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 34px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: 500 14px / 1 var(--font-text);
+  color: var(--lab-3);
+  cursor: pointer;
+  transition: color .3s ease;
+}
+.lab-movs button:hover { color: var(--lab-claro); }
+.lab-movs button[aria-pressed="true"] { color: var(--lab-claro); }
+.lab-movs__l button::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: #ff7a22; opacity: 0; transform: scale(.4); transition: opacity .3s ease, transform .3s var(--lab-ease); }
+.lab-movs__l button[aria-pressed="true"]::before { opacity: 1; transform: none; }
+.lab-auto { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--lab-linea); }
+.lab-auto button { font-weight: 700; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; }
+.lab-auto i { position: relative; width: 26px; height: 14px; border: 1px solid rgb(236 235 231 / .35); border-radius: 8px; transition: border-color .3s ease; }
+.lab-auto i::after { content: ""; position: absolute; top: 2px; left: 2px; width: 8px; height: 8px; border-radius: 50%; background: var(--lab-3); transition: transform .35s var(--lab-ease), background-color .3s ease; }
+.lab-auto button[aria-pressed="true"] i { border-color: rgb(236 235 231 / .7); }
+.lab-auto button[aria-pressed="true"] i::after { transform: translateX(12px); background: #ff7a22; }
+
+/* ---------- red y destello: el lienzo, a pantalla completa ---------- */
+.lab-destello { position: absolute; inset: 0; }
+.lab-destello canvas { display: block; width: 100%; height: 100%; cursor: grab; }
+.lab-destello canvas:active { cursor: grabbing; }
+
+/* ---------- captura de las vistas previas (?captura): solo el objeto ---------- */
+.lab-captura .cabecera, .lab-captura .lab-volver, .lab-captura .lab-sig, .lab-captura .lab-ficha,
+.lab-captura .lab-movs, .lab-captura .lab-velo, .lab-captura .skip-link, .lab-captura .grano,
+.lab-captura .lab-pantalla, .lab-captura .pie { display: none !important; }
+
+@media (max-width: 860px) {
+  .lab-indice { padding-top: 24px; }
+  .lab-ondas-ancla { left: 6%; right: 6%; top: 26%; bottom: 40%; }
+  .lab-movs {
+    left: 0;
+    right: 0;
+    top: calc(64px + 64px);
+    transform: none;
+    flex-direction: row;
+    align-items: center;
+    gap: 18px;
+    padding: 0 var(--lab-g);
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent);
+            mask-image: linear-gradient(90deg, #000 85%, transparent);
+  }
+  .lab-movs::-webkit-scrollbar { display: none; }
+  .lab-movs__l { flex-direction: row; gap: 18px; }
+  .lab-movs button { min-height: 44px; white-space: nowrap; }
+  .lab-auto { order: -1; margin: 0; padding: 0 18px 0 0; border-top: 0; border-right: 1px solid var(--lab-linea); }
+  .lab-ficha { bottom: calc(max(20px, env(safe-area-inset-bottom)) + 52px); }
+  .lab-sig { left: var(--lab-g); right: auto; }
+}
+
+/* destello: los rayos llegan hasta la ficha; un velo del color del fondo detrás, para que se lea */
+.lab-pag--destello .lab-pantalla::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: min(760px, 100%);
+  height: 60%;
+  background: radial-gradient(ellipse 70% 80% at 0% 100%, rgb(7 10 19 / .82), rgb(7 10 19 / .5) 45%, transparent 75%);
+  pointer-events: none;
+}

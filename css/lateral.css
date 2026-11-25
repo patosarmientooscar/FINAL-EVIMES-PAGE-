@@ -74,6 +74,28 @@
 }
 .lat-list li:nth-child(odd) { color: rgb(18 19 23 / .5); }   /* prototipo .28 (1,8:1) → AA en texto grande */
 .lat-ondas { display: none; }
+/* el enlace al laboratorio, al final de la lista (desde backup-pre-lab) */
+.lat-lab {
+  display: inline-flex;
+  align-items: center;
+  gap: .55em;
+  min-height: 44px;
+  margin-top: 28px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--lat-tinta);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: .45em;
+  text-decoration-color: rgb(18 19 23 / .3);
+  transition: text-decoration-color .3s;
+}
+.lat-lab svg { width: .9em; height: .8em; fill: none; stroke: currentColor; stroke-width: 10; transition: transform .5s cubic-bezier(.2, .75, .15, 1); }
+.lat-lab:hover { text-decoration-color: currentColor; }
+.lat-lab:hover svg { transform: translateX(.2em); }
+.lat-lab:focus-visible { outline: 2px solid var(--lat-tinta); outline-offset: 4px; }
 .p-band {
   display: flex;
   align-items: center;
@@ -135,6 +157,7 @@
 .is-viva .p-text { width: max(70vw, 760px); }
 .is-viva .p-list { width: max(100vw, 1040px); padding-left: 14vw; }
 .is-viva .lat-list li { font-size: max(19px, min(clamp(30px, 4.6vw, 78px), (100svh - 150px) / 11)); }
+.is-viva .lat-lab { position: absolute; left: 14vw; bottom: calc(var(--barra) + 52px); margin: 0; }
 .is-viva .lat-ondas { display: block; position: absolute; right: 6vw; top: 26%; width: 34vw; height: 42%; pointer-events: none; }
 .is-viva .p-band { width: 6vw; min-height: 0; padding: 0; }   /* solo un acento de color, sin texto */
 .is-viva .p-quien { width: 100vw; }
