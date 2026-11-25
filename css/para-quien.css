@@ -441,7 +441,7 @@
   .pq-window { --pq-wpad: 20px; grid-template-columns: minmax(0, 1fr); gap: 20px; min-height: 0; padding: 56px 20px 24px; }
   .pq-vivo .pq-talk-pista::after, .pq-vivo .pq-caso-pista::after { height: 40vh; }
   /* en móvil, la información va debajo del dispositivo: el dispositivo, con el alto que le deja */
-  .pq-stage .ts-card__escena { width: min(100%, (var(--pq-wmax) - 80px - 250px) * 16 / 11); }
+  .pq-stage .ts-card__escena { width: min(100%, (var(--pq-wmax) - 80px - 380px) * 16 / 11); }   /* 380: el nombre, los anillos en 2 × 2 y los enlaces */
   .pq-phone { --w: min(62vw, (var(--pq-wmax) - 80px - 270px) * 9 / 19.3); }
   .pq-info p:not(.pq-info__src) { font-size: 14px; line-height: 1.5; }
   .pq-info__h { margin-bottom: 12px !important; }
