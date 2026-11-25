@@ -25,6 +25,8 @@ export async function iniciar({ escena }) {
     else { let l = 0; const f = now => { if (!paso) return; requestAnimationFrame(f); paso(0, l ? now - l : 16.7); l = now; }; requestAnimationFrame(f); }
   }
   el.classList.add('is-viva');
+  // ?captura (tools/grabar-lab.mjs): un paso fijo, sin depender del reloj (la vista previa del índice)
+  if (new URLSearchParams(location.search).has('captura')) window.__labPaso = dt => { c.step(dt); c.render(); };
 
   return {
     liberar() {

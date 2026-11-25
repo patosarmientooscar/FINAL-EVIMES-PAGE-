@@ -22,7 +22,7 @@ export async function iniciar({ escena }) {
   const caja = document.querySelector('.lab-movs');
   // el tamaño de las piezas: en una pantalla estrecha, la órbita y el intercambio no caben a la escala del escritorio
   const estrecha = matchMedia('(max-width: 860px)');
-  const escala = () => { ancla.dataset.ondasScale = estrecha.matches ? '.95' : '1.55'; };
+  const escala = () => { ancla.dataset.ondasScale = estrecha.matches ? '.8' : '1.4'; };
   escala();
   estrecha.addEventListener('change', escala);
   const m = await import('../ondas.js');

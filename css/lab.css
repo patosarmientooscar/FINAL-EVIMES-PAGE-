@@ -244,6 +244,8 @@
 }
 .lab-volver:hover { border-color: rgb(255 255 255 / .22); }
 .lab-pag--oficina .lab-volver { position: fixed; }
+/* sobre el gris, el cristal se oscurece como la píldora de la cabecera (is-clara): igual de oscuro sobre los dos fondos */
+.lab-pag--oficina .lab-volver { -webkit-backdrop-filter: blur(16px) saturate(140%) brightness(.15); backdrop-filter: blur(16px) saturate(140%) brightness(.15); }
 .lab-sig { right: var(--lab-g); bottom: max(20px, env(safe-area-inset-bottom)); }
 .lab-volver .lab-f, .lab-sig .lab-f { transition: transform .5s var(--lab-ease); }
 @media (hover: hover) {
