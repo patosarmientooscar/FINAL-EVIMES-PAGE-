@@ -458,7 +458,9 @@ html:not(.cinta-viva) .cinta__lista { flex-wrap: wrap; gap: 8px 40px; padding: 0
 @media (max-width: 899px) {
   /* Contacto en móvil: el hueco entre el texto y el formulario (contacto.css la deja static: aquí, relative) */
   .contacto .contacto__cab { position: relative; top: auto; }
-  .ondas-ancla--contacto { top: 100%; left: 18%; width: 64%; height: 56px; }
+  /* más pequeñas y con más aire (desde backup-pre-planes-gris): en la hélice pisaban la intro y el borde del formulario */
+  .ondas-ancla--contacto { top: calc(100% + 10px); left: 27%; width: 46%; height: 52px; }
+  .inicio .contacto { row-gap: 84px; }
 }
 @media (max-width: 860px) {
   .ondas-ancla--ts { left: var(--g); }

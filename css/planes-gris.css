@@ -163,6 +163,30 @@
 .pg-vivo .pg-plan.is-dentro { opacity: 1; transform: none; transition: opacity .9s var(--pg-ease) var(--d, 0ms), transform .9s var(--pg-ease) var(--d, 0ms); }
 .pg-vivo .pg-plan.is-hecho { transition: opacity .4s var(--pg-ease); }
 
+/* ---------- el cierre del gris (.pg-fin; solo con .pg-cierra, js/planes-gris.js) ----------
+   Espejo de la apertura de #lateral: pin de una pantalla + 60vh de scroll. Empieza con lo último de #planes a
+   media pantalla (.pg-fin sube media pantalla por debajo del contenido). El contenido (.pg-cont, z 7) va por
+   encima del pin (z 6: también por encima de las ondas, z 5, que ya esperan en el contacto) y se desvanece al
+   empezar a cerrarse. El contacto sube por detrás (margin-top −100lvh, el alto del pin): lo que deja ver el gris
+   al cerrarse YA es el contacto en negro sobre la red, y al acabar su titular está en pantalla. */
+.pg { --pg-fin: calc(100vh + 60vh); }
+@supports (height: 100lvh) { .pg { --pg-fin: calc(100lvh + 60vh); } }
+.pg-fin { display: none; }
+.pg-cierra {
+  padding-bottom: 0;
+  /* el gris acaba donde empieza el cierre: de ahí abajo lo pinta el pin */
+  background: linear-gradient(var(--gris), var(--gris)) top / 100% calc(100% - var(--pg-fin)) no-repeat;
+}
+.pg-cierra .pg-cont { position: relative; z-index: 7; }
+.pg-cerrando .pg-cont { pointer-events: none; }
+.pg-cierra .pg-fin { display: block; position: relative; height: var(--pg-fin); margin: calc(-50vh - 12px) calc(-1 * var(--pg-g)) 0; pointer-events: none; }
+.pg-fin__pin { position: sticky; top: 0; z-index: 6; height: 100vh; height: 100lvh; overflow: hidden; overflow: clip; }
+.pg-fin__gris { position: absolute; inset: 0; background: var(--gris); will-change: clip-path, opacity; }
+/* el grano (.grano, fijo, z 1) queda por debajo del pin: lo lleva él (el mismo, a .2) */
+.pg-fin__gris::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .2; background: url("../assets/onda/grano.png") 0 0 / 200px 200px repeat; }
+.pg-cierra ~ .contacto { margin-top: -100vh; margin-top: -100lvh; }
+/* sin cierre (movimiento reducido, versión fija, sin JS): corte limpio del gris al negro tras 12vh de gris */
+
 /* ---------- móvil: una columna debajo de otra, Inmersión la primera ---------- */
 @media (max-width: 860px) {
   .pg-lista { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; margin-top: 56px; }
