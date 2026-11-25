@@ -27,13 +27,16 @@
   --pq-claro: #ecebe7;
   --pq-ease: cubic-bezier(.2, .75, .15, 1);
   position: relative;                           /* sin z-index: el contenido, bajo #lateral (2) y las ondas (5) */
-  /* arriba, el aire del título fijo; abajo, 12vh hasta la línea que la separa de #planes (desde backup-pre-planes-gris
-     el gris no se cierra aquí: #lateral, #para-quien y #planes son un solo capítulo gris; el cierre, al final de #planes) */
-  padding: clamp(150px, 22vh, 230px) var(--pq-g) 12vh;
-  background: var(--gris);
+  padding: clamp(150px, 22vh, 230px) var(--pq-g) 0;   /* arriba, el aire del título fijo; abajo, el cierre (.pq-fin) */
+  /* el gris acaba donde empieza el cierre: de ahí abajo lo pinta el pin (y detrás está #como, en negro) */
+  background: linear-gradient(var(--gris), var(--gris)) top / 100% calc(100% - var(--pq-fin)) no-repeat;
   color: var(--pq-tinta);
   font-family: "Schibsted Lateral", var(--font-text);
 }
+/* el tramo del cierre (desde backup-pre-puente): pin de una pantalla + 25vh (el subrayado se alarga) + 60vh (el
+   gris se cierra). #como (css/como.css) sube por detrás todo el tramo: empieza donde empieza el pin. */
+.inicio { --pq-tramo: 85vh; --pq-fin: calc(100vh + var(--pq-tramo)); }
+@supports (height: 100lvh) { .inicio { --pq-fin: calc(100lvh + var(--pq-tramo)); } }
 .pq :where(h3, p, ul, small) { margin: 0; }
 .pq :focus-visible { outline: 2px solid var(--pq-tinta); outline-offset: 4px; }
 .pq-switch, .pq-talk p, .pq-info__h, .pq-cta { font-weight: 800; letter-spacing: -.04em; text-transform: uppercase; }
@@ -151,9 +154,24 @@
   opacity: 0;
 }
 
-/* el contenido va por encima del grano fijo (.grano, z 1): la ventana negra lleva el suyo (el mismo, a .2) */
+/* ---------- el cierre (js/para-quien.js) ----------
+   Se engancha con el CTA final a media pantalla (.pq-fin sube media pantalla + medio CTA por debajo del
+   contenido). El contenido (.pq-auds, z 2) va por encima del pin (z 1), con el gris del fondo, y se queda quieto
+   mientras dura: el subrayado del CTA pasa a ser .pq-fin__l (mismo sitio y grosor), que se alarga a todo el
+   ancho; después el gris se cierra hacia ella. El contenido se desvanece al empezar a cerrarse. */
+.pq-fin { position: relative; height: var(--pq-fin); margin: calc(-50vh - clamp(19px, 2.7vw, 50px)) calc(-1 * var(--pq-g)) 0; pointer-events: none; }
 .pq-vivo .pq-auds { z-index: 2; }
-.pq-vivo .pq-window::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .2; background: url("../assets/onda/grano.png") 0 0 / 200px 200px repeat; }
+.pq-cerrando .pq-auds { pointer-events: none; }
+.pq-fijo .pq-cta::after { visibility: hidden; }          /* enganchado: el subrayado lo lleva el pin */
+/* el grano (.grano, fijo, z 1) queda por debajo del pin y del contenido: lo llevan ellos (el mismo, a .2) */
+.pq-fin__gris::after, .pq-vivo .pq-window::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .2; background: url("../assets/onda/grano.png") 0 0 / 200px 200px repeat; }
+.pq-fin__pin { position: sticky; top: 0; z-index: 1; height: 100vh; height: 100lvh; overflow: hidden; overflow: clip; }
+.pq-fin__gris { position: absolute; inset: 0; background: var(--gris); will-change: clip-path, opacity; }
+/* la línea: 100 × 1 px escalados (solo transform) al subrayado del CTA y, después, a todo el ancho */
+.pq-fin__l { position: absolute; top: 0; left: 0; width: 100px; height: 1px; background: var(--pq-tinta); transform-origin: 0 0; opacity: 0; will-change: transform, opacity; }
+/* sin animación (movimiento reducido, versión fija, sin JS): corte limpio del gris al negro */
+.pq:not(.pq-vivo) { --pq-fin: 0px; padding-bottom: clamp(90px, 14vh, 150px); }
+.pq:not(.pq-vivo) .pq-fin { display: none; }
 
 /* las ondas: en el aire de debajo de la frase, a la derecha (la frase ocupa casi todo el ancho) */
 .pq-ondas { position: absolute; top: calc(100% + 8px); right: 0; width: min(30vw, 460px); height: clamp(90px, 16vh, 170px); pointer-events: none; }
@@ -379,7 +397,10 @@
 }
 .pq-cta__arr { display: inline-block; margin-left: .2em; transition: transform .5s var(--pq-ease); }
 .pq-cta__arr svg { display: block; width: .64em; height: .58em; fill: none; stroke: currentColor; stroke-width: 12; }
-.pq-cta::after { content: ""; position: absolute; left: 0; right: 0; bottom: -.06em; height: .05em; background: var(--pq-tinta); transform: scaleX(0); transform-origin: left; transition: transform .7s var(--pq-ease); }
+/* el subrayado: se dibuja con la flecha al terminar de escribirse (--u, js/para-quien.js) y es el que se alarga en
+   el cierre; sin animación, dibujado */
+.pq-cta::after { content: ""; position: absolute; left: 0; right: 0; bottom: -.06em; height: .05em; background: var(--pq-tinta); transform: scaleX(var(--u, 1)); transform-origin: left; }
+.pq-vivo .pq-cta::after { transform: scaleX(var(--u, 0)); }
 @media (hover: hover) {
   .pq-cta:hover::after { transform: scaleX(1); }
   .pq-cta:hover .pq-cta__arr { transform: translateX(.18em); }

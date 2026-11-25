@@ -33,9 +33,9 @@
      la pantalla en el mismo sitio, y al bajar se encoge (ligado al scroll, con
      suavizado) hasta el título discreto, que se queda arriba sobre una franja
      gris mientras dura la sección (la cabecera, clara: EV.cabeceraGris).
-   · Sin cierre (desde backup-pre-planes-gris): el gris sigue hasta #planes, que
-     es parte del mismo capítulo; el cierre está al final de #planes
-     (js/planes-gris.js).
+   · El cierre (.pq-fin, desde backup-pre-puente): el subrayado del CTA final se
+     alarga hasta todo el ancho y el gris se cierra hacia esa línea; detrás,
+     #como en negro (la cabecera, oscura: EV.cabeceraOscura).
    · Posiciones cacheadas (sin lecturas de layout por fotograma); un callback
      en gsap.ticker que no calcula con la sección lejos ni quieta.
    · Movimiento reducido o versión fija: todo visible desde el principio.
@@ -86,7 +86,10 @@
     if (quieto) return;
     A.bloques = $$('[data-type]', p).map(function (el) {
       var flecha = el.parentNode.querySelector('.pq-cta__arr svg');
-      return { el: el, start: parseFloat(el.dataset.start) || .88, top: 0, b: new R.Bloque({ el: el, W: parseFloat(el.dataset.type) || 8 }), flecha: flecha && escritor(flecha, 'opacity') };
+      // el subrayado del CTA (::after, scaleX(var(--u))): se dibuja con la flecha; es el que se alarga en el cierre
+      var cta = flecha && el.closest('.pq-cta'), u;
+      var linea = cta && function (v) { if (v !== u) { u = v; cta.style.setProperty('--u', v); } };
+      return { el: el, start: parseFloat(el.dataset.start) || .88, top: 0, b: new R.Bloque({ el: el, W: parseFloat(el.dataset.type) || 8 }), flecha: flecha && escritor(flecha, 'opacity'), linea: linea };
     });
     A.clip = escritor(win, 'clipPath');
     A.stage = escritor(stage, 'transform');
@@ -246,22 +249,46 @@
     return { cambio: cambio, colocar: colocar };
   })();
 
-  /* ---------- el relevo de "¿Para quién?" ----------
-     Desde backup-pre-planes-gris el gris no se cierra aquí: sigue hasta #planes (el cierre está al final de
-     #planes, js/planes-gris.js). El título discreto se va cuando la línea que separa #para-quien de #planes
-     sube de media pantalla a un 15 % de la pantalla. */
+  /* ---------- el relevo de "¿Para quién?" y el cierre del gris (desde backup-pre-puente) ----------
+     El cierre (.pq-fin): un pin de una pantalla + 25vh (el subrayado) + 60vh (el cierre). Se engancha con el
+     CTA final a media pantalla; desde ahí el contenido (.pq-auds, por encima del pin) se queda quieto
+     (transform = lo que baja el scroll) y:
+       1. el subrayado del CTA (que pasa a ser .pq-fin__l, en el mismo sitio y con el mismo grosor) se alarga
+          hasta ocupar todo el ancho de la pantalla;
+       2. el gris se cierra por arriba y por abajo hacia esa línea hasta 1 px (la línea de tinta se disuelve
+          en él) y la línea gris se recoge hacia el centro y se desvanece. Espejo de la apertura de #lateral.
+     Detrás ya está #como (en negro sobre la red: sube por detrás, css/para-quien.css). Las ondas (z 5, por
+     encima del pin) se recortan al negro que va quedando (clip-path del canvas). Suavizado 9.
+     Movimiento reducido / versión fija: sin pin, corte limpio del gris al negro. */
   var relevo = (function () {
-    var caja = sec.querySelector('.pq-relevo'), sig = document.getElementById('planes');
-    if (!caja) return { medir: function () {} };
+    var caja = sec.querySelector('.pq-relevo'), fin = sec.querySelector('.pq-fin');
+    if (!caja || !fin) return { medir: function () {} };
     var grande = caja.querySelector('.pq-relevo__g'), chico = caja.querySelector('.pq-relevo__t'), banda = caja.querySelector('.pq-relevo__banda');
+    var gris = fin.querySelector('.pq-fin__gris'), pin = fin.querySelector('.pq-fin__pin'), lin = fin.querySelector('.pq-fin__l');
+    var audsEl = sec.querySelector('.pq-auds'), ondas = document.getElementById('ondas');
     var pon = {
       g: escritor(grande, 'transform'), gO: escritor(grande, 'opacity'), cO: escritor(chico, 'opacity'),
-      bO: escritor(banda, 'opacity'), cajaO: escritor(caja, 'opacity')
+      bO: escritor(banda, 'opacity'), cajaO: escritor(caja, 'opacity'),
+      clip: escritor(gris, 'clipPath'), grisO: escritor(gris, 'opacity'),
+      audsO: escritor(audsEl, 'opacity'), audsT: escritor(audsEl, 'transform'), audsC: escritor(audsEl, 'clipPath'),
+      lT: escritor(lin, 'transform'), lO: escritor(lin, 'opacity'),
+      ondas: ondas ? escritor(ondas, 'clipPath') : function () {}
     };
-    var F = { top: 0, cx: 0, cy: 0, fs: 0 }, L = null, ponLat = null, k = 0, visible = null, ultima = null;
+    var F = { top: 0, alto: 0, pin: 0, G: 1, C: 1, vw: 0, cx: 0, cy: 0, fs: 0, cta: {} }, L = null, ponLat = null;
+    var k = 0, g = 0, c = 0, visible = null, ultima = null, fijo = false, cerrando = false;
     function medir() {
       L = EV.lateralRelevo ? EV.lateralRelevo() : null;
-      F.top = sig ? arriba(sig) : 1e9;                   // la línea entre #para-quien y #planes
+      F.top = arriba(fin); F.alto = fin.offsetHeight; F.pin = pin.offsetHeight; F.vw = document.documentElement.clientWidth;
+      F.C = Math.min(window.innerHeight * .6, Math.max(1, F.alto - F.pin));   // el cierre: 60vh como máximo
+      F.G = Math.max(1, F.alto - F.pin - F.C);                                // antes, el subrayado
+      F.auds = { y: arriba(audsEl), h: audsEl.offsetHeight, x: audsEl.getBoundingClientRect().left, w: audsEl.offsetWidth };
+      // el subrayado de cada CTA (.pq-cta::after: bottom −.06em, alto .05em), relativo al pin enganchado
+      Object.keys(auds).forEach(function (n) {
+        var el = auds[n].panel.querySelector('.pq-cta');
+        if (!el) return;
+        var fs = parseFloat(getComputedStyle(el).fontSize) || 60, t = Math.max(1, fs * .05);
+        F.cta[n] = { x: el.getBoundingClientRect().left, w: el.offsetWidth, y: arriba(el) + el.offsetHeight + fs * .01 - F.top, t: t };
+      });
       var r = chico.getBoundingClientRect();
       F.cx = r.left; F.cy = r.top;                       // el título discreto (position: fixed: ya está en coordenadas de pantalla)
       if (L) {
@@ -285,13 +312,21 @@
       var suelta = L.suelta, d = y - suelta;
       // 1) el relevo: 0 = la grande donde la deja #lateral · 1 = el título discreto
       var meta = d <= 0 ? 0 : quieto ? 1 : cl(d / (vh * .7));
-      if (y === ultima && k === meta) return;            // quieto y asentado: nada que escribir
+      // 2) el cierre: dp = lo que se ha bajado con el pin enganchado; gm = el subrayado (0 → todo el ancho);
+      //    cm = el gris (0 = a pantalla completa · 1 = negro)
+      var dp = y - F.top;
+      var gm = quieto ? 0 : cl(dp / F.G), cm = quieto ? (dp >= 0 ? 1 : 0) : cl((dp - F.G) / F.C);
+      if (y === ultima && k === meta && g === gm && c === cm) return;   // quieto y asentado: nada que escribir
       ultima = y;
       k = quieto ? meta : k + (meta - k) * (1 - Math.exp(-dt * 9));
       if (Math.abs(meta - k) < 1e-4) k = meta;
       var e = io(k);
-      // 2) el título se va al llegar #planes: su línea, de media pantalla a un 15 %
-      var vete = cl((y - (F.top - vh * .5)) / (vh * .35));
+      g = quieto ? gm : g + (gm - g) * (1 - Math.exp(-dt * 9));
+      if (Math.abs(gm - g) < 1e-4) g = gm;
+      c = quieto ? cm : c + (cm - c) * (1 - Math.exp(-dt * 9));
+      if (Math.abs(cm - c) < 1e-4) c = cm;
+      // el título se va al empezar a cerrarse el gris (con el contenido)
+      var vete = quieto ? cl((y - (F.top - vh * .35)) / (vh * .3)) : cl(c / .1);   // antes de que el negro llegue a su franja
 
       var ve = (d > 0 || k > .002) && vete < 1;
       if (ve !== visible) { visible = ve; caja.classList.toggle('is-on', ve); }
@@ -307,9 +342,43 @@
         pon.cajaO((1 - vete).toFixed(3));
       }
       bandera('cabeceraGris', ve && e > .75 && vete < .5);
+      if (quieto) return;
+
+      var U = F.cta[aud], tramo = F.alto - F.pin;
+      if (!U) return;
+      // el contenido, quieto mientras dura el pin (el CTA no se mueve: su subrayado es la línea del pin)
+      var enPin = dp > 0;
+      pon.audsT(enPin ? 'translate3d(0,' + Math.min(dp, tramo).toFixed(2) + 'px,0)' : '');
+      if (enPin !== fijo) { fijo = enPin; sec.classList.toggle('pq-fijo', fijo); }
+      // 1) el subrayado: de debajo del CTA a todo el ancho (izquierda y derecha a la vez, solo transform)
+      var eg = io(g), izq = U.x * (1 - eg), ancho = U.w * (1 - eg) + F.vw * eg;
+      pon.lT('translate3d(' + izq.toFixed(2) + 'px,' + U.y.toFixed(2) + 'px,0) scale(' + (ancho / 100).toFixed(4) + ',' + U.t.toFixed(2) + ')');
+      // 2) el gris se cierra hacia la línea (su centro) hasta 1 px; después la línea gris se recoge al centro y se va
+      var a = io(cl(c / .55)), b = io(cl((c - .5) / .5)), Lc = U.y + U.t / 2;
+      var arr = a * (Lc - .5), aba = a * (F.pin - Lc - .5), lados = b * 50;
+      pon.clip(c <= 0 ? 'none' : 'inset(' + arr.toFixed(2) + 'px ' + lados.toFixed(2) + '% ' + aba.toFixed(2) + 'px ' + lados.toFixed(2) + '%)');
+      pon.grisO(c <= 0 ? '' : (1 - b).toFixed(3));
+      pon.lO(enPin ? (1 - cl((a - .55) / .4)).toFixed(3) : '0');   // la tinta se disuelve en la franja gris
+      pon.audsO(c <= 0 ? '' : (1 - cl(c / .4)).toFixed(3));
+      if ((c > .2) !== cerrando) { cerrando = c > .2; sec.classList.toggle('pq-cerrando', cerrando); }
+      // las ondas (z 5) van por encima del pin: solo se ven en el negro que deja el gris
+      var p0 = dp < 0 ? -dp : dp <= tramo ? 0 : tramo - dp;          // el arriba del pin en la pantalla
+      var T = p0 + arr, B = p0 + F.pin - aba, I = F.vw * lados / 100, D = F.vw - I;
+      // el contenido, recortado a la franja gris (como si estuviera impreso en ella)
+      if (c <= 0) pon.audsC('');
+      else {
+        var aT = F.auds.y - y + Math.min(Math.max(dp, 0), tramo);
+        pon.audsC('inset(' + Math.max(0, T - aT).toFixed(1) + 'px ' + Math.max(0, F.auds.x + F.auds.w - D).toFixed(1) + 'px ' + Math.max(0, aT + F.auds.h - B).toFixed(1) + 'px ' + Math.max(0, I - F.auds.x).toFixed(1) + 'px)');
+      }
+      if (b >= 1 || B <= 0 || T >= vh || D <= I) pon.ondas('');
+      else pon.ondas('polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0, ' + I.toFixed(1) + 'px ' + T.toFixed(1) + 'px, ' + D.toFixed(1) + 'px ' + T.toFixed(1) + 'px, ' + D.toFixed(1) + 'px ' + B.toFixed(1) + 'px, ' + I.toFixed(1) + 'px ' + B.toFixed(1) + 'px, ' + I.toFixed(1) + 'px ' + T.toFixed(1) + 'px)');
+      // la cabecera: oscura en cuanto el negro llega a su línea central, y mientras el cierre (ya negro) siga bajo ella
+      bandera('cabeceraOscura', y >= F.top && y < F.top + F.alto && arr > 32);
     }
     if (window.gsap) gsap.ticker.add(function (t, dms) { if (!document.hidden) paso(Math.min(.1, (dms || 16.7) / 1000)); });
     else (function f() { requestAnimationFrame(f); paso(1 / 60); })();
+    // a donde salta un ancla de lo que hay detrás (#como): con el gris ya cerrado
+    EV.finGris = function () { medir(); return F.top + F.alto - F.pin; };
     return { medir: medir };
   })();
 
@@ -387,7 +456,7 @@
     else if (swap < meta) swap = Math.min(meta, swap + dt / .8);
     if (pendiente && swap <= 0) {
       // el que sale, borrado del todo: sus letras a medio cruzar llevan visibility: visible y se verían en el panel oculto
-      auds[aud].bloques.forEach(function (b) { b.b.escribir(0); if (b.flecha) b.flecha('0'); });
+      auds[aud].bloques.forEach(function (b) { b.b.escribir(0); if (b.flecha) b.flecha('0'); if (b.linea) b.linea('0'); });
       aplicar(pendiente); meta = 1;
     }
 
@@ -400,6 +469,7 @@
       var P = Math.min(swap, cl((tope - M.vh * (1 - b.start) - enPantalla(b.top)) / (M.vh * .42)));
       b.b.escribir(P);
       if (b.flecha) { var f = cl((P - .82) / .18); b.flecha((f * f * (3 - 2 * f)).toFixed(3)); }
+      if (b.linea) b.linea(io(cl((P - .6) / .4)).toFixed(3));
     });
 
     // la ventana: la línea cruza (la) y se abre (lb)

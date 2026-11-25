@@ -70,8 +70,8 @@
     var off = id === 'inicio' ? 0 : -Math.round((el.cab ? el.cab.getBoundingClientRect().bottom : 80) + 16);
     var yT = 0, m = t; while (m) { yT += m.offsetTop; m = m.offsetParent; }
     var propio = EV.recorrido ? EV.recorrido.destino(id) : null;   // #lateral abierta; #para-quien, ya descubierta por la persiana
-    // el contacto, con el gris de #planes ya cerrado del todo (js/planes-gris.js)
-    if (propio === null && id === 'contacto' && EV.finGris) propio = EV.finGris();
+    // #como, con el gris de #para-quien ya cerrado del todo (js/para-quien.js)
+    if (propio === null && id === 'como' && EV.finGris) propio = EV.finGris();
     var destino = propio !== null ? propio : Math.max(0, yT + off);
     if (lenis) lenis.scrollTo(id === 'inicio' ? 0 : destino, { duration: Math.min(2.2, 0.8 + Math.abs(t.getBoundingClientRect().top) / 4000), onComplete: fin });
     else if (propio !== null) { window.scrollTo({ top: destino, behavior: EV.reducedMotion ? 'auto' : 'smooth' }); setTimeout(fin, 1200); }

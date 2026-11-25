@@ -77,7 +77,6 @@
     if (letras) letras.ordenar();
     ultima = null;
   }
-  EV.finGris = fin ? function () { medir(); return M.top + M.alto - M.pin; } : null;
 
   function bandera(nombre, v) {
     if (!!EV[nombre] === v) return;

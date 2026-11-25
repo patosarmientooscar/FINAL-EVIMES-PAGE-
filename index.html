@@ -87,6 +87,7 @@
   <link rel="stylesheet" href="css/lateral.css">
   <link rel="stylesheet" href="css/trabajo-selecto.css">
   <link rel="stylesheet" href="css/para-quien.css">
+  <link rel="stylesheet" href="css/como.css">
   <link rel="stylesheet" href="css/planes-gris.css">
   <link rel="stylesheet" href="css/contacto.css">
 </head>
@@ -284,6 +285,14 @@
           <a class="pq-cta" href="#contacto" data-perfil="Negocio local"><span class="pq-cta__t" data-type="6">¿Qué necesita tu negocio?</span><span class="pq-cta__arr"><svg viewBox="0 0 100 100" aria-hidden="true" focusable="false"><path d="M4 50H92M58 14L94 50L58 86"/></svg></span></a>
         </div>
       </div>
+      <!-- El cierre (desde backup-pre-puente): el subrayado del CTA se alarga hasta todo el ancho (.pq-fin__l) y el
+           gris, fijo a la pantalla, se cierra hacia esa línea hasta 1 px, que se recoge hacia el centro y se desvanece.
+           Detrás, #como en negro. Espejo de la apertura de #lateral. -->
+      <div class="pq-fin" aria-hidden="true"><div class="pq-fin__pin"><div class="pq-fin__gris"></div><span class="pq-fin__l"></span></div></div>
+    </section>
+
+    <!-- ===== Cómo trabajamos (desde backup-pre-puente): el puente en negro entre #para-quien y #planes ===== -->
+    <section class="como" id="como" aria-labelledby="como-t">
     </section>
 
     <!-- ===== Planes (desde backup-pre-planes-gris, en el capítulo gris: sigue a #para-quien sin cortes, solo una línea fina) =====
@@ -348,10 +357,6 @@
           <a class="pg-todo" href="planes.html">Ver todos los detalles<span aria-hidden="true"> →</span></a>
         </div>
       </div>
-      <!-- El cierre del capítulo gris: el gris, fijo a la pantalla, se estrecha de arriba y abajo hasta una línea de 1 px,
-           que se recoge hacia el centro y se desvanece (60vh de scroll). Espejo de la apertura de #lateral. Detrás ya
-           está el contacto, en negro sobre la red (sube por detrás: css/planes-gris.css). -->
-      <div class="pg-fin" aria-hidden="true"><div class="pg-fin__pin"><div class="pg-fin__gris"></div></div></div>
     </section>
 
     <!-- ===== Contacto: formulario (Web3Forms; la clave va en js/config.js → WEB3FORMS_KEY). JS: js/contacto/form.js · CSS: css/contacto.css ===== -->

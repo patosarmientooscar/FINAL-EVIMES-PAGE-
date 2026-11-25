@@ -1,0 +1,17 @@
+/* ==========================================================================
+   como.css — #como, "Cómo trabajamos" (desde backup-pre-puente): el puente en
+   negro entre #para-quien (gris) y #planes. Fondo transparente sobre la red
+   (js/red.js). Con el cierre del gris (.pq-vivo), sube por detrás de todo el
+   cierre (margin-top = −el alto de .pq-fin): lo que deja ver el gris al cerrarse
+   YA es #como; su panel (sticky, una pantalla) se queda quieto detrás mientras
+   el gris se cierra y después mientras se escriben las palabras.
+   JS: js/como.js
+   ========================================================================== */
+.como {
+  position: relative;
+  color: #ecebe7;
+  font-family: "Schibsted Lateral", var(--font-text);
+}
+/* el pin del cierre + 70vh para escribir las tres palabras con el panel quieto */
+.pq-vivo ~ .como { height: calc(100vh + var(--pq-tramo) + 70vh); margin-top: calc(-1 * var(--pq-fin)); }
+@supports (height: 100lvh) { .pq-vivo ~ .como { height: calc(100lvh + var(--pq-tramo) + 70vh); } }

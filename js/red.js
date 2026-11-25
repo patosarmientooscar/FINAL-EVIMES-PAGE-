@@ -53,14 +53,14 @@ function iniciar() {
   let finGris = 0, despierta = false, presencia = 0, t = 0, acc = 0, maxV = 0, maxD = 0;
 
   const arriba = el => { let y = 0; for (let n = el; n; n = n.offsetParent) y += n.offsetTop; return y; };
-  // desde backup-pre-planes-gris el gris (#lateral → #para-quien → #planes) se cierra al final de #planes (.pg-fin)
-  const cierre = document.querySelector('.pg-fin') || document.getElementById('planes');
-  function medir() { finGris = cierre ? arriba(cierre) + (cierre.classList.contains('pg-fin') ? 0 : cierre.offsetHeight) : 0; }
+  // desde backup-pre-puente el gris (#lateral → #para-quien) se cierra al final de #para-quien (.pq-fin)
+  const cierre = document.querySelector('.pq-fin');
+  function medir() { finGris = cierre ? arriba(cierre) : 0; }
   medir();
   if (window.ResizeObserver) new ResizeObserver(medir).observe(document.body);
 
   // ¿lo tapa todo el gris? #lateral abierta (la avisa ella), o de #lateral suelta hasta que empieza el cierre
-  // del gris al final de #planes (que deja ver ya los cuadros del contacto)
+  // de #para-quien (que deja ver ya los cuadros de #como)
   function tapada() {
     if (EV.lateralCubre) return true;
     const L = EV.lateralRelevo && EV.lateralRelevo();
