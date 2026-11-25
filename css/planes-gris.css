@@ -92,7 +92,7 @@
 }
 /* "Recomendado": naranja con la tinta encima (7:1; el naranja como texto sobre el gris se quedaría en 2:1) */
 .pg-rec {
-  padding: 4px 6px 3px;
+  padding: 5px 8px 4px;
   background: var(--pg-naranja);
   font: 600 11px / 1 var(--font-text);
   letter-spacing: .14em;
