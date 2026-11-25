@@ -341,6 +341,7 @@
 .lab-captura .lab-pantalla, .lab-captura .pie { display: none !important; }
 
 @media (max-width: 860px) {
+  .lab-portada { min-height: 82svh; }
   .lab-indice { padding-top: 24px; }
   .lab-ondas-ancla { left: 6%; right: 6%; top: 26%; bottom: 40%; }
   .lab-movs {

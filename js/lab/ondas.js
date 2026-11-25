@@ -20,6 +20,11 @@ const HOLD = 6.5;
 export async function iniciar({ escena }) {
   const ancla = escena.querySelector('[data-ondas]');
   const caja = document.querySelector('.lab-movs');
+  // el tamaño de las piezas: en una pantalla estrecha, la órbita y el intercambio no caben a la escala del escritorio
+  const estrecha = matchMedia('(max-width: 860px)');
+  const escala = () => { ancla.dataset.ondasScale = estrecha.matches ? '.95' : '1.55'; };
+  escala();
+  estrecha.addEventListener('change', escala);
   const m = await import('../ondas.js');
   const api = await m.listo;
   if (!api) { if (caja) caja.hidden = true; return null; }          // sin WebGL: no se ve nada (como en la home)
