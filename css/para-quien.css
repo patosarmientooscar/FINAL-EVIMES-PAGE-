@@ -29,7 +29,8 @@
   position: relative;                           /* sin z-index: el contenido, bajo #lateral (2) y las ondas (5) */
   padding: clamp(150px, 22vh, 230px) var(--pq-g) 0;   /* arriba, el aire del título fijo; abajo, el cierre (.pq-fin) */
   /* el gris acaba donde empieza el cierre: de ahí abajo lo pinta el pin (y detrás está #como, en negro) */
-  background: linear-gradient(var(--gris), var(--gris)) top / 100% calc(100% - var(--pq-fin)) no-repeat;
+  /* + 2 px por debajo del arriba del pin: con los bordes en medio píxel, el negro de debajo asomaba en una línea */
+  background: linear-gradient(var(--gris), var(--gris)) top / 100% calc(100% - var(--pq-fin) + 2px) no-repeat;
   color: var(--pq-tinta);
   font-family: "Schibsted Lateral", var(--font-text);
 }
@@ -198,8 +199,18 @@
   text-transform: uppercase;
   color: var(--pq-2);
 }
-.pq-talk p { font-size: clamp(22px, 2.5vw, 42px); line-height: 1.02; text-wrap: balance; }
-.pq-talk__pro p { color: rgb(18 19 23 / .52); }      /* el problema, apagado (3,3:1, texto grande) */
+.pq-talk p { max-width: 22ch; font-size: clamp(22px, 2.5vw, 42px); line-height: 1.02; text-wrap: balance; }   /* unos 22 caracteres por línea: se lee de un vistazo */
+.pq-talk__pro p { color: rgb(18 19 23 / .58); }      /* el problema, apagado (4:1, texto grande) */
+
+/* ---------- el ritmo de lectura (desde backup-pre-ritmo; solo con .pq-vivo) ----------
+   El problema y lo que hacemos: ya escritos, se quedan quietos (sticky, centrados bajo la franja del título) 50vh.
+   La ventana del caso (con su pestaña): se abre mientras sube entera a la vista y, abierta, se queda quieta 70vh.
+   En móvil, 40vh las dos. El top de cada sticky lo pone js/para-quien.js (centrado con su alto medido). */
+.pq-vivo .pq-talk-pista::after, .pq-vivo .pq-caso-pista::after { content: ""; display: block; height: 50vh; }   /* el recorrido del sticky (un sticky no recorre el padding de su caja) */
+.pq-vivo .pq-talk { position: sticky; }
+.pq-caso-pista { margin-top: clamp(80px, 14vh, 150px); }
+.pq-vivo .pq-caso-pista::after { height: 70vh; }
+.pq-vivo .pq-caso { position: sticky; }
 
 /* ---------- la pestaña del caso (desde backup-pre-pestana; sustituye al interruptor pequeño) ----------
    Una solapa negra pegada al borde de arriba de la ventana, a su izquierda: las dos son una sola forma. Una en
@@ -213,7 +224,6 @@
   align-items: stretch;
   width: fit-content;
   height: 44px;
-  margin-top: clamp(80px, 14vh, 150px);
   padding: 0 18px;
   background: var(--pq-negro);                  /* el negro de la ventana (#141518): sin costura */
   font: 600 12px / 1.2 var(--font-text);
@@ -254,7 +264,6 @@
 .pq-vivo .pq-tab { opacity: 0; transform: translate3d(0, 6px, 0); }
 /* sin JS no hay pestaña (los dos públicos se ven uno debajo del otro) */
 .pq:not(.pq-viva) .pq-tab { display: none; }
-.pq:not(.pq-viva) .pq-tab + .pq-window { margin-top: clamp(80px, 14vh, 150px); }
 
 /* ---------- la ventana del caso ---------- */
 .pq-window {
@@ -264,9 +273,14 @@
   align-items: center;
   align-content: center;
   gap: clamp(24px, 4vw, 72px);
-  min-height: min(86svh, 820px);
-  margin-top: clamp(80px, 14vh, 150px);
-  padding: clamp(28px, 5vw, 80px);
+  /* cabe entera en la pantalla, bajo la franja del título fijo (108 px) y con su pestaña (44 px): nunca más alta */
+  --pq-wmax: min(82svh, 100svh - 64px - env(safe-area-inset-top, 0px) - 44px - 44px - 24px);
+  --pq-wpad: clamp(28px, 5vw, 80px);
+  min-height: min(var(--pq-wmax), 760px);
+  max-height: var(--pq-wmax);
+  margin-top: 0;
+  padding: var(--pq-wpad);
+  box-sizing: border-box;
   background: var(--pq-negro);
   color: var(--pq-claro);
 }
@@ -284,7 +298,7 @@
   color: rgb(236 235 231 / .6);
 }
 .pq-stage { display: grid; place-items: center; min-width: 0; }
-.pq-stage .ts-card__escena { width: 100%; }
+.pq-stage .ts-card__escena { width: min(100%, (var(--pq-wmax) - 2 * var(--pq-wpad)) * 16 / 11); }   /* el portátil, de alto como mucho lo que cabe */
 .pq-info { min-width: 0; }
 .pq-info__h { margin-bottom: 22px !important; font-family: inherit; font-variation-settings: normal; font-size: clamp(26px, 2.6vw, 44px); line-height: 1; }
 .pq-info p:not(.pq-info__src) { max-width: 36ch; font: 400 15px / 1.55 var(--font-text); color: rgb(236 235 231 / .7); }
@@ -308,7 +322,7 @@
 /* EVIMES Reservas en un iPhone: todo en --u (1 px con el móvil a 300 px), para que encoja entero */
 .pq-movil { display: flex; align-items: center; gap: clamp(20px, 3vw, 48px); }
 .pq-phone {
-  --w: min(300px, 62vw);
+  --w: min(300px, 62vw, (var(--pq-wmax) - 2 * var(--pq-wpad)) * 9 / 19.3);   /* el iPhone, de alto como mucho lo que cabe */
   --u: calc(var(--w) / 300);
   position: relative;
   flex: none;
@@ -408,6 +422,13 @@
 
 /* ---------- los estados de partida (solo con .pq-vivo; js/para-quien.js) ---------- */
 .pq-vivo .pq-window { clip-path: inset(50% 50%); }
+/* abierta del todo (js): 1) el dispositivo sube (.6 s); 2) a los 200 ms, el nombre y el texto; 3) los anillos */
+.pq-vivo .pq-stage { transform: translate3d(0, 30px, 0) scale(.96); transition: transform .6s var(--pq-ease), opacity .25s var(--pq-ease); }
+.pq-vivo .pq-window.is-sube .pq-stage { transform: none; }
+.pq-vivo .pq-info { opacity: 0; transform: translate3d(0, 8px, 0); transition: opacity .6s var(--pq-ease), transform .6s var(--pq-ease); }
+.pq-vivo .pq-window.is-info .pq-info { opacity: 1; transform: none; }
+/* al cambiar de caso con la ventana a la vista: se queda en su sitio y su contenido se va (.25 s) */
+.pq-vivo .pq-window.is-sale .pq-stage, .pq-vivo .pq-window.is-sale .pq-info { opacity: 0; transition: opacity .25s var(--pq-ease); }
 .pq-vivo .pq-cta__arr svg { opacity: 0; }
 
 @media (max-width: 860px) {
@@ -417,15 +438,28 @@
   .pq-tip__t { font-size: 11px; }
   .pq-ondas { top: calc(100% + 4px); right: 0; width: 56vw; height: clamp(84px, 16vh, 120px); }
   .pq-talk { grid-template-columns: minmax(0, 1fr); gap: 40px; }
-  .pq-window { grid-template-columns: minmax(0, 1fr); min-height: 0; padding: 64px 20px 32px; }
+  .pq-window { --pq-wpad: 20px; grid-template-columns: minmax(0, 1fr); gap: 20px; min-height: 0; padding: 56px 20px 24px; }
+  .pq-vivo .pq-talk-pista::after, .pq-vivo .pq-caso-pista::after { height: 40vh; }
+  /* en móvil, la información va debajo del dispositivo: el dispositivo, con el alto que le deja */
+  .pq-stage .ts-card__escena { width: min(100%, (var(--pq-wmax) - 80px - 250px) * 16 / 11); }
+  .pq-phone { --w: min(62vw, (var(--pq-wmax) - 80px - 270px) * 9 / 19.3); }
+  .pq-info p:not(.pq-info__src) { font-size: 14px; line-height: 1.5; }
+  .pq-info__h { margin-bottom: 12px !important; }
+  .pq-info__src { margin-top: 14px !important; }
+  .pq-info__links { margin-top: 16px; }
   /* la pestaña, a todo el ancho de la ventana: las dos opciones a partes iguales */
   .pq-tab { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); width: 100%; padding: 0 10px; font-size: 11px; letter-spacing: .1em; }
   .pq-tab__b { justify-content: center; gap: 6px; white-space: normal; text-align: center; }
   .pq-tab__sep { margin: 0 6px; }
   .pq-window__tag { left: 20px; right: 20px; flex-wrap: wrap; row-gap: 6px; font-size: 11px; letter-spacing: .12em; }
-  .pq-movil { flex-direction: column-reverse; }
-  .pq-psi { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 22px; max-width: 320px; }
-  .pq-psi__g svg { max-width: 112px; }
+  .pq-movil { gap: 16px; }
+  .pq-appicon { width: 64px; }
+  /* los cuatro anillos en una fila: la ventana entera cabe en la pantalla */
+  .pq-psi { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .pq-psi__g { gap: 8px; }
+  .pq-psi__g svg { max-width: 72px; }
+  .pq-psi__g b { font-size: 18px; }
+  .pq-psi__g span { max-width: 100%; font-size: 9px; letter-spacing: .02em; hyphens: auto; overflow-wrap: anywhere; }   /* "ACCESIBILIDAD" en una columna de ~72 px */
 }
 @media (prefers-reduced-motion: reduce) {
   .pq-aud, .pq-aud::after, .pq-tab__b, .pq-tab__p, .pq-tab__l, .pq-cta::after, .pq-cta__arr, .pq-info__links a, .pq-tip, .pq-tip__f path { transition: none !important; }

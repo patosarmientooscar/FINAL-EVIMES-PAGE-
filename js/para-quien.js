@@ -82,22 +82,43 @@
   var auds = {};
   $$('[data-aud]').forEach(function (p) {
     var win = p.querySelector('.pq-window'), stage = win.querySelector('.pq-stage'), info = win.querySelector('.pq-info');
-    var A = auds[p.dataset.aud] = { panel: p, win: win, winTop: 0, bloques: [], anillos: [] };
+    var A = auds[p.dataset.aud] = {
+      panel: p, win: win, talk: p.querySelector('.pq-talk'), caso: p.querySelector('.pq-caso'), winTop: 0, winH: 0, fin: 0,
+      bloques: [], anillos: [], o: 0, ot: 0, fase: -1, ve70: false, contado: false
+    };
     if (quieto) return;
     A.bloques = $$('[data-type]', p).map(function (el) {
       var flecha = el.parentNode.querySelector('.pq-cta__arr svg');
       // el subrayado del CTA (::after, scaleX(var(--u))): se dibuja con la flecha; es el que se alarga en el cierre
       var cta = flecha && el.closest('.pq-cta'), u;
       var linea = cta && function (v) { if (v !== u) { u = v; cta.style.setProperty('--u', v); } };
-      return { el: el, start: parseFloat(el.dataset.start) || .88, top: 0, b: new R.Bloque({ el: el, W: parseFloat(el.dataset.type) || 8 }), flecha: flecha && escritor(flecha, 'opacity'), linea: linea };
+      // start: dónde empieza (el arriba del bloque, en fracción de pantalla); todos terminan al 70 %
+      return { el: el, start: parseFloat(el.dataset.start) || .98, top: 0, lleno: false, b: new R.Bloque({ el: el, W: parseFloat(el.dataset.type) || 8 }), flecha: flecha && escritor(flecha, 'opacity'), linea: linea };
     });
     A.clip = escritor(win, 'clipPath');
-    A.stage = escritor(stage, 'transform');
-    A.info = escritor(info, 'transform');
     A.anillos = $$('.pq-psi__g', p).map(function (li) {
       return { li: li, b: li.querySelector('b'), arco: li.querySelector('.pq-psi__arco'), v: 0 };
     });
   });
+  // los anillos se disparan con la ventana visible al 70 % (IntersectionObserver), no por la posición del scroll
+  if (!quieto && window.IntersectionObserver) {
+    var vista = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        Object.keys(auds).forEach(function (k) { if (auds[k].win === e.target) auds[k].ve70 = e.intersectionRatio >= .69; });
+      });
+      sucio = true;
+    }, { threshold: [0, .7] });
+    Object.keys(auds).forEach(function (k) { vista.observe(auds[k].win); });
+  } else Object.keys(auds).forEach(function (k) { auds[k].ve70 = true; });
+  // el orden de dentro de la ventana, de vuelta al principio (cerrada del todo, o al cambiar de caso)
+  function reiniciar(A) {
+    if (A.fase < 0) return;
+    A.fase = -1; A.t = 0;
+    A.win.classList.remove('is-sube', 'is-info', 'is-sale');
+    if (A === (cuenta && cuenta.A)) cuenta = null;
+    A.contado = false;
+    A.anillos.forEach(function (d) { if (d.ponB) { d.ponB('0'); d.ponArco(C + 'px'); d.li.classList.add('is-contando'); } });
+  }
 
   /* ---------- el interruptor ---------- */
   var swap = 1, meta = 1;                         // 1: escrito y abierto · 0: borrado y cerrado (el cambio)
@@ -130,8 +151,18 @@
       tabs.forEach(function (t) { if (t.letras[n]) t.letras[n].escribir(0); });
     }
     if (quieto) { aplicar(n); return; }
-    if (n === aud) { pendiente = null; meta = 1; return; }    // vuelve antes de que dé tiempo a cambiar
-    pendiente = n; meta = 0;
+    if (n === aud) {                                // vuelve antes de que dé tiempo a cambiar
+      pendiente = null; meta = 1;
+      if (enSitio) { enSitio = null; auds[aud].win.classList.remove('is-sale'); }
+      return;
+    }
+    pendiente = n;
+    // con la ventana del caso a la vista: el scroll no se mueve, la ventana se queda en su sitio (abierta) y su
+    // contenido se va (.25 s); el caso nuevo entra con su orden (dispositivo, texto, anillos). Más arriba (en la
+    // frase), los textos se borran y se reescriben y la ventana se cierra en línea y se abre.
+    var w = auds[aud].win.getBoundingClientRect();
+    if (w.top < M.vh * .7 && w.bottom > M.vh * .3) { enSitio = { t: 0 }; auds[aud].win.classList.add('is-sale'); }
+    else meta = 0;
   }
   botones.forEach(function (b) { b.addEventListener('click', function () { elegir(b.dataset.for); }); });
   radios.forEach(function (r) { r.addEventListener('click', function () { elegir(r.dataset.for); }); });
@@ -383,12 +414,29 @@
   })();
 
   /* ---------- medidas (solo al cambiar el tamaño) ---------- */
-  var M = { vh: 0, top: 0, alto: 0 };
+  var M = { vh: 0, top: 0, alto: 0, cab: 108 };
   function igualar() {
     var els = $$('.pq-talk');
     els.forEach(function (e) { e.style.minHeight = ''; });
     var alto = Math.max.apply(null, els.map(function (e) { return e.offsetHeight; }));
     els.forEach(function (e) { e.style.minHeight = alto + 'px'; });
+  }
+  // los sticky de lectura: centrados en lo que queda bajo la franja del título fijo (64 px de cabecera + 44)
+  function fijar() {
+    if (quieto) return;
+    var banda = sec.querySelector('.pq-relevo__banda');
+    M.cab = banda ? banda.offsetHeight : 108;
+    var libre = function (h) { return Math.max(M.cab + 8, Math.round(M.cab + (M.vh - M.cab - h) / 2)); };
+    Object.keys(auds).forEach(function (k) {
+      var A = auds[k];
+      if (A.talk) A.talk.style.top = libre(A.talk.offsetHeight) + 'px';
+      if (A.caso) {
+        var tab = A.caso.querySelector('.pq-tab'), th = tab ? tab.offsetHeight : 0;
+        A.caso.style.top = libre(A.caso.offsetHeight) + 'px';
+        A.fin = libre(A.caso.offsetHeight) + th;             // donde se queda la ventana: ahí termina de abrirse
+      }
+      A.winH = A.win.offsetHeight;
+    });
   }
   function posiciones() {
     M.top = arriba(sec); M.alto = sec.offsetHeight;
@@ -404,6 +452,7 @@
     igualar();
     tip.colocar();
     M.vh = window.innerHeight;
+    fijar();
     posiciones();
     if (listas) Object.keys(auds).forEach(function (k) { auds[k].bloques.forEach(function (b) { b.b.ordenar(); }); });
     tabs.forEach(function (t) {
@@ -440,52 +489,74 @@
   }
 
   /* ---------- el bucle ---------- */
-  var sucio = true, ultimaY = null, o = 0, oMeta = 0, ot = 0, otMeta = 0, abierta = false, contados = false, cuenta = null;
+  var sucio = true, ultimaY = null, o = 0, oMeta = 0, ot = 0, otMeta = 0, cuenta = null, enSitio = null;
   function vuelta(t, dms) {
     if (document.hidden || quieto || !listas) return;
     var dt = Math.min(.1, (dms || 16.7) / 1000);
     var y = scrollY();
-    var anima = pendiente !== null || swap !== meta || cuenta !== null || tabAnim !== null || Math.abs(oMeta - o) > 1e-4 || Math.abs(otMeta - ot) > 1e-4;
+    var A = auds[aud];
+    var anima = pendiente !== null || swap !== meta || cuenta !== null || tabAnim !== null || enSitio !== null ||
+      Math.abs(oMeta - o) > 1e-4 || Math.abs(otMeta - ot) > 1e-4 || (A.fase >= 0 && A.fase < 3);
     var cerca = M.top - y < M.vh * 1.2 && M.top + M.alto - y > -M.vh * .2;
     if (!cerca && !anima && !sucio) return;
     if (!sucio && !anima && y === ultimaY) return;
     ultimaY = y; sucio = false;
 
-    // el cambio de público: borrar deprisa (.35 s), cambiar, escribir otra vez (.8 s)
+    // el cambio de público, más arriba: borrar deprisa (.35 s), cambiar, escribir otra vez (.8 s)
     if (swap > meta) swap = Math.max(meta, swap - dt / .35);
     else if (swap < meta) swap = Math.min(meta, swap + dt / .8);
-    if (pendiente && swap <= 0) {
+    var cambia = pendiente && (enSitio ? (enSitio.t += dt) >= .25 : swap <= 0);
+    if (cambia) {
       // el que sale, borrado del todo: sus letras a medio cruzar llevan visibility: visible y se verían en el panel oculto
-      auds[aud].bloques.forEach(function (b) { b.b.escribir(0); if (b.flecha) b.flecha('0'); if (b.linea) b.linea('0'); });
+      A.bloques.forEach(function (b) { b.b.escribir(0); b.lleno = false; if (b.flecha) b.flecha('0'); if (b.linea) b.linea('0'); });
+      reiniciar(A);
+      var quieta = !!enSitio;
+      enSitio = null;
       aplicar(pendiente); meta = 1;
+      A = auds[aud];
+      // con la ventana a la vista: el caso nuevo, ya abierto en el mismo sitio (sin la línea); su orden empieza ya
+      if (quieta) { o = oMeta = 1; reiniciar(A); }
     }
 
-    var A = auds[aud];
-    var tope = M.vh;
-    var enPantalla = function (docTop) { return docTop - y; };
-
-    // los textos se escriben a medida que suben desde abajo de la pantalla
+    var vh = M.vh;
+    // los textos: empiezan con su arriba al 98 % de la pantalla (la respuesta, al 94 %) y terminan al 70 %. Una vez
+    // completos se quedan completos; solo se deshacen si el bloque vuelve a bajar del punto en que empezó.
     A.bloques.forEach(function (b) {
-      var P = Math.min(swap, cl((tope - M.vh * (1 - b.start) - enPantalla(b.top)) / (M.vh * .42)));
+      var arr = b.top - y, raw = cl((vh * b.start - arr) / (vh * (b.start - .7)));
+      if (b.lleno) { if (raw <= 0) b.lleno = false; } else if (raw >= 1) b.lleno = true;
+      var P = Math.min(swap, b.lleno ? 1 : raw);
       b.b.escribir(P);
       if (b.flecha) { var f = cl((P - .82) / .18); b.flecha((f * f * (3 - 2 * f)).toFixed(3)); }
       if (b.linea) b.linea(io(cl((P - .6) / .4)).toFixed(3));
     });
 
-    // la ventana: la línea cruza (la) y se abre (lb)
-    oMeta = Math.min(swap, cl((tope - M.vh * .08 - enPantalla(A.winTop)) / (M.vh * .55)));
-    o += (oMeta - o) * (1 - Math.exp(-dt * 8));
+    // la ventana: la línea aparece cuando su arriba entra por abajo y termina de abrirse al llegar a donde se queda
+    // quieta (centrada): se abre entera a la vista. La línea cruza (la) y se abre (lb).
+    // termina un 8 % de pantalla antes de engancharse: con el suavizado, ya está abierta del todo al quedarse quieta
+    var wTop = A.winTop - y, abre = cl((vh - wTop) / Math.max(1, vh - A.fin - vh * .08));
+    oMeta = Math.min(swap, abre);
+    o += (oMeta - o) * (1 - Math.exp(-dt * 12));
     if (Math.abs(oMeta - o) <= 1e-4) o = oMeta;
     var la = io(cl(o / .3)), lb = io(cl((o - .24) / .76));
     var lado = (1 - la) * 50, tb = (1 - lb) * 50, px = (1 - lb) * .5;
-    A.clip(la >= 1 && lb >= 1 ? 'none' : 'inset(calc(' + tb.toFixed(2) + '% - ' + px.toFixed(2) + 'px) ' + lado.toFixed(2) + '% calc(' + tb.toFixed(2) + '% - ' + px.toFixed(2) + 'px) ' + lado.toFixed(2) + '%)');
-    A.stage(lb >= 1 ? 'none' : 'translate3d(0,' + ((1 - lb) * 30).toFixed(2) + 'px,0) scale(' + (.96 + .04 * lb).toFixed(4) + ')');
-    A.info(lb >= 1 ? 'none' : 'translate3d(0,' + ((1 - lb) * 20).toFixed(2) + 'px,0)');
-    abierta = lb > .97;
+    var abierta = la > .9995 && lb > .9995;
+    A.clip(abierta ? 'none' : 'inset(calc(' + tb.toFixed(2) + '% - ' + px.toFixed(2) + 'px) ' + lado.toFixed(2) + '% calc(' + tb.toFixed(2) + '% - ' + px.toFixed(2) + 'px) ' + lado.toFixed(2) + '%)');
+
+    // dentro, solo con la ventana abierta del todo: 1) el dispositivo sube (.6 s); 2) a los 200 ms, el nombre y el
+    // texto; 3) a continuación (con la ventana visible al 70 %), los anillos, uno tras otro
+    if (abierta && A.fase < 0) { A.fase = 0; A.t = 0; A.win.classList.add('is-sube'); }
+    if (A.fase >= 0) {
+      A.t += dt;
+      if (A.fase === 0 && A.t >= .2) { A.fase = 1; A.win.classList.add('is-info'); }
+      if (A.fase === 1 && A.t >= .8) A.fase = 2;
+      if (A.fase === 2 && (!A.anillos.length || A.contado)) A.fase = 3;
+      if (A.fase === 2 && A.ve70 && !A.contado) { A.contado = true; cuenta = { t: 0, A: A }; A.fase = 3; }
+    }
+    if (o < .02 && !pendiente) reiniciar(A);     // cerrada del todo (al volver a subir): el orden, otra vez
 
     // la pestaña: aparece al terminar de abrirse la ventana (por el scroll, no por el cambio: mientras la
     // ventana se cierra para cambiar de caso, se queda)
-    otMeta = cl((tope - M.vh * .08 - enPantalla(A.winTop)) / (M.vh * .55));
+    otMeta = abre;
     ot += (otMeta - ot) * (1 - Math.exp(-dt * 8));
     if (Math.abs(otMeta - ot) <= 1e-4) ot = otMeta;
     var rv = cl((ot - .9) / .1); rv = rv * rv * (3 - 2 * rv);
@@ -497,8 +568,7 @@
       if (tp >= 1) tabAnim = null;
     }
 
-    // los anillos: la primera vez que la ventana de Disco termina de abrirse
-    if (!contados && abierta && A.anillos.length) { contados = true; cuenta = { t: 0, A: A }; }
+    // los anillos: de 0 a su valor (1,1 s, ease-out), uno tras otro (120 ms)
     if (cuenta) {
       cuenta.t += dt;
       var fin = true;
