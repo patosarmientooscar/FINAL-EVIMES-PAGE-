@@ -1,11 +1,9 @@
 /* ==========================================================================
    Planes. EDITABLE. De aquí salen las cards de la home, las de planes.html y
    la tabla comparativa.
-   BORRADOR: las listas vienen del prototipo aprobado en estilo
-   (Downloads/evimes-hero) y Oscar debe confirmarlas antes de publicar.
    · incluye: lo PROPIO de cada plan (es lo que enseñan las cards).
    · hereda + quita: la tabla es acumulativa. Inmersión tiene todo lo de
-     Fundamento menos "Web de una página"; Impacto, todo lo de Inmersión.
+     Fundamento menos "Landing de una página"; Impacto, todo lo de Inmersión.
      EVIMES_PLANES_TODO(plan) devuelve la lista completa de un plan.
    · unica: una frase destacada en la card (solo la card, no la tabla).
    precio: texto tal cual se muestra ("Desde 150 €" → "desde" pequeño + cifra).
@@ -16,33 +14,30 @@ window.EVIMES_PLANES = [
     id: 'fundamento',
     nombre: 'Fundamento',
     precio: 'Desde 150 €',
-    para: 'Para empezar con buena base.',
-    incluye: ['Web de una página', 'Formulario y botón de WhatsApp', 'Adaptada a móvil', 'Dominio y SSL'],   // BORRADOR
-    boton: 'Empezar',
-    borrador: true
+    para: 'Una landing para conseguir clientes.',
+    incluye: ['Landing de una página', 'Con tu marca y tus colores', 'Formulario y botón de WhatsApp', 'Adaptada a móvil', 'Dominio y SSL'],
+    boton: 'Empezar'
   },
   {
     id: 'inmersion',
     nombre: 'Inmersión',
     precio: '499 €',
     para: 'Para destacar y captar clientes.',
-    incluye: ['Diseño web a medida', 'Animaciones y experiencia inmersiva', 'Pensada para convertir', 'SEO completo'],   // BORRADOR
+    incluye: ['Todas las páginas que necesites', 'Diseño web a medida', 'Animaciones y experiencia inmersiva', 'Pensada para convertir', 'SEO completo'],
     hereda: 'fundamento',
-    quita: ['Web de una página'],
+    quita: ['Landing de una página'],
     boton: 'Empezar',
-    recomendado: true,
-    borrador: true
+    recomendado: true
   },
   {
     id: 'impacto',
     nombre: 'Impacto',
     precio: 'A medida',
-    para: 'Proyectos a medida.',
-    incluye: ['Tienda online', 'SEO, AEO y GEO', 'UX y animaciones avanzadas', 'Lo que tu negocio necesite'],   // BORRADOR
+    para: 'Lo que nunca se ha hecho.',
+    incluye: ['Concepto creado desde cero', 'Nuestro trabajo más creativo', 'UX y animaciones avanzadas', 'Tienda online, SEO, AEO y GEO si lo necesitas'],
     hereda: 'inmersion',
-    unica: 'Una web única, diseñada desde cero solo para tu marca. No existe otra igual.',   // BORRADOR
-    boton: 'Pide presupuesto',
-    borrador: true
+    unica: 'Una web única, diseñada desde cero solo para tu marca. No existe otra igual.',
+    boton: 'Pide presupuesto'
   }
 ];
 
