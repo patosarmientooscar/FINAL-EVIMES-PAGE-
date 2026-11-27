@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <!-- Todas las rutas de la página, desde la raíz de la web (vive en laboratorio/). -->
+  <base href="../">
+  <title>Experimentos | Laboratorio Evimes · Web 3D y WebGL</title>
+  <meta name="description" content="El laboratorio de Evimes: ondas con física real, una red WebGL que reacciona al ratón, un destello de cromo en 3D y nuestra oficina en 360°. Lo que podemos llevar a tu web.">
+  <link rel="canonical" href="https://evimesweb.com/laboratorio/experimentos.html">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="theme-color" content="#0b0c0f">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_ES">
+  <meta property="og:site_name" content="Evimes">
+  <meta property="og:url" content="https://evimesweb.com/laboratorio/experimentos.html">
+  <meta property="og:title" content="Experimentos | Laboratorio Evimes">
+  <meta property="og:description" content="Lo que construimos cuando nadie nos pone límites: ondas, red, destello y oficina, en vivo.">
+  <meta property="og:image" content="https://evimesweb.com/assets/onda/onda-og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Bandas de cromo con la forma de la línea del monograma de Evimes sobre fondo navy.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Experimentos | Laboratorio Evimes">
+  <meta name="twitter:description" content="Lo que construimos cuando nadie nos pone límites: ondas, red, destello y oficina, en vivo.">
+  <meta name="twitter:image" content="https://evimesweb.com/assets/onda/onda-og.jpg">
+  <!-- Modo (como la home): cine o fijo (movimiento reducido, ahorro de datos). La entrada con la línea, solo si se llega desde otra página del laboratorio. -->
+  <script>
+    (function () {
+      var EV = (window.EV = window.EV || {}), q = new URLSearchParams(location.search).get('modo');
+      var rm = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+      var c = navigator.connection || {}, lenta = c.saveData || /(^|-)(2g|3g)$/.test(c.effectiveType || '');
+      EV.reducedMotion = rm;
+      EV.lenta = !!lenta;
+      EV.mode = q === 'fijo' ? 'still' : q === 'cine' ? 'cine' : (rm || lenta) ? 'still' : 'cine';
+      var h = document.documentElement;
+      h.classList.add(EV.mode === 'cine' ? 'is-cine' : 'is-still');
+      if (EV.mode === 'cine') h.classList.add('lab-vivo');
+      try { if (!rm && sessionStorage.getItem('lab-velo')) { sessionStorage.removeItem('lab-velo'); h.classList.add('lab-entra'); } } catch (e) {}
+    })();
+  </script>
+  <link rel="preload" href="assets/fonts/schibsted-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <!-- "three" = la MISMA URL que la home. Solo es el nombre: Three.js no se descarga hasta que la red lo pide (primer gesto). -->
+  <script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js" } }</script>
+  <link rel="stylesheet" href="css/fonts.css">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/fondo.css">
+  <link rel="stylesheet" href="css/home.css">
+  <link rel="stylesheet" href="css/lateral.css">
+  <link rel="stylesheet" href="css/lab.css">
+</head>
+<body class="inicio lab lab-index">
+  <!-- La cuadrícula. js/red.js (importado con el primer gesto) pone su canvas justo encima: la misma cuadrícula, pero reacciona al ratón. -->
+  <div class="bg-grid" aria-hidden="true"></div>
+  <a class="skip-link" href="laboratorio/experimentos.html#contenido">Saltar al contenido</a>
+  <div class="grano" aria-hidden="true"></div>
+
+  <!-- ===== Cabecera (la misma en todas las páginas) ===== -->
+  <header class="cabecera">
+    <a class="cabecera__marca" href="index.html" aria-label="Evimes, inicio">EVIMES</a>
+    <button class="cabecera__abrir" type="button" aria-expanded="false" aria-controls="cabecera-nav">Menú</button>
+    <nav class="cabecera__nav" id="cabecera-nav" aria-label="Principal">
+      <ul>
+        <li><a href="laboratorio.html" data-scramble><span class="sl">Laboratorio</span></a></li>
+        <li><a href="planes.html" data-scramble><span class="sl">Planes</span></a></li>
+        <li><a href="contacto.html" data-scramble><span class="sl">Contacto</span></a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="contenido">
+    <!-- Portada: negro con la red (js/red.js) y el titular con las franjas de las letras (js/lab/indice.js). -->
+    <section class="lab-portada" aria-labelledby="lab-h1" data-red>
+      <h1 class="lab-h1" id="lab-h1">Laboratorio</h1>
+      <p class="lab-lema">Lo que construimos cuando nadie nos pone límites.</p>
+    </section>
+
+    <!-- El índice: un experimento por línea. En escritorio, la vista previa (vídeo) sigue al cursor; en táctil,
+         aparece debajo de la línea tocada y el segundo toque abre el experimento. -->
+    <section class="lab-indice" aria-label="Experimentos">
+      <ol class="lab-lista">
+        <li><a class="lab-fila" href="laboratorio/ondas.html" data-vista="ondas"><span class="lab-nombre">Ondas</span><span class="lab-hilo" aria-hidden="true"></span><span class="lab-tec">Three.js · física · 9 movimientos</span></a></li>
+        <li><a class="lab-fila" href="laboratorio/red.html" data-vista="red"><span class="lab-nombre">Red</span><span class="lab-hilo" aria-hidden="true"></span><span class="lab-tec">WebGL · simulación en tiempo real</span></a></li>
+        <li><a class="lab-fila" href="laboratorio/destello.html" data-vista="destello"><span class="lab-nombre">Destello</span><span class="lab-hilo" aria-hidden="true"></span><span class="lab-tec">Cromo · reflejos · interacción</span></a></li>
+        <li><a class="lab-fila" href="laboratorio/oficina.html" data-vista="oficina"><span class="lab-nombre">Oficina</span><span class="lab-hilo" aria-hidden="true"></span><span class="lab-tec">Panorama 360° · cámara guiada</span></a></li>
+      </ol>
+      <!-- La vista previa: un vídeo por experimento (assets/lab/). Sin descargar nada hasta el hover o el toque. -->
+      <div class="lab-vista" hidden>
+        <div class="lab-vista__v" data-vista="ondas"><video muted loop playsinline preload="none" aria-label="Vista previa de Ondas: las dos piezas de cromo y grafito de la onda del logo, girando una alrededor de la otra." data-poster="assets/lab/ondas.webp"><source data-src="assets/lab/ondas.webm" type="video/webm"><source data-src="assets/lab/ondas.mp4" type="video/mp4"></video></div>
+        <div class="lab-vista__v" data-vista="red"><video muted loop playsinline preload="none" aria-label="Vista previa de Red: la cuadrícula se estira en naranja y rosa al pasar el cursor." data-poster="assets/lab/red.webp"><source data-src="assets/lab/red.webm" type="video/webm"><source data-src="assets/lab/red.mp4" type="video/mp4"></video></div>
+        <div class="lab-vista__v" data-vista="destello"><video muted loop playsinline preload="none" aria-label="Vista previa de Destello: una estrella de cromo con el EH grabado gira entre rayos azules y cian." data-poster="assets/lab/destello.webp"><source data-src="assets/lab/destello.webm" type="video/webm"><source data-src="assets/lab/destello.mp4" type="video/mp4"></video></div>
+        <div class="lab-vista__v" data-vista="oficina"><video muted loop playsinline preload="none" aria-label="Vista previa de Oficina: la cámara recorre el panorama 360° de la oficina de Evimes." data-poster="assets/lab/oficina.webp"><source data-src="assets/lab/oficina.webm" type="video/webm"><source data-src="assets/lab/oficina.mp4" type="video/mp4"></video></div>
+        <span class="lab-vista__toca" aria-hidden="true">Toca otra vez para abrirlo</span>
+      </div>
+    </section>
+
+    <!-- Cierre: el CTA de la web, al contacto de la home. -->
+    <section class="lab-cierre" aria-labelledby="lab-cierre-t">
+      <h2 id="lab-cierre-t">¿Quieres algo así en tu web?</h2>
+      <a class="portada__cta" href="index.html#contacto"><span>Cuéntanos tu idea</span><span class="portada__cta-f" aria-hidden="true"><svg viewBox="0 0 100 100" focusable="false"><path d="M4 50H92M58 14L94 50L58 86"/></svg></span></a>
+    </section>
+  </main>
+
+  <!-- ===== Pie ===== -->
+  <footer class="pie">
+    <div class="pie__firma">
+      <p>© 2026 Evimes · Madrid</p>
+      <a class="pie__lab" href="laboratorio.html">Laboratorio</a>
+    </div>
+    <nav aria-label="Textos legales">
+      <ul class="pie__legales">
+        <li><a href="aviso-legal.html">Aviso legal</a></li>
+        <li><a href="terminos.html">Términos</a></li>
+        <li><a href="privacidad.html">Privacidad</a></li>
+        <li><a href="cookies.html">Cookies</a></li>
+      </ul>
+    </nav>
+  </footer>
+
+  <!-- La transición: la línea fina que cruza y se abre (css/lab.css). -->
+  <div class="lab-velo" aria-hidden="true"><i class="lab-velo__a"></i><i class="lab-velo__b"></i><i class="lab-velo__p"></i><i class="lab-velo__l"></i></div>
+
+  <!-- Sin Three.js en la carga: GSAP (el bucle), las letras (js/recorrido.js) y el índice. La red (js/red.js, con su
+       Three.js) se importa con el primer gesto; los vídeos, con el hover o el toque. -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script defer src="js/recorrido.js"></script>
+  <script defer src="js/ui/menu.js"></script>
+  <script type="module" src="js/lab/indice.js"></script>
+  <script type="module" src="js/ui/scramble.js"></script>
+</body>
+</html>

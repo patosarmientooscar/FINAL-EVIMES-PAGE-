@@ -60,7 +60,7 @@ function textos(els) {
     const h = el.querySelector('h3'), p = el.querySelector('.meta p'), a = el.querySelector('.more'), n = el.querySelector('.num b'), hi = el.querySelector('.hint');
     if (h) h.textContent = d.nombre;
     if (p) p.textContent = d.frase;
-    if (a) a.href = 'servicios.html#' + d.ancla;
+    if (a) a.href = 'laboratorio.html';
     if (n && d.num) n.textContent = d.num;
     if (hi) { if (d.pista) hi.textContent = d.pista; else hi.remove(); }
   });

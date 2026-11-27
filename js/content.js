@@ -52,9 +52,9 @@ window.EVIMES_CONTENT = {
   tambien: {
     titulo: 'También hacemos',
     filas: [
-      { titulo: 'Software e IA', linea: 'Herramientas a medida que automatizan lo repetitivo.', href: 'servicios.html#ia' },
-      { titulo: 'Automatización de servicios', linea: 'Reservas, citas y avisos que funcionan solos.', href: 'servicios.html#ia' },
-      { titulo: 'Plantillas de portfolio para fotógrafos', linea: 'Un portfolio rápido y elegante, listo en días.', href: 'servicios.html' }
+      { titulo: 'Software e IA', linea: 'Herramientas a medida que automatizan lo repetitivo.', href: 'laboratorio.html#software' },
+      { titulo: 'Automatización de servicios', linea: 'Reservas, citas y avisos que funcionan solos.', href: 'laboratorio.html#software' },
+      { titulo: 'Plantillas de portfolio para fotógrafos', linea: 'Un portfolio rápido y elegante, listo en días.', href: 'laboratorio.html' }
     ]
   },
 
@@ -86,7 +86,7 @@ window.EVIMES_CONTENT = {
 
   // ===== Home nueva (index.html, fase onda). La oficina aparcada usa las claves de arriba. =====
   inicio: {
-    menu: { servicios: 'Servicios', herramientas: 'Herramientas', planes: 'Planes', contacto: 'Contacto' },
+    menu: { laboratorio: 'Laboratorio', herramientas: 'Herramientas', planes: 'Planes', contacto: 'Contacto' },
     // Hero (desde backup-pre-ondas). La línea de datos y el H1 ('Diseño web / en Madrid.') van escritos en
     // index.html; aquí, lo que se enlaza con data-c (el texto y el CTA, desde backup-pre-ajustes-ondas).
     hero: {

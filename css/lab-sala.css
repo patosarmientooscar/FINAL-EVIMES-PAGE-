@@ -1,0 +1,128 @@
+/* ==========================================================================
+   lab-sala.css — laboratorio.html, la sala 3D (desde antes-laboratorio-3d).
+   Los estilos de la sala aprobada (Downloads/evimes-laboratorio-farol/sala.html)
+   tal cual, con lo justo para vivir en la web:
+   · todo dentro de .sala (la página sigue debajo): lo que era fijo a la
+     ventana va absoluto dentro de la sala, que mide una pantalla;
+   · la cabecera de la web encima (64 px): el título y, en móvil, el mapa
+     bajan por debajo de ella; los safe-area de los móviles se respetan;
+   · debajo, el texto sin 3D (.sala-texto) y el pie. Sin WebGL
+     (html.sala-sin-3d) o sin JS, solo el texto.
+   JS: js/lab/sala.js
+   ========================================================================== */
+/* la Schibsted de la web con todo su eje de peso (el mismo archivo; ver css/lateral.css) */
+@font-face {
+  font-family: "Schibsted Lateral";
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url("../assets/fonts/schibsted-grotesk-latin.woff2") format("woff2");
+}
+
+.lab-sala-pag { --ink: #f1efea; --mut: rgba(241, 239, 234, .6); --or: #ff7a22; background: #08090b; }
+
+/* ---------- la sala: una pantalla ---------- */
+.sala {
+  --sala-top: calc(64px + env(safe-area-inset-top, 0px));     /* lo que ocupa la cabecera de la web */
+  --sala-bottom: env(safe-area-inset-bottom, 0px);
+  --sala-l: max(24px, env(safe-area-inset-left, 0px));
+  --sala-r: max(24px, env(safe-area-inset-right, 0px));
+  position: relative;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: #08090b;
+  color: var(--ink);
+  font-family: "Schibsted Lateral", "Schibsted Grotesk", system-ui, sans-serif;
+}
+.sala * { box-sizing: border-box; }
+/* base.css da a los titulares la fuente de display: aquí, la de la sala */
+.sala :is(h1, h2), .sala-texto :is(h2, h3) { font-family: "Schibsted Lateral", "Schibsted Grotesk", system-ui, sans-serif; font-variation-settings: normal; }
+.sala canvas { position: absolute; left: 0; top: 0; display: block; touch-action: none; cursor: grab; }
+.sala canvas.drag { cursor: grabbing; } .sala canvas.hot { cursor: pointer; }
+.sala .top { position: absolute; top: calc(var(--sala-top) + 14px); left: var(--sala-l); right: var(--sala-r); display: flex; justify-content: space-between; align-items: flex-start; pointer-events: none; }
+.sala .top h1 { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .24em; text-transform: uppercase; }
+.sala .top h1 span { color: var(--mut); font-weight: 500; }
+.sala .top p { margin: 0; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--mut); }
+.sala .zone { position: absolute; left: var(--sala-l); bottom: calc(96px + var(--sala-bottom)); pointer-events: none; }
+.sala .zone .n { font-size: 11px; letter-spacing: .22em; color: var(--or); font-weight: 700; }
+.sala .zone h2 { margin: 8px 0 0; font-size: clamp(28px, 4vw, 56px); font-weight: 800; line-height: .92; text-transform: uppercase; text-shadow: 0 2px 30px rgba(0, 0, 0, .5); transition: opacity .5s, transform .6s; }
+.sala .zone.out h2, .sala .zone.out .n { opacity: 0; transform: translateY(12px); }
+.sala-nav { position: absolute; left: var(--sala-l); right: var(--sala-r); bottom: calc(24px + var(--sala-bottom)); display: flex; border-top: 1px solid rgba(255, 255, 255, .18); }
+.sala-nav button { flex: 1; background: none; border: 0; color: var(--mut); padding: 14px 0 0; text-align: left; cursor: pointer; position: relative; font: 500 10.5px/1.2 "Schibsted Lateral", "Schibsted Grotesk", sans-serif; letter-spacing: .16em; text-transform: uppercase; }
+.sala-nav button b { display: block; font-weight: 700; margin-bottom: 5px; }
+.sala-nav button::before { content: ''; position: absolute; top: -1px; left: 0; height: 1px; width: 0; background: var(--or); transition: width .8s cubic-bezier(.6, 0, .2, 1); }
+.sala-nav button.on { color: var(--ink); } .sala-nav button.on b { color: var(--or); } .sala-nav button.on::before { width: 100%; }
+.sala-nav button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 4px; }
+.sala .map { position: absolute; right: var(--sala-r); bottom: calc(92px + var(--sala-bottom)); width: 120px; opacity: .92; }
+.sala .map svg { width: 100%; display: block; }
+.sala .map .z { cursor: pointer; pointer-events: all; }
+.sala .load { position: absolute; inset: 0; display: grid; place-items: center; background: #08090b; font-size: 10px; letter-spacing: .3em; text-transform: uppercase; color: var(--mut); transition: opacity .8s; }
+
+/* "Qué hay en cada zona": al texto de debajo (en móvil la sala no hace scroll: así se llega) */
+.sala-leer {
+  display: inline-flex;
+  align-items: center;
+  gap: .6em;
+  min-height: 44px;
+  margin-top: 2px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--mut);
+  text-decoration: none;
+  pointer-events: auto;
+  transition: color .3s;
+}
+.sala-leer:hover { color: var(--ink); }
+.sala-leer svg { width: .9em; height: 1em; fill: none; stroke: currentColor; stroke-width: 10; }
+.sala-leer:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+
+@media (max-width: 720px) {
+  .sala-nav button { font-size: 8.5px; letter-spacing: .08em; }
+  .sala .map { width: 86px; top: calc(var(--sala-top) + 56px); bottom: auto; }
+  .sala .zone h2 { font-size: 26px; }
+  .sala .top p { display: none; }          /* la pista ("Arrastra para mirar") no cabe junto al mapa */
+}
+
+/* ---------- debajo: lo que hay en cada zona, sin 3D (Google, y móviles sin WebGL) ---------- */
+.sala-texto {
+  --st-g: clamp(16px, 4vw, 56px);
+  padding: clamp(80px, 14vh, 160px) var(--st-g) clamp(64px, 12vh, 140px);
+  background: #08090b;
+  color: var(--ink);
+  font-family: "Schibsted Lateral", var(--font-text);
+}
+.sala-texto :where(h2, h3, p, ul, ol) { margin: 0; padding: 0; }
+.sala-texto__cab { max-width: 52ch; }
+.sala-texto__cab h2 { font-size: clamp(34px, 5.4vw, 80px); font-weight: 800; line-height: .92; letter-spacing: -.04em; text-transform: uppercase; }
+.sala-texto__cab p { margin-top: 20px; font-family: var(--font-text); font-size: clamp(16px, 1.3vw, 19px); line-height: 1.55; color: rgb(241 239 234 / .7); }
+.sala-zonas { list-style: none; margin-top: clamp(48px, 8vh, 96px); border-top: 1px solid rgb(255 255 255 / .12); }
+.sala-zona {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(0, 2fr);
+  gap: 16px clamp(24px, 4vw, 64px);
+  padding: clamp(28px, 4vh, 44px) 0;
+  border-bottom: 1px solid rgb(255 255 255 / .12);
+  scroll-margin-top: 80px;
+}
+.sala-zona__n { display: block; font-size: 11px; font-weight: 700; letter-spacing: .22em; color: var(--or); }
+.sala-zona h3 { margin-top: 8px; font-size: clamp(24px, 2.6vw, 38px); font-weight: 800; line-height: .95; letter-spacing: -.03em; text-transform: uppercase; }
+.sala-zona__k { display: block; margin-top: 10px; font-size: 11px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--mut); }
+.sala-zona__t { max-width: 62ch; font-family: var(--font-text); font-size: 16px; line-height: 1.6; color: rgb(241 239 234 / .78); }
+.sala-zona__t > * + * { margin-top: 14px; }
+.sala-zona__t ul + p { margin-top: 22px; }
+.sala-zona__t strong { color: var(--ink); font-weight: 600; }
+.sala-zona__t ul { display: flex; flex-wrap: wrap; gap: 8px 22px; list-style: none; font-size: 14px; color: rgb(241 239 234 / .66); }
+.sala-zona__t li::before { content: ""; display: inline-block; width: 4px; height: 4px; margin: 0 10px 2px 0; border-radius: 50%; background: var(--or); vertical-align: middle; }
+.sala-zona__t a { color: var(--ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .3em; text-decoration-color: rgb(241 239 234 / .35); transition: text-decoration-color .3s; }
+.sala-zona__t a:hover { text-decoration-color: currentColor; }
+.sala-texto .portada__cta { margin-top: clamp(48px, 8vh, 88px); }
+@media (max-width: 720px) {
+  .sala-zona { grid-template-columns: 1fr; }
+}
+
+/* ---------- sin JS o sin WebGL: solo el texto ---------- */
+html:not(.js) .sala, .sala-sin-3d .sala { display: none; }
+html:not(.js) .sala-texto, .sala-sin-3d .sala-texto { padding-top: calc(64px + clamp(48px, 10vh, 120px)); }
